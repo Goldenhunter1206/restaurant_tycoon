@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://b04reg56kulh2"]
+
+[ext_resource type="Script" uid="uid://b1u0txufoi1mf" path="res://scripts/agents/citizen.gd" id="1_sjepd"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_uunna"]
+radius = 0.45
+height = 1.7
+
+[node name="Citizen" type="Area3D" unique_id=1986784417]
+script = ExtResource("1_sjepd")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1439829653]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
+shape = SubResource("CapsuleShape3D_uunna")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=398215343]

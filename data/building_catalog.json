@@ -1,0 +1,7999 @@
+{
+ "families": {
+  "B1": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 1/",
+   "variants": [
+    "Building_1_1_A.glb",
+    "Building_1_1_B.glb",
+    "Building_1_1_C.glb",
+    "Building_1_1_D.glb",
+    "Building_1_1_E.glb",
+    "Building_1_1_F.glb",
+    "Building_1_1_G.glb",
+    "Building_1_1_H.glb",
+    "Building_1_1_I.glb",
+    "Building_1_1_J.glb",
+    "Building_1_1_K.glb",
+    "Building_1_1_L.glb",
+    "Building_1_1_M.glb",
+    "Building_1_1_N.glb",
+    "Building_1_1_O.glb",
+    "Building_1_1_R.glb",
+    "Building_1_2_B.glb",
+    "Building_1_2_C.glb",
+    "Building_1_2_D.glb",
+    "Building_1_2_E.glb",
+    "Building_1_2_F.glb",
+    "Building_1_2_G.glb",
+    "Building_1_2_H.glb",
+    "Building_1_2_I.glb",
+    "Building_1_2_J.glb",
+    "Building_1_2_K.glb",
+    "Building_1_2_L.glb",
+    "Building_1_2_M.glb",
+    "Building_1_2_N.glb",
+    "Building_1_2_O.glb",
+    "Building_1_2_R.glb",
+    "Building_1_3_A.glb",
+    "Building_1_3_B.glb",
+    "Building_1_3_C.glb",
+    "Building_1_3_D.glb",
+    "Building_1_3_E.glb",
+    "Building_1_3_F.glb",
+    "Building_1_3_G.glb",
+    "Building_1_3_H.glb",
+    "Building_1_3_I.glb",
+    "Building_1_3_J.glb",
+    "Building_1_3_K.glb",
+    "Building_1_3_L.glb",
+    "Building_1_3_M.glb",
+    "Building_1_3_N.glb",
+    "Building_1_3_O.glb",
+    "Building_1_3_R.glb",
+    "Building_1_4_A.glb",
+    "Building_1_4_B.glb",
+    "Building_1_4_C.glb",
+    "Building_1_4_D.glb",
+    "Building_1_4_E.glb",
+    "Building_1_4_F.glb",
+    "Building_1_4_G.glb",
+    "Building_1_4_H.glb",
+    "Building_1_4_I.glb",
+    "Building_1_4_J.glb",
+    "Building_1_4_K.glb",
+    "Building_1_4_L.glb",
+    "Building_1_4_M.glb",
+    "Building_1_4_N.glb",
+    "Building_1_4_O.glb",
+    "Building_1_4_R.glb",
+    "Building_1_5_A.glb",
+    "Building_1_5_B.glb",
+    "Building_1_5_C.glb",
+    "Building_1_5_D.glb",
+    "Building_1_5_E.glb",
+    "Building_1_5_F.glb",
+    "Building_1_5_G.glb",
+    "Building_1_5_H.glb",
+    "Building_1_5_I.glb",
+    "Building_1_5_J.glb",
+    "Building_1_5_K.glb",
+    "Building_1_5_L.glb",
+    "Building_1_5_M.glb",
+    "Building_1_5_N.glb",
+    "Building_1_5_O.glb",
+    "Building_1_5_R.glb",
+    "Building_1_A.glb",
+    "Building_1_AA.glb",
+    "Building_1_B.glb",
+    "Building_1_BB.glb",
+    "Building_1_C.glb",
+    "Building_1_D.glb",
+    "Building_1_E.glb",
+    "Building_1_F.glb",
+    "Building_1_G.glb",
+    "Building_1_H.glb",
+    "Building_1_I.glb"
+   ],
+   "sizes": {
+    "Building_1_1_A.glb": [
+     8.2,
+     10.5,
+     3.4,
+     -0.2,
+     0.1
+    ],
+    "Building_1_1_B.glb": [
+     8.2,
+     10.5,
+     3.4,
+     -0.2,
+     0.1
+    ],
+    "Building_1_1_C.glb": [
+     8.2,
+     10.5,
+     3.4,
+     -0.2,
+     0.1
+    ],
+    "Building_1_1_D.glb": [
+     8.2,
+     10.5,
+     3.4,
+     -0.2,
+     0.1
+    ],
+    "Building_1_1_E.glb": [
+     8.2,
+     10.5,
+     3.4,
+     -0.2,
+     0.1
+    ],
+    "Building_1_1_F.glb": [
+     8.2,
+     10.5,
+     3.4,
+     -0.2,
+     0.1
+    ],
+    "Building_1_1_G.glb": [
+     8.2,
+     10.5,
+     3.4,
+     -0.2,
+     0.1
+    ],
+    "Building_1_1_H.glb": [
+     8.2,
+     10.5,
+     3.4,
+     -0.2,
+     0.1
+    ],
+    "Building_1_1_I.glb": [
+     8.2,
+     10.5,
+     3.4,
+     -0.2,
+     0.1
+    ],
+    "Building_1_1_J.glb": [
+     8.2,
+     10.5,
+     3.4,
+     -0.2,
+     0.1
+    ],
+    "Building_1_1_K.glb": [
+     8.2,
+     10.5,
+     3.4,
+     -0.2,
+     0.1
+    ],
+    "Building_1_1_L.glb": [
+     8.2,
+     10.5,
+     3.4,
+     -0.2,
+     0.1
+    ],
+    "Building_1_1_M.glb": [
+     8.2,
+     10.5,
+     3.4,
+     -0.2,
+     0.1
+    ],
+    "Building_1_1_N.glb": [
+     8.2,
+     10.5,
+     3.4,
+     -0.2,
+     0.1
+    ],
+    "Building_1_1_O.glb": [
+     8.2,
+     10.5,
+     3.4,
+     -0.2,
+     0.1
+    ],
+    "Building_1_1_R.glb": [
+     8.2,
+     10.5,
+     3.4,
+     -0.2,
+     0.1
+    ],
+    "Building_1_2_B.glb": [
+     8.4,
+     10.6,
+     6.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_2_C.glb": [
+     8.4,
+     10.6,
+     6.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_2_D.glb": [
+     8.4,
+     10.6,
+     6.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_2_E.glb": [
+     8.4,
+     10.6,
+     6.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_2_F.glb": [
+     8.4,
+     10.6,
+     6.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_2_G.glb": [
+     8.4,
+     10.6,
+     6.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_2_H.glb": [
+     8.4,
+     10.6,
+     6.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_2_I.glb": [
+     8.4,
+     10.6,
+     6.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_2_J.glb": [
+     8.4,
+     10.6,
+     6.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_2_K.glb": [
+     8.4,
+     10.6,
+     6.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_2_L.glb": [
+     8.4,
+     10.6,
+     6.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_2_M.glb": [
+     8.4,
+     10.6,
+     6.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_2_N.glb": [
+     8.4,
+     10.6,
+     6.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_2_O.glb": [
+     8.4,
+     10.6,
+     6.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_2_R.glb": [
+     8.4,
+     10.6,
+     6.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_3_A.glb": [
+     8.4,
+     10.6,
+     9.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_3_B.glb": [
+     8.4,
+     10.6,
+     9.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_3_C.glb": [
+     8.4,
+     10.6,
+     9.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_3_D.glb": [
+     8.4,
+     10.6,
+     9.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_3_E.glb": [
+     8.4,
+     10.6,
+     9.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_3_F.glb": [
+     8.4,
+     10.6,
+     9.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_3_G.glb": [
+     8.4,
+     10.6,
+     9.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_3_H.glb": [
+     8.4,
+     10.6,
+     9.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_3_I.glb": [
+     8.4,
+     10.6,
+     9.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_3_J.glb": [
+     8.4,
+     10.6,
+     9.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_3_K.glb": [
+     8.4,
+     10.6,
+     9.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_3_L.glb": [
+     8.4,
+     10.6,
+     9.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_3_M.glb": [
+     8.4,
+     10.6,
+     9.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_3_N.glb": [
+     8.4,
+     10.6,
+     9.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_3_O.glb": [
+     8.4,
+     10.6,
+     9.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_3_R.glb": [
+     8.4,
+     10.6,
+     9.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_4_A.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_4_B.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_4_C.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_4_D.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_4_E.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_4_F.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_4_G.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_4_H.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_4_I.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_4_J.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_4_K.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_4_L.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_4_M.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_4_N.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_4_O.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_4_R.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_5_A.glb": [
+     8.5,
+     10.7,
+     15.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_5_B.glb": [
+     8.5,
+     10.7,
+     15.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_5_C.glb": [
+     8.5,
+     10.7,
+     15.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_5_D.glb": [
+     8.5,
+     10.7,
+     15.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_5_E.glb": [
+     8.5,
+     10.7,
+     15.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_5_F.glb": [
+     8.5,
+     10.7,
+     15.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_5_G.glb": [
+     8.5,
+     10.7,
+     15.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_5_H.glb": [
+     8.5,
+     10.7,
+     15.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_5_I.glb": [
+     8.5,
+     10.7,
+     15.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_5_J.glb": [
+     8.5,
+     10.7,
+     15.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_5_K.glb": [
+     8.5,
+     10.7,
+     15.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_5_L.glb": [
+     8.5,
+     10.7,
+     15.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_5_M.glb": [
+     8.5,
+     10.7,
+     15.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_5_N.glb": [
+     8.5,
+     10.7,
+     15.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_5_O.glb": [
+     8.5,
+     10.7,
+     15.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_5_R.glb": [
+     8.5,
+     10.7,
+     15.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_A.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_AA.glb": [
+     8.4,
+     10.6,
+     6.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_B.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_BB.glb": [
+     8.4,
+     10.6,
+     6.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_C.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_D.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_E.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_F.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_G.glb": [
+     8.4,
+     10.6,
+     12.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_H.glb": [
+     8.4,
+     10.6,
+     6.0,
+     -0.3,
+     0.0
+    ],
+    "Building_1_I.glb": [
+     8.4,
+     10.6,
+     6.0,
+     -0.3,
+     0.0
+    ]
+   }
+  },
+  "B2": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building_2/",
+   "variants": [
+    "Building_2_1_A.glb",
+    "Building_2_1_B.glb",
+    "Building_2_1_C.glb",
+    "Building_2_1_D.glb",
+    "Building_2_1_E.glb",
+    "Building_2_1_F.glb",
+    "Building_2_1_G.glb",
+    "Building_2_1_H.glb",
+    "Building_2_1_I.glb",
+    "Building_2_1_J.glb",
+    "Building_2_2_A.glb",
+    "Building_2_2_B.glb",
+    "Building_2_2_C.glb",
+    "Building_2_2_D.glb",
+    "Building_2_2_E.glb",
+    "Building_2_2_F.glb",
+    "Building_2_2_G.glb",
+    "Building_2_2_H.glb",
+    "Building_2_2_I.glb",
+    "Building_2_2_J.glb",
+    "Building_2_3_A.glb",
+    "Building_2_3_B.glb",
+    "Building_2_3_C.glb",
+    "Building_2_3_D.glb",
+    "Building_2_3_E.glb",
+    "Building_2_3_F.glb",
+    "Building_2_3_G.glb",
+    "Building_2_3_H.glb",
+    "Building_2_3_I.glb",
+    "Building_2_3_J.glb",
+    "Building_2_4_A.glb",
+    "Building_2_4_B.glb",
+    "Building_2_4_C.glb",
+    "Building_2_4_D.glb",
+    "Building_2_4_E.glb",
+    "Building_2_4_F.glb",
+    "Building_2_4_G.glb",
+    "Building_2_4_H.glb",
+    "Building_2_4_I.glb",
+    "Building_2_4_J.glb",
+    "Building_2_5_A.glb",
+    "Building_2_5_B.glb",
+    "Building_2_5_C.glb",
+    "Building_2_5_D.glb",
+    "Building_2_5_E.glb",
+    "Building_2_5_F.glb",
+    "Building_2_5_G.glb",
+    "Building_2_5_H.glb",
+    "Building_2_5_I.glb",
+    "Building_2_5_J.glb",
+    "Building_2_6_A.glb",
+    "Building_2_6_B.glb",
+    "Building_2_6_C.glb",
+    "Building_2_6_D.glb",
+    "Building_2_6_E.glb",
+    "Building_2_6_F.glb",
+    "Building_2_6_G.glb",
+    "Building_2_6_H.glb",
+    "Building_2_6_I.glb",
+    "Building_2_6_J.glb",
+    "Building_2_7_A.glb",
+    "Building_2_7_B.glb",
+    "Building_2_7_C.glb",
+    "Building_2_7_D.glb",
+    "Building_2_7_E.glb",
+    "Building_2_7_F.glb",
+    "Building_2_7_G.glb",
+    "Building_2_7_H.glb",
+    "Building_2_7_I.glb",
+    "Building_2_7_J.glb",
+    "Building_2_8_A.glb",
+    "Building_2_8_B.glb",
+    "Building_2_8_C.glb",
+    "Building_2_8_D.glb",
+    "Building_2_8_E.glb",
+    "Building_2_8_F.glb",
+    "Building_2_8_G.glb",
+    "Building_2_8_H.glb",
+    "Building_2_8_I.glb",
+    "Building_2_8_J.glb"
+   ],
+   "sizes": {
+    "Building_2_1_A.glb": [
+     7.5,
+     6.8,
+     6.2,
+     -0.7,
+     -3.4
+    ],
+    "Building_2_1_B.glb": [
+     7.5,
+     6.8,
+     6.2,
+     -0.7,
+     -3.4
+    ],
+    "Building_2_1_C.glb": [
+     7.5,
+     6.8,
+     6.2,
+     -0.7,
+     -3.4
+    ],
+    "Building_2_1_D.glb": [
+     7.5,
+     6.8,
+     6.2,
+     -0.7,
+     -3.4
+    ],
+    "Building_2_1_E.glb": [
+     7.5,
+     6.8,
+     6.2,
+     -0.7,
+     -3.4
+    ],
+    "Building_2_1_F.glb": [
+     7.5,
+     6.8,
+     6.2,
+     -0.7,
+     -3.4
+    ],
+    "Building_2_1_G.glb": [
+     7.5,
+     6.8,
+     6.2,
+     -0.7,
+     -3.4
+    ],
+    "Building_2_1_H.glb": [
+     7.5,
+     6.8,
+     6.2,
+     -0.7,
+     -3.4
+    ],
+    "Building_2_1_I.glb": [
+     7.5,
+     6.8,
+     6.2,
+     -0.7,
+     -3.4
+    ],
+    "Building_2_1_J.glb": [
+     7.5,
+     6.8,
+     6.2,
+     -0.7,
+     -3.4
+    ],
+    "Building_2_2_A.glb": [
+     7.5,
+     11.9,
+     6.2,
+     -0.7,
+     -6.0
+    ],
+    "Building_2_2_B.glb": [
+     7.5,
+     11.9,
+     6.2,
+     -0.7,
+     -6.0
+    ],
+    "Building_2_2_C.glb": [
+     7.5,
+     11.9,
+     6.2,
+     -0.7,
+     -6.0
+    ],
+    "Building_2_2_D.glb": [
+     7.5,
+     11.9,
+     6.2,
+     -0.7,
+     -6.0
+    ],
+    "Building_2_2_E.glb": [
+     7.5,
+     11.9,
+     6.2,
+     -0.7,
+     -6.0
+    ],
+    "Building_2_2_F.glb": [
+     7.5,
+     11.9,
+     6.2,
+     -0.7,
+     -6.0
+    ],
+    "Building_2_2_G.glb": [
+     7.5,
+     11.9,
+     6.2,
+     -0.7,
+     -6.0
+    ],
+    "Building_2_2_H.glb": [
+     7.5,
+     11.9,
+     6.2,
+     -0.7,
+     -6.0
+    ],
+    "Building_2_2_I.glb": [
+     7.5,
+     11.9,
+     6.2,
+     -0.7,
+     -6.0
+    ],
+    "Building_2_2_J.glb": [
+     7.5,
+     11.9,
+     6.2,
+     -0.7,
+     -6.0
+    ],
+    "Building_2_3_A.glb": [
+     6.2,
+     6.0,
+     6.2,
+     0.9,
+     -2.9
+    ],
+    "Building_2_3_B.glb": [
+     6.2,
+     6.0,
+     6.2,
+     0.9,
+     -2.9
+    ],
+    "Building_2_3_C.glb": [
+     6.2,
+     6.0,
+     6.2,
+     0.9,
+     -2.9
+    ],
+    "Building_2_3_D.glb": [
+     6.2,
+     6.0,
+     6.2,
+     0.9,
+     -2.9
+    ],
+    "Building_2_3_E.glb": [
+     6.2,
+     6.0,
+     6.2,
+     0.9,
+     -2.9
+    ],
+    "Building_2_3_F.glb": [
+     6.2,
+     6.0,
+     6.2,
+     0.9,
+     -2.9
+    ],
+    "Building_2_3_G.glb": [
+     6.2,
+     6.0,
+     6.2,
+     0.9,
+     -2.9
+    ],
+    "Building_2_3_H.glb": [
+     6.2,
+     6.0,
+     6.2,
+     0.9,
+     -2.9
+    ],
+    "Building_2_3_I.glb": [
+     6.2,
+     6.0,
+     6.2,
+     0.9,
+     -2.9
+    ],
+    "Building_2_3_J.glb": [
+     6.2,
+     6.0,
+     6.2,
+     0.9,
+     -2.9
+    ],
+    "Building_2_4_A.glb": [
+     7.5,
+     9.3,
+     6.2,
+     -0.7,
+     -4.6
+    ],
+    "Building_2_4_B.glb": [
+     7.5,
+     9.3,
+     6.2,
+     -0.7,
+     -4.6
+    ],
+    "Building_2_4_C.glb": [
+     7.5,
+     9.3,
+     6.2,
+     -0.7,
+     -4.6
+    ],
+    "Building_2_4_D.glb": [
+     7.5,
+     9.3,
+     6.2,
+     -0.7,
+     -4.6
+    ],
+    "Building_2_4_E.glb": [
+     7.5,
+     9.3,
+     6.2,
+     -0.7,
+     -4.6
+    ],
+    "Building_2_4_F.glb": [
+     7.5,
+     9.3,
+     6.2,
+     -0.7,
+     -4.6
+    ],
+    "Building_2_4_G.glb": [
+     7.5,
+     9.3,
+     6.2,
+     -0.7,
+     -4.6
+    ],
+    "Building_2_4_H.glb": [
+     7.5,
+     9.3,
+     6.2,
+     -0.7,
+     -4.6
+    ],
+    "Building_2_4_I.glb": [
+     7.5,
+     9.3,
+     6.2,
+     -0.7,
+     -4.6
+    ],
+    "Building_2_4_J.glb": [
+     7.5,
+     9.3,
+     6.2,
+     -0.7,
+     -4.6
+    ],
+    "Building_2_5_A.glb": [
+     6.2,
+     11.0,
+     6.2,
+     0.0,
+     -5.5
+    ],
+    "Building_2_5_B.glb": [
+     6.2,
+     11.0,
+     6.2,
+     0.0,
+     -5.5
+    ],
+    "Building_2_5_C.glb": [
+     6.2,
+     11.0,
+     6.2,
+     0.0,
+     -5.5
+    ],
+    "Building_2_5_D.glb": [
+     6.2,
+     11.0,
+     6.2,
+     0.0,
+     -5.5
+    ],
+    "Building_2_5_E.glb": [
+     6.2,
+     11.0,
+     6.2,
+     0.0,
+     -5.5
+    ],
+    "Building_2_5_F.glb": [
+     6.2,
+     11.0,
+     6.2,
+     0.0,
+     -5.5
+    ],
+    "Building_2_5_G.glb": [
+     6.2,
+     11.0,
+     6.2,
+     0.0,
+     -5.5
+    ],
+    "Building_2_5_H.glb": [
+     6.2,
+     11.0,
+     6.2,
+     0.0,
+     -5.5
+    ],
+    "Building_2_5_I.glb": [
+     6.2,
+     11.0,
+     6.2,
+     0.0,
+     -5.5
+    ],
+    "Building_2_5_J.glb": [
+     6.2,
+     11.0,
+     6.2,
+     0.0,
+     -5.5
+    ],
+    "Building_2_6_A.glb": [
+     6.2,
+     8.4,
+     6.2,
+     0.0,
+     -4.2
+    ],
+    "Building_2_6_B.glb": [
+     6.2,
+     8.4,
+     6.2,
+     0.0,
+     -4.2
+    ],
+    "Building_2_6_C.glb": [
+     6.2,
+     8.4,
+     6.2,
+     0.0,
+     -4.2
+    ],
+    "Building_2_6_D.glb": [
+     6.2,
+     8.4,
+     6.2,
+     0.0,
+     -4.2
+    ],
+    "Building_2_6_E.glb": [
+     6.2,
+     8.4,
+     6.2,
+     0.0,
+     -4.2
+    ],
+    "Building_2_6_F.glb": [
+     6.2,
+     8.4,
+     6.2,
+     0.0,
+     -4.2
+    ],
+    "Building_2_6_G.glb": [
+     6.2,
+     8.4,
+     6.2,
+     0.0,
+     -4.2
+    ],
+    "Building_2_6_H.glb": [
+     6.2,
+     8.4,
+     6.2,
+     0.0,
+     -4.2
+    ],
+    "Building_2_6_I.glb": [
+     6.2,
+     8.4,
+     6.2,
+     0.0,
+     -4.2
+    ],
+    "Building_2_6_J.glb": [
+     6.2,
+     8.4,
+     6.2,
+     0.0,
+     -4.2
+    ],
+    "Building_2_7_A.glb": [
+     7.5,
+     9.3,
+     6.2,
+     -0.7,
+     -4.6
+    ],
+    "Building_2_7_B.glb": [
+     7.5,
+     9.3,
+     6.2,
+     -0.7,
+     -4.6
+    ],
+    "Building_2_7_C.glb": [
+     7.5,
+     9.3,
+     6.2,
+     -0.7,
+     -4.6
+    ],
+    "Building_2_7_D.glb": [
+     7.5,
+     9.3,
+     6.2,
+     -0.7,
+     -4.6
+    ],
+    "Building_2_7_E.glb": [
+     7.5,
+     9.3,
+     6.2,
+     -0.7,
+     -4.6
+    ],
+    "Building_2_7_F.glb": [
+     7.5,
+     9.3,
+     6.2,
+     -0.7,
+     -4.6
+    ],
+    "Building_2_7_G.glb": [
+     7.5,
+     9.3,
+     6.2,
+     -0.7,
+     -4.6
+    ],
+    "Building_2_7_H.glb": [
+     7.5,
+     9.3,
+     6.2,
+     -0.7,
+     -4.6
+    ],
+    "Building_2_7_I.glb": [
+     7.5,
+     9.3,
+     6.2,
+     -0.7,
+     -4.6
+    ],
+    "Building_2_7_J.glb": [
+     7.5,
+     9.3,
+     6.2,
+     -0.7,
+     -4.6
+    ],
+    "Building_2_8_A.glb": [
+     7.5,
+     11.9,
+     6.2,
+     -0.7,
+     -6.0
+    ],
+    "Building_2_8_B.glb": [
+     7.5,
+     11.9,
+     6.2,
+     -0.7,
+     -6.0
+    ],
+    "Building_2_8_C.glb": [
+     7.5,
+     11.9,
+     6.2,
+     -0.7,
+     -6.0
+    ],
+    "Building_2_8_D.glb": [
+     7.5,
+     11.9,
+     6.2,
+     -0.7,
+     -6.0
+    ],
+    "Building_2_8_E.glb": [
+     7.5,
+     11.9,
+     6.2,
+     -0.7,
+     -6.0
+    ],
+    "Building_2_8_F.glb": [
+     7.5,
+     11.9,
+     6.2,
+     -0.7,
+     -6.0
+    ],
+    "Building_2_8_G.glb": [
+     7.5,
+     11.9,
+     6.2,
+     -0.7,
+     -6.0
+    ],
+    "Building_2_8_H.glb": [
+     7.5,
+     11.9,
+     6.2,
+     -0.7,
+     -6.0
+    ],
+    "Building_2_8_I.glb": [
+     7.5,
+     11.9,
+     6.2,
+     -0.7,
+     -6.0
+    ],
+    "Building_2_8_J.glb": [
+     7.5,
+     11.9,
+     6.2,
+     -0.7,
+     -6.0
+    ]
+   }
+  },
+  "B3": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 3/",
+   "variants": [
+    "Building_3_1_A.glb",
+    "Building_3_1_B.glb",
+    "Building_3_1_C.glb",
+    "Building_3_1_D.glb",
+    "Building_3_1_E.glb",
+    "Building_3_1_F.glb",
+    "Building_3_2_A.glb",
+    "Building_3_2_B.glb",
+    "Building_3_2_C.glb",
+    "Building_3_2_D.glb",
+    "Building_3_2_E.glb",
+    "Building_3_2_F.glb",
+    "Building_3_2_G.glb",
+    "Building_3_2_H.glb",
+    "Building_3_2_I.glb",
+    "Building_3_2_J.glb",
+    "Building_3_2_K.glb",
+    "Building_3_2_L.glb",
+    "Building_3_3_A.glb",
+    "Building_3_3_B.glb",
+    "Building_3_3_C.glb",
+    "Building_3_3_D.glb",
+    "Building_3_3_E.glb",
+    "Building_3_3_F.glb",
+    "Building_3_3_G.glb",
+    "Building_3_3_H.glb",
+    "Building_3_3_I.glb",
+    "Building_3_3_J.glb",
+    "Building_3_3_K.glb",
+    "Building_3_3_L.glb",
+    "Building_3_4_A.glb",
+    "Building_3_4_B.glb",
+    "Building_3_4_C.glb",
+    "Building_3_4_D.glb",
+    "Building_3_4_E.glb",
+    "Building_3_4_F.glb",
+    "Building_3_4_G.glb"
+   ],
+   "sizes": {
+    "Building_3_1_A.glb": [
+     8.2,
+     3.7,
+     8.1,
+     -2.3,
+     -1.9
+    ],
+    "Building_3_1_B.glb": [
+     8.2,
+     3.7,
+     8.1,
+     -2.3,
+     -1.9
+    ],
+    "Building_3_1_C.glb": [
+     8.2,
+     3.7,
+     8.1,
+     -2.3,
+     -1.9
+    ],
+    "Building_3_1_D.glb": [
+     8.2,
+     3.7,
+     8.1,
+     -2.3,
+     -1.9
+    ],
+    "Building_3_1_E.glb": [
+     8.2,
+     3.7,
+     8.1,
+     -2.3,
+     -1.9
+    ],
+    "Building_3_1_F.glb": [
+     8.2,
+     3.7,
+     8.1,
+     -2.3,
+     -1.9
+    ],
+    "Building_3_2_A.glb": [
+     8.2,
+     7.3,
+     8.2,
+     -2.3,
+     -3.6
+    ],
+    "Building_3_2_B.glb": [
+     8.2,
+     7.3,
+     8.2,
+     -2.3,
+     -3.6
+    ],
+    "Building_3_2_C.glb": [
+     8.2,
+     7.3,
+     8.2,
+     -2.3,
+     -3.6
+    ],
+    "Building_3_2_D.glb": [
+     8.2,
+     7.3,
+     8.2,
+     -2.3,
+     -3.6
+    ],
+    "Building_3_2_E.glb": [
+     8.2,
+     7.3,
+     8.2,
+     -2.3,
+     -3.6
+    ],
+    "Building_3_2_F.glb": [
+     8.2,
+     7.3,
+     8.2,
+     -2.3,
+     -3.6
+    ],
+    "Building_3_2_G.glb": [
+     8.2,
+     7.3,
+     8.2,
+     -2.3,
+     -3.6
+    ],
+    "Building_3_2_H.glb": [
+     8.2,
+     7.3,
+     8.2,
+     -2.3,
+     -3.6
+    ],
+    "Building_3_2_I.glb": [
+     8.2,
+     7.3,
+     8.2,
+     -2.3,
+     -3.6
+    ],
+    "Building_3_2_J.glb": [
+     8.2,
+     7.3,
+     8.2,
+     -2.3,
+     -3.6
+    ],
+    "Building_3_2_K.glb": [
+     8.2,
+     7.3,
+     8.2,
+     -2.3,
+     -3.6
+    ],
+    "Building_3_2_L.glb": [
+     8.2,
+     7.3,
+     8.2,
+     -2.3,
+     -3.6
+    ],
+    "Building_3_3_A.glb": [
+     8.1,
+     13.8,
+     8.4,
+     -2.1,
+     -6.9
+    ],
+    "Building_3_3_B.glb": [
+     8.1,
+     13.8,
+     8.4,
+     -2.1,
+     -6.9
+    ],
+    "Building_3_3_C.glb": [
+     8.1,
+     13.8,
+     8.4,
+     -2.1,
+     -6.9
+    ],
+    "Building_3_3_D.glb": [
+     8.1,
+     13.8,
+     8.4,
+     -2.1,
+     -6.9
+    ],
+    "Building_3_3_E.glb": [
+     8.1,
+     13.8,
+     8.4,
+     -2.1,
+     -6.9
+    ],
+    "Building_3_3_F.glb": [
+     8.1,
+     13.8,
+     8.4,
+     -2.1,
+     -6.9
+    ],
+    "Building_3_3_G.glb": [
+     8.1,
+     13.8,
+     8.4,
+     -2.1,
+     -6.9
+    ],
+    "Building_3_3_H.glb": [
+     8.1,
+     13.8,
+     8.4,
+     -2.1,
+     -6.9
+    ],
+    "Building_3_3_I.glb": [
+     8.1,
+     13.8,
+     8.4,
+     -2.1,
+     -6.9
+    ],
+    "Building_3_3_J.glb": [
+     8.1,
+     13.8,
+     8.4,
+     -2.1,
+     -6.9
+    ],
+    "Building_3_3_K.glb": [
+     8.1,
+     13.8,
+     8.4,
+     -2.1,
+     -6.9
+    ],
+    "Building_3_3_L.glb": [
+     8.1,
+     13.8,
+     8.4,
+     -2.1,
+     -6.9
+    ],
+    "Building_3_4_A.glb": [
+     8.1,
+     20.4,
+     8.4,
+     -2.1,
+     -10.2
+    ],
+    "Building_3_4_B.glb": [
+     8.1,
+     20.4,
+     8.4,
+     -2.1,
+     -10.2
+    ],
+    "Building_3_4_C.glb": [
+     8.1,
+     20.4,
+     8.4,
+     -2.1,
+     -10.2
+    ],
+    "Building_3_4_D.glb": [
+     8.1,
+     20.4,
+     8.4,
+     -2.1,
+     -10.2
+    ],
+    "Building_3_4_E.glb": [
+     8.1,
+     20.4,
+     8.4,
+     -2.1,
+     -10.2
+    ],
+    "Building_3_4_F.glb": [
+     8.1,
+     20.4,
+     8.4,
+     -2.1,
+     -10.2
+    ],
+    "Building_3_4_G.glb": [
+     8.1,
+     8.4,
+     20.4,
+     -2.1,
+     -0.0
+    ]
+   }
+  },
+  "B4": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 4/",
+   "variants": [
+    "Building_4_A.glb",
+    "Building_4_B.glb",
+    "Building_4_C.glb",
+    "Building_4_D.glb",
+    "Building_4_E.glb",
+    "Building_4_F.glb",
+    "Building_4_G.glb",
+    "Building_4_H.glb",
+    "Building_4_I.glb",
+    "Building_4_J.glb",
+    "Building_4_K.glb",
+    "Building_4_L.glb"
+   ],
+   "sizes": {
+    "Building_4_A.glb": [
+     15.8,
+     11.9,
+     18.6,
+     2.4,
+     0.0
+    ],
+    "Building_4_B.glb": [
+     15.8,
+     11.9,
+     18.6,
+     2.4,
+     0.0
+    ],
+    "Building_4_C.glb": [
+     15.8,
+     11.9,
+     18.6,
+     2.4,
+     0.0
+    ],
+    "Building_4_D.glb": [
+     15.8,
+     11.9,
+     18.6,
+     2.4,
+     0.0
+    ],
+    "Building_4_E.glb": [
+     15.8,
+     11.9,
+     18.6,
+     2.4,
+     0.0
+    ],
+    "Building_4_F.glb": [
+     15.8,
+     11.9,
+     18.6,
+     2.4,
+     0.0
+    ],
+    "Building_4_G.glb": [
+     15.8,
+     11.9,
+     18.6,
+     2.4,
+     0.0
+    ],
+    "Building_4_H.glb": [
+     15.8,
+     11.9,
+     18.6,
+     2.4,
+     0.0
+    ],
+    "Building_4_I.glb": [
+     15.8,
+     11.9,
+     18.6,
+     2.4,
+     0.0
+    ],
+    "Building_4_J.glb": [
+     15.8,
+     11.9,
+     18.6,
+     2.4,
+     0.0
+    ],
+    "Building_4_K.glb": [
+     15.8,
+     11.9,
+     18.6,
+     2.4,
+     0.0
+    ],
+    "Building_4_L.glb": [
+     15.8,
+     11.9,
+     18.6,
+     2.4,
+     0.0
+    ]
+   }
+  },
+  "B5": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 5/",
+   "variants": [
+    "Building_5_1_B.glb",
+    "Building_5_1_C.glb",
+    "Building_5_1_D.glb",
+    "Building_5_1_E.glb",
+    "Building_5_1_F.glb",
+    "Building_5_1_G.glb",
+    "Building_5_1_H.glb",
+    "Building_5_1_I.glb",
+    "Building_5_1_J.glb",
+    "Building_5_1_K.glb",
+    "Building_5_1_L.glb",
+    "Building_5_1_M.glb",
+    "Building_5_1_N.glb",
+    "Building_5_1_O.glb",
+    "Building_5_1_R.glb",
+    "Building_5_2_B.glb",
+    "Building_5_2_C.glb",
+    "Building_5_2_D.glb",
+    "Building_5_2_E.glb",
+    "Building_5_2_F.glb",
+    "Building_5_2_G.glb",
+    "Building_5_2_H.glb",
+    "Building_5_2_I.glb",
+    "Building_5_2_J.glb",
+    "Building_5_2_K.glb",
+    "Building_5_2_L.glb",
+    "Building_5_2_M.glb",
+    "Building_5_2_N.glb",
+    "Building_5_2_O.glb",
+    "Building_5_2_R.glb",
+    "Building_5_3_B.glb",
+    "Building_5_3_C.glb",
+    "Building_5_3_D.glb",
+    "Building_5_3_E.glb",
+    "Building_5_3_F.glb",
+    "Building_5_3_G.glb",
+    "Building_5_3_H.glb",
+    "Building_5_3_I.glb",
+    "Building_5_3_J.glb",
+    "Building_5_3_K.glb",
+    "Building_5_3_L.glb",
+    "Building_5_3_M.glb",
+    "Building_5_3_N.glb",
+    "Building_5_3_O.glb",
+    "Building_5_3_R.glb",
+    "Building_5_4_B.glb",
+    "Building_5_4_C.glb",
+    "Building_5_4_D.glb",
+    "Building_5_4_E.glb",
+    "Building_5_4_F.glb",
+    "Building_5_4_G.glb",
+    "Building_5_4_H.glb",
+    "Building_5_4_I.glb",
+    "Building_5_4_J.glb",
+    "Building_5_4_K.glb",
+    "Building_5_4_L.glb",
+    "Building_5_4_M.glb",
+    "Building_5_4_N.glb",
+    "Building_5_4_O.glb",
+    "Building_5_4_R.glb"
+   ],
+   "sizes": {
+    "Building_5_1_B.glb": [
+     12.5,
+     19.1,
+     8.0,
+     -0.4,
+     0.0
+    ],
+    "Building_5_1_C.glb": [
+     12.5,
+     19.1,
+     8.0,
+     -0.4,
+     0.0
+    ],
+    "Building_5_1_D.glb": [
+     12.5,
+     19.1,
+     8.0,
+     -0.4,
+     0.0
+    ],
+    "Building_5_1_E.glb": [
+     12.5,
+     19.1,
+     8.0,
+     -0.4,
+     0.0
+    ],
+    "Building_5_1_F.glb": [
+     12.5,
+     19.1,
+     8.0,
+     -0.4,
+     0.0
+    ],
+    "Building_5_1_G.glb": [
+     12.5,
+     19.1,
+     8.0,
+     -0.4,
+     0.0
+    ],
+    "Building_5_1_H.glb": [
+     12.5,
+     19.1,
+     8.0,
+     -0.4,
+     0.0
+    ],
+    "Building_5_1_I.glb": [
+     12.5,
+     19.1,
+     8.0,
+     -0.4,
+     0.0
+    ],
+    "Building_5_1_J.glb": [
+     12.5,
+     19.1,
+     8.0,
+     -0.4,
+     0.0
+    ],
+    "Building_5_1_K.glb": [
+     12.5,
+     19.1,
+     8.0,
+     -0.4,
+     0.0
+    ],
+    "Building_5_1_L.glb": [
+     12.5,
+     19.1,
+     8.0,
+     -0.4,
+     0.0
+    ],
+    "Building_5_1_M.glb": [
+     12.5,
+     19.1,
+     8.0,
+     -0.4,
+     0.0
+    ],
+    "Building_5_1_N.glb": [
+     12.5,
+     19.1,
+     8.0,
+     -0.4,
+     0.0
+    ],
+    "Building_5_1_O.glb": [
+     12.5,
+     19.1,
+     8.0,
+     -0.4,
+     0.0
+    ],
+    "Building_5_1_R.glb": [
+     12.5,
+     19.1,
+     8.0,
+     -0.4,
+     0.0
+    ],
+    "Building_5_2_B.glb": [
+     12.5,
+     19.1,
+     11.3,
+     -0.4,
+     0.0
+    ],
+    "Building_5_2_C.glb": [
+     12.5,
+     19.1,
+     11.3,
+     -0.4,
+     0.0
+    ],
+    "Building_5_2_D.glb": [
+     12.5,
+     19.1,
+     11.3,
+     -0.4,
+     0.0
+    ],
+    "Building_5_2_E.glb": [
+     12.5,
+     19.1,
+     11.3,
+     -0.4,
+     0.0
+    ],
+    "Building_5_2_F.glb": [
+     12.5,
+     19.1,
+     11.3,
+     -0.4,
+     0.0
+    ],
+    "Building_5_2_G.glb": [
+     12.5,
+     19.1,
+     11.3,
+     -0.4,
+     0.0
+    ],
+    "Building_5_2_H.glb": [
+     12.5,
+     19.1,
+     11.3,
+     -0.4,
+     0.0
+    ],
+    "Building_5_2_I.glb": [
+     12.5,
+     19.1,
+     11.3,
+     -0.4,
+     0.0
+    ],
+    "Building_5_2_J.glb": [
+     12.5,
+     19.1,
+     11.3,
+     -0.4,
+     0.0
+    ],
+    "Building_5_2_K.glb": [
+     12.5,
+     19.1,
+     11.3,
+     -0.4,
+     0.0
+    ],
+    "Building_5_2_L.glb": [
+     12.5,
+     19.1,
+     11.3,
+     -0.4,
+     0.0
+    ],
+    "Building_5_2_M.glb": [
+     12.5,
+     19.1,
+     11.3,
+     -0.4,
+     0.0
+    ],
+    "Building_5_2_N.glb": [
+     12.5,
+     19.1,
+     11.3,
+     -0.4,
+     0.0
+    ],
+    "Building_5_2_O.glb": [
+     12.5,
+     19.1,
+     11.3,
+     -0.4,
+     0.0
+    ],
+    "Building_5_2_R.glb": [
+     12.5,
+     19.1,
+     11.3,
+     -0.4,
+     0.0
+    ],
+    "Building_5_3_B.glb": [
+     12.5,
+     19.1,
+     14.5,
+     -0.4,
+     0.0
+    ],
+    "Building_5_3_C.glb": [
+     12.5,
+     19.1,
+     14.5,
+     -0.4,
+     0.0
+    ],
+    "Building_5_3_D.glb": [
+     12.5,
+     19.1,
+     14.5,
+     -0.4,
+     0.0
+    ],
+    "Building_5_3_E.glb": [
+     12.5,
+     19.1,
+     14.5,
+     -0.4,
+     0.0
+    ],
+    "Building_5_3_F.glb": [
+     12.5,
+     19.1,
+     14.5,
+     -0.4,
+     0.0
+    ],
+    "Building_5_3_G.glb": [
+     12.5,
+     19.1,
+     14.5,
+     -0.4,
+     0.0
+    ],
+    "Building_5_3_H.glb": [
+     12.5,
+     19.1,
+     14.5,
+     -0.4,
+     0.0
+    ],
+    "Building_5_3_I.glb": [
+     12.5,
+     19.1,
+     14.5,
+     -0.4,
+     0.0
+    ],
+    "Building_5_3_J.glb": [
+     12.5,
+     19.1,
+     14.5,
+     -0.4,
+     0.0
+    ],
+    "Building_5_3_K.glb": [
+     12.5,
+     19.1,
+     14.5,
+     -0.4,
+     0.0
+    ],
+    "Building_5_3_L.glb": [
+     12.5,
+     19.1,
+     14.5,
+     -0.4,
+     0.0
+    ],
+    "Building_5_3_M.glb": [
+     12.5,
+     19.1,
+     14.5,
+     -0.4,
+     0.0
+    ],
+    "Building_5_3_N.glb": [
+     12.5,
+     19.1,
+     14.5,
+     -0.4,
+     0.0
+    ],
+    "Building_5_3_O.glb": [
+     12.5,
+     19.1,
+     14.5,
+     -0.4,
+     0.0
+    ],
+    "Building_5_3_R.glb": [
+     12.5,
+     19.1,
+     14.5,
+     -0.4,
+     0.0
+    ],
+    "Building_5_4_B.glb": [
+     12.5,
+     19.1,
+     21.1,
+     -0.4,
+     0.0
+    ],
+    "Building_5_4_C.glb": [
+     12.5,
+     19.1,
+     21.1,
+     -0.4,
+     0.0
+    ],
+    "Building_5_4_D.glb": [
+     12.5,
+     19.1,
+     21.1,
+     -0.4,
+     0.0
+    ],
+    "Building_5_4_E.glb": [
+     12.5,
+     19.1,
+     21.1,
+     -0.4,
+     0.0
+    ],
+    "Building_5_4_F.glb": [
+     12.5,
+     19.1,
+     21.1,
+     -0.4,
+     0.0
+    ],
+    "Building_5_4_G.glb": [
+     12.5,
+     19.1,
+     21.1,
+     -0.4,
+     0.0
+    ],
+    "Building_5_4_H.glb": [
+     12.5,
+     19.1,
+     21.1,
+     -0.4,
+     0.0
+    ],
+    "Building_5_4_I.glb": [
+     12.5,
+     19.1,
+     21.1,
+     -0.4,
+     0.0
+    ],
+    "Building_5_4_J.glb": [
+     12.5,
+     19.1,
+     21.1,
+     -0.4,
+     0.0
+    ],
+    "Building_5_4_K.glb": [
+     12.5,
+     19.1,
+     21.1,
+     -0.4,
+     0.0
+    ],
+    "Building_5_4_L.glb": [
+     12.5,
+     19.1,
+     21.1,
+     -0.4,
+     0.0
+    ],
+    "Building_5_4_M.glb": [
+     12.5,
+     19.1,
+     21.1,
+     -0.4,
+     0.0
+    ],
+    "Building_5_4_N.glb": [
+     12.5,
+     19.1,
+     21.1,
+     -0.4,
+     0.0
+    ],
+    "Building_5_4_O.glb": [
+     12.5,
+     19.1,
+     21.1,
+     -0.4,
+     0.0
+    ],
+    "Building_5_4_R.glb": [
+     12.5,
+     19.1,
+     21.1,
+     -0.4,
+     0.0
+    ]
+   }
+  },
+  "B6": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 6/",
+   "variants": [
+    "Building_6_A.glb",
+    "Building_6_B.glb",
+    "Building_6_C.glb",
+    "Building_6_D.glb",
+    "Building_6_E.glb",
+    "Building_6_F.glb",
+    "Building_6_G.glb",
+    "Building_6_H.glb",
+    "Building_6_I.glb",
+    "Building_6_J.glb",
+    "Building_6_K.glb"
+   ],
+   "sizes": {
+    "Building_6_A.glb": [
+     9.4,
+     22.7,
+     14.4,
+     0.8,
+     0.0
+    ],
+    "Building_6_B.glb": [
+     9.4,
+     22.7,
+     14.4,
+     0.8,
+     0.0
+    ],
+    "Building_6_C.glb": [
+     9.4,
+     22.7,
+     14.4,
+     0.8,
+     0.0
+    ],
+    "Building_6_D.glb": [
+     9.4,
+     22.7,
+     14.4,
+     0.8,
+     0.0
+    ],
+    "Building_6_E.glb": [
+     9.4,
+     22.7,
+     14.4,
+     0.8,
+     0.0
+    ],
+    "Building_6_F.glb": [
+     9.4,
+     22.7,
+     14.4,
+     0.8,
+     0.0
+    ],
+    "Building_6_G.glb": [
+     9.4,
+     22.7,
+     14.4,
+     0.8,
+     0.0
+    ],
+    "Building_6_H.glb": [
+     9.4,
+     22.7,
+     14.4,
+     0.8,
+     0.0
+    ],
+    "Building_6_I.glb": [
+     9.4,
+     22.7,
+     14.4,
+     0.8,
+     0.0
+    ],
+    "Building_6_J.glb": [
+     9.4,
+     22.7,
+     14.4,
+     0.8,
+     0.0
+    ],
+    "Building_6_K.glb": [
+     9.4,
+     22.7,
+     14.4,
+     0.8,
+     0.0
+    ]
+   }
+  },
+  "B7": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 7/",
+   "variants": [
+    "Building_7_1_A.glb",
+    "Building_7_1_B.glb",
+    "Building_7_1_C.glb",
+    "Building_7_1_D.glb",
+    "Building_7_1_E.glb",
+    "Building_7_1_F.glb",
+    "Building_7_2_A.glb",
+    "Building_7_2_B.glb",
+    "Building_7_2_C.glb",
+    "Building_7_2_D.glb",
+    "Building_7_2_E.glb",
+    "Building_7_2_F.glb",
+    "Building_7_3_A.glb",
+    "Building_7_3_B.glb",
+    "Building_7_3_C.glb",
+    "Building_7_3_D.glb",
+    "Building_7_3_E.glb",
+    "Building_7_3_F.glb"
+   ],
+   "sizes": {
+    "Building_7_1_A.glb": [
+     25.2,
+     23.1,
+     68.5,
+     1.3,
+     0.0
+    ],
+    "Building_7_1_B.glb": [
+     25.2,
+     23.1,
+     68.5,
+     1.3,
+     0.0
+    ],
+    "Building_7_1_C.glb": [
+     25.2,
+     23.1,
+     68.5,
+     1.3,
+     0.0
+    ],
+    "Building_7_1_D.glb": [
+     25.2,
+     23.1,
+     68.5,
+     1.3,
+     0.0
+    ],
+    "Building_7_1_E.glb": [
+     25.2,
+     23.1,
+     68.5,
+     1.3,
+     0.0
+    ],
+    "Building_7_1_F.glb": [
+     25.2,
+     23.1,
+     68.5,
+     1.3,
+     0.0
+    ],
+    "Building_7_2_A.glb": [
+     25.2,
+     23.1,
+     44.2,
+     1.3,
+     0.0
+    ],
+    "Building_7_2_B.glb": [
+     25.2,
+     23.1,
+     44.2,
+     1.3,
+     0.0
+    ],
+    "Building_7_2_C.glb": [
+     25.2,
+     23.1,
+     44.2,
+     1.3,
+     0.0
+    ],
+    "Building_7_2_D.glb": [
+     25.2,
+     23.1,
+     44.2,
+     1.3,
+     0.0
+    ],
+    "Building_7_2_E.glb": [
+     25.2,
+     23.1,
+     44.2,
+     1.3,
+     0.0
+    ],
+    "Building_7_2_F.glb": [
+     25.2,
+     23.1,
+     44.2,
+     1.3,
+     0.0
+    ],
+    "Building_7_3_A.glb": [
+     25.2,
+     23.1,
+     22.7,
+     1.3,
+     0.0
+    ],
+    "Building_7_3_B.glb": [
+     25.2,
+     23.1,
+     22.7,
+     1.3,
+     0.0
+    ],
+    "Building_7_3_C.glb": [
+     25.2,
+     23.1,
+     22.7,
+     1.3,
+     0.0
+    ],
+    "Building_7_3_D.glb": [
+     25.2,
+     23.1,
+     22.7,
+     1.3,
+     0.0
+    ],
+    "Building_7_3_E.glb": [
+     25.2,
+     23.1,
+     22.7,
+     1.3,
+     0.0
+    ],
+    "Building_7_3_F.glb": [
+     25.2,
+     23.1,
+     22.7,
+     1.3,
+     0.0
+    ]
+   }
+  },
+  "B8": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 8'/",
+   "variants": [
+    "Building_8_1_A.glb",
+    "Building_8_1_B.glb",
+    "Building_8_1_C.glb",
+    "Building_8_1_D.glb",
+    "Building_8_1_E.glb",
+    "Building_8_1_F.glb",
+    "Building_8_1_G.glb",
+    "Building_8_1_H.glb",
+    "Building_8_1_I.glb",
+    "Building_8_1_J.glb",
+    "Building_8_1_K.glb",
+    "Building_8_1_L.glb",
+    "Building_8_1_M.glb",
+    "Building_8_1_N.glb",
+    "Building_8_1_O.glb",
+    "Building_8_1_P.glb",
+    "Building_8_1_R.glb",
+    "Building_8_1_S.glb",
+    "Building_8_1_T.glb",
+    "Building_8_1_W.glb",
+    "Building_8_1_X.glb",
+    "Building_8_2_A.glb",
+    "Building_8_2_B.glb",
+    "Building_8_2_C.glb",
+    "Building_8_2_D.glb",
+    "Building_8_2_E.glb",
+    "Building_8_2_F.glb",
+    "Building_8_2_G.glb",
+    "Building_8_2_H.glb",
+    "Building_8_2_I.glb",
+    "Building_8_2_J.glb",
+    "Building_8_2_K.glb",
+    "Building_8_2_L.glb",
+    "Building_8_2_M.glb",
+    "Building_8_2_N.glb",
+    "Building_8_2_O.glb",
+    "Building_8_2_P.glb",
+    "Building_8_2_R.glb",
+    "Building_8_2_S.glb",
+    "Building_8_2_T.glb",
+    "Building_8_2_W.glb",
+    "Building_8_2_X.glb"
+   ],
+   "sizes": {
+    "Building_8_1_A.glb": [
+     6.8,
+     6.7,
+     11.1,
+     -0.7,
+     0.4
+    ],
+    "Building_8_1_B.glb": [
+     6.8,
+     6.7,
+     11.1,
+     -0.7,
+     0.4
+    ],
+    "Building_8_1_C.glb": [
+     6.8,
+     6.7,
+     11.1,
+     -0.7,
+     0.4
+    ],
+    "Building_8_1_D.glb": [
+     6.8,
+     6.7,
+     11.1,
+     -0.7,
+     0.4
+    ],
+    "Building_8_1_E.glb": [
+     6.8,
+     6.7,
+     11.1,
+     -0.7,
+     0.4
+    ],
+    "Building_8_1_F.glb": [
+     6.8,
+     6.7,
+     11.1,
+     -0.7,
+     0.4
+    ],
+    "Building_8_1_G.glb": [
+     6.8,
+     6.7,
+     11.1,
+     -0.7,
+     0.4
+    ],
+    "Building_8_1_H.glb": [
+     6.8,
+     6.7,
+     11.1,
+     -0.7,
+     0.4
+    ],
+    "Building_8_1_I.glb": [
+     6.8,
+     6.7,
+     11.1,
+     -0.7,
+     0.4
+    ],
+    "Building_8_1_J.glb": [
+     6.8,
+     6.7,
+     11.1,
+     -0.7,
+     0.4
+    ],
+    "Building_8_1_K.glb": [
+     6.8,
+     6.7,
+     11.1,
+     -0.7,
+     0.4
+    ],
+    "Building_8_1_L.glb": [
+     6.8,
+     6.7,
+     11.1,
+     -0.7,
+     0.4
+    ],
+    "Building_8_1_M.glb": [
+     6.8,
+     6.7,
+     11.1,
+     -0.7,
+     0.4
+    ],
+    "Building_8_1_N.glb": [
+     6.8,
+     6.7,
+     11.1,
+     -0.7,
+     0.4
+    ],
+    "Building_8_1_O.glb": [
+     6.8,
+     6.7,
+     11.1,
+     -0.7,
+     0.4
+    ],
+    "Building_8_1_P.glb": [
+     6.8,
+     6.7,
+     11.1,
+     -0.7,
+     0.4
+    ],
+    "Building_8_1_R.glb": [
+     6.8,
+     6.7,
+     11.1,
+     -0.7,
+     0.4
+    ],
+    "Building_8_1_S.glb": [
+     6.8,
+     6.7,
+     11.1,
+     -0.7,
+     0.4
+    ],
+    "Building_8_1_T.glb": [
+     6.8,
+     6.7,
+     11.1,
+     -0.7,
+     0.4
+    ],
+    "Building_8_1_W.glb": [
+     6.8,
+     6.7,
+     11.1,
+     -0.7,
+     0.4
+    ],
+    "Building_8_1_X.glb": [
+     6.8,
+     6.7,
+     11.1,
+     -0.7,
+     0.4
+    ],
+    "Building_8_2_A.glb": [
+     7.2,
+     7.5,
+     12.8,
+     -0.5,
+     0.4
+    ],
+    "Building_8_2_B.glb": [
+     7.2,
+     7.5,
+     12.8,
+     -0.5,
+     0.4
+    ],
+    "Building_8_2_C.glb": [
+     7.2,
+     7.5,
+     12.8,
+     -0.5,
+     0.4
+    ],
+    "Building_8_2_D.glb": [
+     7.2,
+     7.5,
+     12.8,
+     -0.5,
+     0.4
+    ],
+    "Building_8_2_E.glb": [
+     7.2,
+     7.5,
+     12.8,
+     -0.5,
+     0.4
+    ],
+    "Building_8_2_F.glb": [
+     7.2,
+     7.5,
+     12.8,
+     -0.5,
+     0.4
+    ],
+    "Building_8_2_G.glb": [
+     7.2,
+     7.5,
+     12.8,
+     -0.5,
+     0.4
+    ],
+    "Building_8_2_H.glb": [
+     7.2,
+     7.5,
+     12.8,
+     -0.5,
+     0.4
+    ],
+    "Building_8_2_I.glb": [
+     7.2,
+     7.5,
+     12.8,
+     -0.5,
+     0.4
+    ],
+    "Building_8_2_J.glb": [
+     7.2,
+     7.5,
+     12.8,
+     -0.5,
+     0.4
+    ],
+    "Building_8_2_K.glb": [
+     7.2,
+     7.5,
+     12.8,
+     -0.5,
+     0.4
+    ],
+    "Building_8_2_L.glb": [
+     7.2,
+     7.5,
+     12.8,
+     -0.5,
+     0.4
+    ],
+    "Building_8_2_M.glb": [
+     7.2,
+     7.5,
+     12.8,
+     -0.5,
+     0.4
+    ],
+    "Building_8_2_N.glb": [
+     7.2,
+     7.5,
+     12.8,
+     -0.5,
+     0.4
+    ],
+    "Building_8_2_O.glb": [
+     7.2,
+     7.5,
+     12.8,
+     -0.5,
+     0.4
+    ],
+    "Building_8_2_P.glb": [
+     7.2,
+     7.5,
+     12.8,
+     -0.5,
+     0.4
+    ],
+    "Building_8_2_R.glb": [
+     7.2,
+     7.5,
+     12.8,
+     -0.5,
+     0.4
+    ],
+    "Building_8_2_S.glb": [
+     7.2,
+     7.5,
+     12.8,
+     -0.5,
+     0.4
+    ],
+    "Building_8_2_T.glb": [
+     7.2,
+     7.5,
+     12.8,
+     -0.5,
+     0.4
+    ],
+    "Building_8_2_W.glb": [
+     7.2,
+     7.5,
+     12.8,
+     -0.5,
+     0.4
+    ],
+    "Building_8_2_X.glb": [
+     7.2,
+     7.5,
+     12.8,
+     -0.5,
+     0.4
+    ]
+   }
+  },
+  "B9": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 9/",
+   "variants": [
+    "Building_9_1_A.glb",
+    "Building_9_1_AA.glb",
+    "Building_9_1_B.glb",
+    "Building_9_1_BB.glb",
+    "Building_9_1_C.glb",
+    "Building_9_1_CC.glb",
+    "Building_9_1_D.glb",
+    "Building_9_1_DD.glb",
+    "Building_9_1_E.glb",
+    "Building_9_1_EE.glb",
+    "Building_9_1_F.glb",
+    "Building_9_1_FF.glb",
+    "Building_9_1_G.glb",
+    "Building_9_1_GG.glb",
+    "Building_9_1_H.glb",
+    "Building_9_1_HH.glb",
+    "Building_9_1_I.glb",
+    "Building_9_1_II.glb",
+    "Building_9_1_J.glb",
+    "Building_9_1_JJ.glb",
+    "Building_9_1_K.glb",
+    "Building_9_1_KK.glb",
+    "Building_9_1_L.glb",
+    "Building_9_1_LL.glb",
+    "Building_9_1_M.glb",
+    "Building_9_1_MM.glb",
+    "Building_9_1_N.glb",
+    "Building_9_1_NN.glb",
+    "Building_9_1_O.glb",
+    "Building_9_1_OO.glb",
+    "Building_9_1_P.glb",
+    "Building_9_1_PP.glb",
+    "Building_9_2_A.glb",
+    "Building_9_2_AA.glb",
+    "Building_9_2_B.glb",
+    "Building_9_2_BB.glb",
+    "Building_9_2_C.glb",
+    "Building_9_2_CC.glb",
+    "Building_9_2_D.glb",
+    "Building_9_2_DD.glb",
+    "Building_9_2_E.glb",
+    "Building_9_2_EE.glb",
+    "Building_9_2_F.glb",
+    "Building_9_2_FF.glb",
+    "Building_9_2_G.glb",
+    "Building_9_2_GG.glb",
+    "Building_9_2_H.glb",
+    "Building_9_2_HH.glb",
+    "Building_9_2_I.glb",
+    "Building_9_2_II.glb",
+    "Building_9_2_J.glb",
+    "Building_9_2_JJ.glb",
+    "Building_9_2_K.glb",
+    "Building_9_2_KK.glb",
+    "Building_9_2_L.glb",
+    "Building_9_2_LL.glb",
+    "Building_9_2_M.glb",
+    "Building_9_2_MM.glb",
+    "Building_9_2_N.glb",
+    "Building_9_2_NN.glb",
+    "Building_9_2_O.glb",
+    "Building_9_2_OO.glb",
+    "Building_9_2_P.glb",
+    "Building_9_2_PP.glb"
+   ],
+   "sizes": {
+    "Building_9_1_A.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_AA.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_B.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_BB.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_C.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_CC.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_D.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_DD.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_E.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_EE.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_F.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_FF.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_G.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_GG.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_H.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_HH.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_I.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_II.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_J.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_JJ.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_K.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_KK.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_L.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_LL.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_M.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_MM.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_N.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_NN.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_O.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_OO.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_P.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_1_PP.glb": [
+     9.5,
+     9.1,
+     18.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_A.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_AA.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_B.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_BB.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_C.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_CC.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_D.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_DD.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_E.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_EE.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_F.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_FF.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_G.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_GG.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_H.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_HH.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_I.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_II.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_J.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_JJ.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_K.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_KK.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_L.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_LL.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_M.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_MM.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_N.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_NN.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_O.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_OO.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_P.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ],
+    "Building_9_2_PP.glb": [
+     9.5,
+     9.1,
+     9.6,
+     -0.5,
+     -0.0
+    ]
+   }
+  },
+  "B10": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 10/",
+   "variants": [
+    "Building_10_A.glb",
+    "Building_10_B.glb",
+    "Building_10_C.glb",
+    "Building_10_D.glb",
+    "Building_10_E.glb",
+    "Building_10_F.glb",
+    "Building_10_G.glb",
+    "Building_10_H.glb",
+    "Building_10_I.glb",
+    "Building_10_J.glb",
+    "Building_10_K.glb",
+    "Building_10_L.glb",
+    "Building_10_M.glb",
+    "Building_10_N.glb",
+    "Building_10_O.glb"
+   ],
+   "sizes": {
+    "Building_10_A.glb": [
+     7.0,
+     7.4,
+     7.8,
+     2.1,
+     -0.0
+    ],
+    "Building_10_B.glb": [
+     7.0,
+     7.4,
+     7.8,
+     2.1,
+     -0.0
+    ],
+    "Building_10_C.glb": [
+     7.0,
+     7.4,
+     7.8,
+     2.1,
+     -0.0
+    ],
+    "Building_10_D.glb": [
+     7.0,
+     7.4,
+     7.8,
+     2.1,
+     -0.0
+    ],
+    "Building_10_E.glb": [
+     7.0,
+     7.4,
+     7.8,
+     2.1,
+     -0.0
+    ],
+    "Building_10_F.glb": [
+     7.0,
+     7.4,
+     7.8,
+     2.1,
+     -0.0
+    ],
+    "Building_10_G.glb": [
+     7.0,
+     7.4,
+     7.8,
+     2.1,
+     -0.0
+    ],
+    "Building_10_H.glb": [
+     7.0,
+     7.4,
+     7.8,
+     2.1,
+     -0.0
+    ],
+    "Building_10_I.glb": [
+     7.0,
+     7.4,
+     7.8,
+     2.1,
+     -0.0
+    ],
+    "Building_10_J.glb": [
+     7.0,
+     7.4,
+     7.8,
+     2.1,
+     -0.0
+    ],
+    "Building_10_K.glb": [
+     7.0,
+     7.4,
+     7.8,
+     2.1,
+     -0.0
+    ],
+    "Building_10_L.glb": [
+     7.0,
+     7.4,
+     7.8,
+     2.1,
+     -0.0
+    ],
+    "Building_10_M.glb": [
+     7.0,
+     7.4,
+     7.8,
+     2.1,
+     -0.0
+    ],
+    "Building_10_N.glb": [
+     7.0,
+     7.4,
+     7.8,
+     2.1,
+     -0.0
+    ],
+    "Building_10_O.glb": [
+     7.0,
+     7.4,
+     7.8,
+     2.1,
+     -0.0
+    ]
+   }
+  },
+  "B11": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 11/",
+   "variants": [
+    "Building_11_1_A.glb",
+    "Building_11_1_B.glb",
+    "Building_11_1_C.glb",
+    "Building_11_1_D.glb",
+    "Building_11_1_E.glb",
+    "Building_11_1_F.glb",
+    "Building_11_1_G.glb",
+    "Building_11_1_H.glb",
+    "Building_11_1_I.glb",
+    "Building_11_2_A.glb",
+    "Building_11_2_B.glb",
+    "Building_11_2_C.glb",
+    "Building_11_2_D.glb",
+    "Building_11_2_E.glb",
+    "Building_11_2_F.glb",
+    "Building_11_2_G.glb",
+    "Building_11_2_H.glb",
+    "Building_11_2_I.glb",
+    "Building_11_3_A.glb",
+    "Building_11_3_B.glb",
+    "Building_11_3_C.glb",
+    "Building_11_3_D.glb",
+    "Building_11_3_E.glb",
+    "Building_11_3_F.glb",
+    "Building_11_3_G.glb",
+    "Building_11_3_H.glb",
+    "Building_11_3_I.glb",
+    "Building_11_4_A.glb",
+    "Building_11_4_B.glb",
+    "Building_11_4_C.glb",
+    "Building_11_4_D.glb",
+    "Building_11_4_E.glb",
+    "Building_11_4_F.glb",
+    "Building_11_4_G.glb",
+    "Building_11_4_H.glb",
+    "Building_11_4_I.glb",
+    "Building_11_5_A.glb",
+    "Building_11_5_B.glb",
+    "Building_11_5_C.glb",
+    "Building_11_5_D.glb",
+    "Building_11_5_E.glb",
+    "Building_11_5_F.glb",
+    "Building_11_5_G.glb",
+    "Building_11_5_H.glb",
+    "Building_11_5_I.glb"
+   ],
+   "sizes": {
+    "Building_11_1_A.glb": [
+     8.3,
+     11.6,
+     10.3,
+     1.7,
+     -1.1
+    ],
+    "Building_11_1_B.glb": [
+     8.3,
+     11.6,
+     10.3,
+     1.7,
+     -1.1
+    ],
+    "Building_11_1_C.glb": [
+     8.3,
+     11.6,
+     10.3,
+     1.7,
+     -1.1
+    ],
+    "Building_11_1_D.glb": [
+     8.3,
+     11.6,
+     10.3,
+     1.7,
+     -1.1
+    ],
+    "Building_11_1_E.glb": [
+     8.3,
+     11.6,
+     10.3,
+     1.7,
+     -1.1
+    ],
+    "Building_11_1_F.glb": [
+     8.3,
+     11.6,
+     10.3,
+     1.7,
+     -1.1
+    ],
+    "Building_11_1_G.glb": [
+     8.3,
+     11.6,
+     10.3,
+     1.7,
+     -1.1
+    ],
+    "Building_11_1_H.glb": [
+     8.3,
+     11.6,
+     10.3,
+     1.7,
+     -1.1
+    ],
+    "Building_11_1_I.glb": [
+     8.3,
+     11.6,
+     10.3,
+     1.7,
+     -1.1
+    ],
+    "Building_11_2_A.glb": [
+     8.3,
+     11.6,
+     7.1,
+     1.7,
+     -1.1
+    ],
+    "Building_11_2_B.glb": [
+     8.3,
+     11.6,
+     7.1,
+     1.7,
+     -1.1
+    ],
+    "Building_11_2_C.glb": [
+     8.3,
+     11.6,
+     7.1,
+     1.7,
+     -1.1
+    ],
+    "Building_11_2_D.glb": [
+     8.3,
+     11.6,
+     7.1,
+     1.7,
+     -1.1
+    ],
+    "Building_11_2_E.glb": [
+     8.3,
+     11.6,
+     7.1,
+     1.7,
+     -1.1
+    ],
+    "Building_11_2_F.glb": [
+     8.3,
+     11.6,
+     7.1,
+     1.7,
+     -1.1
+    ],
+    "Building_11_2_G.glb": [
+     8.3,
+     11.6,
+     7.1,
+     1.7,
+     -1.1
+    ],
+    "Building_11_2_H.glb": [
+     8.3,
+     11.6,
+     7.1,
+     1.7,
+     -1.1
+    ],
+    "Building_11_2_I.glb": [
+     8.3,
+     11.6,
+     7.1,
+     1.7,
+     -1.1
+    ],
+    "Building_11_3_A.glb": [
+     8.1,
+     11.6,
+     7.1,
+     1.8,
+     -1.1
+    ],
+    "Building_11_3_B.glb": [
+     8.1,
+     11.6,
+     7.1,
+     1.8,
+     -1.1
+    ],
+    "Building_11_3_C.glb": [
+     8.1,
+     11.6,
+     7.1,
+     1.8,
+     -1.1
+    ],
+    "Building_11_3_D.glb": [
+     8.1,
+     11.6,
+     7.1,
+     1.8,
+     -1.1
+    ],
+    "Building_11_3_E.glb": [
+     8.1,
+     11.6,
+     7.1,
+     1.8,
+     -1.1
+    ],
+    "Building_11_3_F.glb": [
+     8.1,
+     11.6,
+     7.1,
+     1.8,
+     -1.1
+    ],
+    "Building_11_3_G.glb": [
+     8.1,
+     11.6,
+     7.1,
+     1.8,
+     -1.1
+    ],
+    "Building_11_3_H.glb": [
+     8.1,
+     11.6,
+     7.1,
+     1.8,
+     -1.1
+    ],
+    "Building_11_3_I.glb": [
+     8.1,
+     11.6,
+     7.1,
+     1.8,
+     -1.1
+    ],
+    "Building_11_4_A.glb": [
+     8.3,
+     11.6,
+     3.9,
+     1.7,
+     -1.1
+    ],
+    "Building_11_4_B.glb": [
+     8.3,
+     11.6,
+     3.9,
+     1.7,
+     -1.1
+    ],
+    "Building_11_4_C.glb": [
+     8.3,
+     11.6,
+     3.9,
+     1.7,
+     -1.1
+    ],
+    "Building_11_4_D.glb": [
+     8.3,
+     11.6,
+     3.9,
+     1.7,
+     -1.1
+    ],
+    "Building_11_4_E.glb": [
+     8.3,
+     11.6,
+     3.9,
+     1.7,
+     -1.1
+    ],
+    "Building_11_4_F.glb": [
+     8.3,
+     11.6,
+     3.9,
+     1.7,
+     -1.1
+    ],
+    "Building_11_4_G.glb": [
+     8.3,
+     11.6,
+     3.9,
+     1.7,
+     -1.1
+    ],
+    "Building_11_4_H.glb": [
+     8.3,
+     11.6,
+     3.9,
+     1.7,
+     -1.1
+    ],
+    "Building_11_4_I.glb": [
+     8.3,
+     11.6,
+     3.9,
+     1.7,
+     -1.1
+    ],
+    "Building_11_5_A.glb": [
+     8.3,
+     11.6,
+     23.1,
+     1.7,
+     -1.1
+    ],
+    "Building_11_5_B.glb": [
+     8.3,
+     11.6,
+     23.1,
+     1.7,
+     -1.1
+    ],
+    "Building_11_5_C.glb": [
+     8.3,
+     11.6,
+     23.1,
+     1.7,
+     -1.1
+    ],
+    "Building_11_5_D.glb": [
+     8.3,
+     11.6,
+     23.1,
+     1.7,
+     -1.1
+    ],
+    "Building_11_5_E.glb": [
+     8.3,
+     11.6,
+     23.1,
+     1.7,
+     -1.1
+    ],
+    "Building_11_5_F.glb": [
+     8.3,
+     11.6,
+     23.1,
+     1.7,
+     -1.1
+    ],
+    "Building_11_5_G.glb": [
+     8.3,
+     11.6,
+     23.1,
+     1.7,
+     -1.1
+    ],
+    "Building_11_5_H.glb": [
+     8.3,
+     11.6,
+     23.1,
+     1.7,
+     -1.1
+    ],
+    "Building_11_5_I.glb": [
+     8.3,
+     11.6,
+     23.1,
+     1.7,
+     -1.1
+    ]
+   }
+  },
+  "B12": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 12/",
+   "variants": [
+    "Building_12_A.glb",
+    "Building_12_B.glb",
+    "Building_12_C.glb",
+    "Building_12_D.glb",
+    "Building_12_E.glb",
+    "Building_12_F.glb",
+    "Building_12_G.glb",
+    "Building_12_H.glb",
+    "Building_12_I.glb"
+   ],
+   "sizes": {
+    "Building_12_A.glb": [
+     10.5,
+     7.7,
+     4.4,
+     -0.1,
+     0.0
+    ],
+    "Building_12_B.glb": [
+     10.5,
+     7.7,
+     4.4,
+     -0.1,
+     0.0
+    ],
+    "Building_12_C.glb": [
+     10.5,
+     7.7,
+     4.4,
+     -0.1,
+     0.0
+    ],
+    "Building_12_D.glb": [
+     10.5,
+     7.7,
+     4.4,
+     -0.1,
+     0.0
+    ],
+    "Building_12_E.glb": [
+     10.5,
+     7.7,
+     4.4,
+     -0.1,
+     0.0
+    ],
+    "Building_12_F.glb": [
+     10.5,
+     7.7,
+     4.4,
+     -0.1,
+     0.0
+    ],
+    "Building_12_G.glb": [
+     10.5,
+     7.7,
+     4.4,
+     -0.1,
+     0.0
+    ],
+    "Building_12_H.glb": [
+     10.5,
+     7.7,
+     4.4,
+     -0.1,
+     0.0
+    ],
+    "Building_12_I.glb": [
+     10.5,
+     7.7,
+     4.4,
+     -0.1,
+     0.0
+    ]
+   }
+  },
+  "B13": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 13/",
+   "variants": [
+    "Building_13_A.glb",
+    "Building_13_B.glb",
+    "Building_13_C.glb",
+    "Building_13_D.glb",
+    "Building_13_E.glb",
+    "Building_13_F.glb",
+    "Building_13_G.glb"
+   ],
+   "sizes": {
+    "Building_13_A.glb": [
+     3.9,
+     5.5,
+     2.7,
+     0.8,
+     -0.2
+    ],
+    "Building_13_B.glb": [
+     3.9,
+     5.5,
+     2.8,
+     0.8,
+     -0.2
+    ],
+    "Building_13_C.glb": [
+     3.9,
+     5.5,
+     2.8,
+     0.8,
+     -0.2
+    ],
+    "Building_13_D.glb": [
+     3.9,
+     5.5,
+     2.8,
+     0.8,
+     -0.2
+    ],
+    "Building_13_E.glb": [
+     3.9,
+     5.5,
+     2.8,
+     0.8,
+     -0.2
+    ],
+    "Building_13_F.glb": [
+     3.9,
+     5.5,
+     2.8,
+     0.8,
+     -0.2
+    ],
+    "Building_13_G.glb": [
+     3.9,
+     5.5,
+     2.7,
+     0.8,
+     -0.2
+    ]
+   }
+  },
+  "B14": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 14/",
+   "variants": [
+    "Building_14_A.glb",
+    "Building_14_B.glb",
+    "Building_14_C.glb",
+    "Building_14_D.glb",
+    "Building_14_E.glb",
+    "Building_14_F.glb",
+    "Building_14_G.glb",
+    "Building_14_H.glb",
+    "Building_14_I.glb"
+   ],
+   "sizes": {
+    "Building_14_A.glb": [
+     9.1,
+     13.2,
+     7.6,
+     0.9,
+     0.0
+    ],
+    "Building_14_B.glb": [
+     9.1,
+     13.2,
+     7.6,
+     0.9,
+     0.0
+    ],
+    "Building_14_C.glb": [
+     9.1,
+     13.2,
+     7.6,
+     0.9,
+     0.0
+    ],
+    "Building_14_D.glb": [
+     9.1,
+     13.2,
+     7.6,
+     0.9,
+     0.0
+    ],
+    "Building_14_E.glb": [
+     9.1,
+     13.2,
+     7.6,
+     0.9,
+     0.0
+    ],
+    "Building_14_F.glb": [
+     9.1,
+     13.2,
+     7.6,
+     0.9,
+     0.0
+    ],
+    "Building_14_G.glb": [
+     9.1,
+     13.2,
+     7.6,
+     0.9,
+     0.0
+    ],
+    "Building_14_H.glb": [
+     9.1,
+     13.2,
+     7.6,
+     0.9,
+     0.0
+    ],
+    "Building_14_I.glb": [
+     9.1,
+     13.2,
+     7.6,
+     0.9,
+     0.0
+    ]
+   }
+  },
+  "B15": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 15/",
+   "variants": [
+    "Building_15_A.glb",
+    "Building_15_B.glb",
+    "Building_15_C.glb",
+    "Building_15_D.glb",
+    "Building_15_E.glb",
+    "Building_15_F.glb",
+    "Building_15_G.glb",
+    "Building_15_H.glb",
+    "Building_15_I.glb",
+    "Building_15_J.glb"
+   ],
+   "sizes": {
+    "Building_15_A.glb": [
+     8.6,
+     11.8,
+     21.0,
+     1.0,
+     0.0
+    ],
+    "Building_15_B.glb": [
+     8.6,
+     11.8,
+     21.0,
+     1.0,
+     0.0
+    ],
+    "Building_15_C.glb": [
+     8.6,
+     11.8,
+     21.0,
+     1.0,
+     0.0
+    ],
+    "Building_15_D.glb": [
+     8.6,
+     11.8,
+     21.0,
+     1.0,
+     0.0
+    ],
+    "Building_15_E.glb": [
+     8.6,
+     11.8,
+     21.0,
+     1.0,
+     0.0
+    ],
+    "Building_15_F.glb": [
+     8.6,
+     11.8,
+     21.0,
+     1.0,
+     0.0
+    ],
+    "Building_15_G.glb": [
+     8.6,
+     11.8,
+     21.0,
+     1.0,
+     0.0
+    ],
+    "Building_15_H.glb": [
+     8.6,
+     11.8,
+     21.0,
+     1.0,
+     0.0
+    ],
+    "Building_15_I.glb": [
+     8.6,
+     11.8,
+     21.0,
+     1.0,
+     0.0
+    ],
+    "Building_15_J.glb": [
+     8.6,
+     11.8,
+     21.0,
+     1.0,
+     0.0
+    ]
+   }
+  },
+  "B16": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 16/",
+   "variants": [
+    "Building_16_1_A.glb",
+    "Building_16_1_B.glb",
+    "Building_16_1_C.glb",
+    "Building_16_1_D.glb",
+    "Building_16_1_E.glb",
+    "Building_16_1_F.glb",
+    "Building_16_1_G.glb",
+    "Building_16_1_H.glb",
+    "Building_16_1_I.glb",
+    "Building_16_1_J.glb",
+    "Building_16_1_K.glb",
+    "Building_16_1_L.glb",
+    "Building_16_1_M.glb",
+    "Building_16_2_A.glb",
+    "Building_16_2_B.glb",
+    "Building_16_2_C.glb",
+    "Building_16_2_D.glb",
+    "Building_16_2_E.glb",
+    "Building_16_2_F.glb",
+    "Building_16_2_G.glb",
+    "Building_16_2_H.glb",
+    "Building_16_2_I.glb",
+    "Building_16_2_J.glb",
+    "Building_16_2_K.glb",
+    "Building_16_2_L.glb",
+    "Building_16_2_M.glb"
+   ],
+   "sizes": {
+    "Building_16_1_A.glb": [
+     18.9,
+     30.3,
+     3.8,
+     -0.8,
+     1.2
+    ],
+    "Building_16_1_B.glb": [
+     18.9,
+     30.3,
+     3.8,
+     -0.8,
+     1.2
+    ],
+    "Building_16_1_C.glb": [
+     18.9,
+     30.3,
+     3.8,
+     -0.8,
+     1.2
+    ],
+    "Building_16_1_D.glb": [
+     18.9,
+     30.3,
+     3.8,
+     -0.8,
+     1.2
+    ],
+    "Building_16_1_E.glb": [
+     18.9,
+     30.3,
+     3.8,
+     -0.8,
+     1.2
+    ],
+    "Building_16_1_F.glb": [
+     18.9,
+     30.3,
+     3.8,
+     -0.8,
+     1.2
+    ],
+    "Building_16_1_G.glb": [
+     18.9,
+     30.3,
+     3.8,
+     -0.8,
+     1.2
+    ],
+    "Building_16_1_H.glb": [
+     18.9,
+     30.3,
+     3.8,
+     -0.8,
+     1.2
+    ],
+    "Building_16_1_I.glb": [
+     18.9,
+     30.3,
+     3.8,
+     -0.8,
+     1.2
+    ],
+    "Building_16_1_J.glb": [
+     18.9,
+     30.3,
+     3.8,
+     -0.8,
+     1.2
+    ],
+    "Building_16_1_K.glb": [
+     18.9,
+     30.3,
+     3.8,
+     -0.8,
+     1.2
+    ],
+    "Building_16_1_L.glb": [
+     18.9,
+     30.3,
+     3.8,
+     -0.8,
+     1.2
+    ],
+    "Building_16_1_M.glb": [
+     18.9,
+     30.3,
+     3.8,
+     -0.8,
+     1.2
+    ],
+    "Building_16_2_A.glb": [
+     18.9,
+     30.3,
+     7.2,
+     -0.8,
+     1.2
+    ],
+    "Building_16_2_B.glb": [
+     18.9,
+     30.3,
+     7.2,
+     -0.8,
+     1.2
+    ],
+    "Building_16_2_C.glb": [
+     18.9,
+     30.3,
+     7.2,
+     -0.8,
+     1.2
+    ],
+    "Building_16_2_D.glb": [
+     18.9,
+     30.3,
+     7.2,
+     -0.8,
+     1.2
+    ],
+    "Building_16_2_E.glb": [
+     18.9,
+     30.3,
+     7.2,
+     -0.8,
+     1.2
+    ],
+    "Building_16_2_F.glb": [
+     18.9,
+     30.3,
+     7.2,
+     -0.8,
+     1.2
+    ],
+    "Building_16_2_G.glb": [
+     18.9,
+     30.3,
+     7.2,
+     -0.8,
+     1.2
+    ],
+    "Building_16_2_H.glb": [
+     18.9,
+     30.3,
+     7.2,
+     -0.8,
+     1.2
+    ],
+    "Building_16_2_I.glb": [
+     18.9,
+     30.3,
+     7.2,
+     -0.8,
+     1.2
+    ],
+    "Building_16_2_J.glb": [
+     18.9,
+     30.3,
+     7.2,
+     -0.8,
+     1.2
+    ],
+    "Building_16_2_K.glb": [
+     18.9,
+     30.3,
+     7.2,
+     -0.8,
+     1.2
+    ],
+    "Building_16_2_L.glb": [
+     18.9,
+     30.3,
+     7.2,
+     -0.8,
+     1.2
+    ],
+    "Building_16_2_M.glb": [
+     18.9,
+     30.3,
+     7.2,
+     -0.8,
+     1.2
+    ]
+   }
+  },
+  "B17": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 17/",
+   "variants": [
+    "Building_17_1_A.glb",
+    "Building_17_1_AA.glb",
+    "Building_17_1_B.glb",
+    "Building_17_1_BB.glb",
+    "Building_17_1_C.glb",
+    "Building_17_1_CC.glb",
+    "Building_17_1_D.glb",
+    "Building_17_1_DD.glb",
+    "Building_17_1_E.glb",
+    "Building_17_1_EE.glb",
+    "Building_17_1_F.glb",
+    "Building_17_1_FF.glb",
+    "Building_17_1_G.glb",
+    "Building_17_1_GG.glb",
+    "Building_17_1_H.glb",
+    "Building_17_1_HH.glb",
+    "Building_17_1_I.glb",
+    "Building_17_1_II.glb",
+    "Building_17_1_J.glb",
+    "Building_17_1_JJ.glb",
+    "Building_17_1_K.glb",
+    "Building_17_1_KK.glb",
+    "Building_17_2_A.glb",
+    "Building_17_2_AA.glb",
+    "Building_17_2_B.glb",
+    "Building_17_2_BB.glb",
+    "Building_17_2_C.glb",
+    "Building_17_2_CC.glb",
+    "Building_17_2_D.glb",
+    "Building_17_2_DD.glb",
+    "Building_17_2_E.glb",
+    "Building_17_2_EE.glb",
+    "Building_17_2_F.glb",
+    "Building_17_2_FF.glb",
+    "Building_17_2_G.glb",
+    "Building_17_2_GG.glb",
+    "Building_17_2_H.glb",
+    "Building_17_2_HH.glb",
+    "Building_17_2_I.glb",
+    "Building_17_2_II.glb",
+    "Building_17_2_J.glb",
+    "Building_17_2_JJ.glb",
+    "Building_17_2_K.glb",
+    "Building_17_2_KK.glb",
+    "Building_17_3_A.glb",
+    "Building_17_3_AA.glb",
+    "Building_17_3_B.glb",
+    "Building_17_3_BB.glb",
+    "Building_17_3_C.glb",
+    "Building_17_3_CC.glb",
+    "Building_17_3_D.glb",
+    "Building_17_3_DD.glb",
+    "Building_17_3_E.glb",
+    "Building_17_3_EE.glb",
+    "Building_17_3_F.glb",
+    "Building_17_3_FF.glb",
+    "Building_17_3_G.glb",
+    "Building_17_3_GG.glb",
+    "Building_17_3_H.glb",
+    "Building_17_3_HH.glb",
+    "Building_17_3_I.glb",
+    "Building_17_3_II.glb",
+    "Building_17_3_J.glb",
+    "Building_17_3_JJ.glb",
+    "Building_17_3_K.glb",
+    "Building_17_3_KK.glb"
+   ],
+   "sizes": {
+    "Building_17_1_A.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_1_AA.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_1_B.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_1_BB.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_1_C.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_1_CC.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_1_D.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_1_DD.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_1_E.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_1_EE.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_1_F.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_1_FF.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_1_G.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_1_GG.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_1_H.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_1_HH.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_1_I.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_1_II.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_1_J.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_1_JJ.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_1_K.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_1_KK.glb": [
+     8.6,
+     11.7,
+     8.7,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_A.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_AA.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_B.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_BB.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_C.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_CC.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_D.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_DD.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_E.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_EE.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_F.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_FF.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_G.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_GG.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_H.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_HH.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_I.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_II.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_J.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_JJ.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_K.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_2_KK.glb": [
+     8.6,
+     11.7,
+     18.1,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_A.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_AA.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_B.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_BB.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_C.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_CC.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_D.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_DD.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_E.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_EE.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_F.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_FF.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_G.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_GG.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_H.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_HH.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_I.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_II.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_J.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_JJ.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_K.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ],
+    "Building_17_3_KK.glb": [
+     8.6,
+     11.7,
+     25.4,
+     0.4,
+     0.0
+    ]
+   }
+  },
+  "B18": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 18/",
+   "variants": [
+    "Building_18_1_A.glb",
+    "Building_18_1_B.glb",
+    "Building_18_1_C.glb",
+    "Building_18_1_D.glb",
+    "Building_18_1_E.glb",
+    "Building_18_1_F.glb",
+    "Building_18_1_G.glb",
+    "Building_18_1_H.glb",
+    "Building_18_1_I.glb",
+    "Building_18_1_J.glb",
+    "Building_18_1_K.glb",
+    "Building_18_1_L.glb",
+    "Building_18_1_M.glb",
+    "Building_18_1_N.glb",
+    "Building_18_1_O.glb",
+    "Building_18_1_P.glb",
+    "Building_18_1_R.glb",
+    "Building_18_1_S.glb",
+    "Building_18_2_A.glb",
+    "Building_18_2_B.glb",
+    "Building_18_2_C.glb",
+    "Building_18_2_D.glb",
+    "Building_18_2_E.glb",
+    "Building_18_2_F.glb",
+    "Building_18_2_G.glb",
+    "Building_18_2_H.glb",
+    "Building_18_2_I.glb",
+    "Building_18_2_J.glb",
+    "Building_18_2_K.glb",
+    "Building_18_2_L.glb",
+    "Building_18_2_M.glb",
+    "Building_18_2_N.glb",
+    "Building_18_2_O.glb",
+    "Building_18_2_P.glb",
+    "Building_18_2_R.glb",
+    "Building_18_2_S.glb",
+    "Building_18_3_A.glb",
+    "Building_18_3_B.glb",
+    "Building_18_3_C.glb",
+    "Building_18_3_D.glb",
+    "Building_18_3_E.glb",
+    "Building_18_3_F.glb",
+    "Building_18_3_G.glb",
+    "Building_18_3_H.glb",
+    "Building_18_3_I.glb",
+    "Building_18_3_J.glb",
+    "Building_18_3_K.glb",
+    "Building_18_3_L.glb",
+    "Building_18_3_M.glb",
+    "Building_18_3_N.glb",
+    "Building_18_3_O.glb",
+    "Building_18_3_P.glb",
+    "Building_18_3_R.glb",
+    "Building_18_3_S.glb"
+   ],
+   "sizes": {
+    "Building_18_1_A.glb": [
+     7.2,
+     10.6,
+     20.1,
+     1.3,
+     0.9
+    ],
+    "Building_18_1_B.glb": [
+     7.2,
+     10.6,
+     20.1,
+     1.3,
+     0.9
+    ],
+    "Building_18_1_C.glb": [
+     7.2,
+     10.6,
+     20.1,
+     1.3,
+     0.9
+    ],
+    "Building_18_1_D.glb": [
+     7.2,
+     10.6,
+     20.1,
+     1.3,
+     0.9
+    ],
+    "Building_18_1_E.glb": [
+     7.2,
+     10.6,
+     20.1,
+     1.3,
+     0.9
+    ],
+    "Building_18_1_F.glb": [
+     7.2,
+     10.6,
+     20.1,
+     1.3,
+     0.9
+    ],
+    "Building_18_1_G.glb": [
+     7.2,
+     10.6,
+     20.1,
+     1.3,
+     0.9
+    ],
+    "Building_18_1_H.glb": [
+     7.2,
+     10.6,
+     20.1,
+     1.3,
+     0.9
+    ],
+    "Building_18_1_I.glb": [
+     7.2,
+     10.6,
+     20.1,
+     1.3,
+     0.9
+    ],
+    "Building_18_1_J.glb": [
+     7.2,
+     10.6,
+     20.1,
+     1.3,
+     0.9
+    ],
+    "Building_18_1_K.glb": [
+     7.2,
+     10.6,
+     20.1,
+     1.3,
+     0.9
+    ],
+    "Building_18_1_L.glb": [
+     7.2,
+     10.6,
+     20.1,
+     1.3,
+     0.9
+    ],
+    "Building_18_1_M.glb": [
+     7.2,
+     10.6,
+     20.1,
+     1.3,
+     0.9
+    ],
+    "Building_18_1_N.glb": [
+     7.2,
+     10.6,
+     20.1,
+     1.3,
+     0.9
+    ],
+    "Building_18_1_O.glb": [
+     7.2,
+     10.6,
+     20.1,
+     1.3,
+     0.9
+    ],
+    "Building_18_1_P.glb": [
+     7.2,
+     10.6,
+     20.1,
+     1.3,
+     0.9
+    ],
+    "Building_18_1_R.glb": [
+     7.2,
+     10.6,
+     20.1,
+     1.3,
+     0.9
+    ],
+    "Building_18_1_S.glb": [
+     7.2,
+     10.6,
+     20.1,
+     1.3,
+     0.9
+    ],
+    "Building_18_2_A.glb": [
+     7.2,
+     10.6,
+     15.9,
+     1.3,
+     0.9
+    ],
+    "Building_18_2_B.glb": [
+     7.2,
+     10.6,
+     15.9,
+     1.3,
+     0.9
+    ],
+    "Building_18_2_C.glb": [
+     7.2,
+     10.6,
+     15.9,
+     1.3,
+     0.9
+    ],
+    "Building_18_2_D.glb": [
+     7.2,
+     10.6,
+     15.9,
+     1.3,
+     0.9
+    ],
+    "Building_18_2_E.glb": [
+     7.2,
+     10.6,
+     15.9,
+     1.3,
+     0.9
+    ],
+    "Building_18_2_F.glb": [
+     7.2,
+     10.6,
+     15.9,
+     1.3,
+     0.9
+    ],
+    "Building_18_2_G.glb": [
+     7.2,
+     10.6,
+     15.9,
+     1.3,
+     0.9
+    ],
+    "Building_18_2_H.glb": [
+     7.2,
+     10.6,
+     15.9,
+     1.3,
+     0.9
+    ],
+    "Building_18_2_I.glb": [
+     7.2,
+     10.6,
+     15.9,
+     1.3,
+     0.9
+    ],
+    "Building_18_2_J.glb": [
+     7.2,
+     10.6,
+     15.9,
+     1.3,
+     0.9
+    ],
+    "Building_18_2_K.glb": [
+     7.2,
+     10.6,
+     15.9,
+     1.3,
+     0.9
+    ],
+    "Building_18_2_L.glb": [
+     7.2,
+     10.6,
+     15.9,
+     1.3,
+     0.9
+    ],
+    "Building_18_2_M.glb": [
+     7.2,
+     10.6,
+     15.9,
+     1.3,
+     0.9
+    ],
+    "Building_18_2_N.glb": [
+     7.2,
+     10.6,
+     15.9,
+     1.3,
+     0.9
+    ],
+    "Building_18_2_O.glb": [
+     7.2,
+     10.6,
+     15.9,
+     1.3,
+     0.9
+    ],
+    "Building_18_2_P.glb": [
+     7.2,
+     10.6,
+     15.9,
+     1.3,
+     0.9
+    ],
+    "Building_18_2_R.glb": [
+     7.2,
+     10.6,
+     15.9,
+     1.3,
+     0.9
+    ],
+    "Building_18_2_S.glb": [
+     7.2,
+     10.6,
+     15.9,
+     1.3,
+     0.9
+    ],
+    "Building_18_3_A.glb": [
+     7.2,
+     10.6,
+     11.6,
+     1.3,
+     0.9
+    ],
+    "Building_18_3_B.glb": [
+     7.2,
+     10.6,
+     11.6,
+     1.3,
+     0.9
+    ],
+    "Building_18_3_C.glb": [
+     7.2,
+     10.6,
+     11.6,
+     1.3,
+     0.9
+    ],
+    "Building_18_3_D.glb": [
+     7.2,
+     10.6,
+     11.6,
+     1.3,
+     0.9
+    ],
+    "Building_18_3_E.glb": [
+     7.2,
+     10.6,
+     11.6,
+     1.3,
+     0.9
+    ],
+    "Building_18_3_F.glb": [
+     7.2,
+     10.6,
+     11.6,
+     1.3,
+     0.9
+    ],
+    "Building_18_3_G.glb": [
+     7.2,
+     10.6,
+     11.6,
+     1.3,
+     0.9
+    ],
+    "Building_18_3_H.glb": [
+     7.2,
+     10.6,
+     11.6,
+     1.3,
+     0.9
+    ],
+    "Building_18_3_I.glb": [
+     7.2,
+     10.6,
+     11.6,
+     1.3,
+     0.9
+    ],
+    "Building_18_3_J.glb": [
+     7.2,
+     10.6,
+     11.6,
+     1.3,
+     0.9
+    ],
+    "Building_18_3_K.glb": [
+     7.2,
+     10.6,
+     11.6,
+     1.3,
+     0.9
+    ],
+    "Building_18_3_L.glb": [
+     7.2,
+     10.6,
+     11.6,
+     1.3,
+     0.9
+    ],
+    "Building_18_3_M.glb": [
+     7.2,
+     10.6,
+     11.6,
+     1.3,
+     0.9
+    ],
+    "Building_18_3_N.glb": [
+     7.2,
+     10.6,
+     11.6,
+     1.3,
+     0.9
+    ],
+    "Building_18_3_O.glb": [
+     7.2,
+     10.6,
+     11.6,
+     1.3,
+     0.9
+    ],
+    "Building_18_3_P.glb": [
+     7.2,
+     10.6,
+     11.6,
+     1.3,
+     0.9
+    ],
+    "Building_18_3_R.glb": [
+     7.2,
+     10.6,
+     11.6,
+     1.3,
+     0.9
+    ],
+    "Building_18_3_S.glb": [
+     7.2,
+     10.6,
+     11.6,
+     1.3,
+     0.9
+    ]
+   }
+  },
+  "B19": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 19/",
+   "variants": [
+    "Building_19_1_A.glb",
+    "Building_19_1_B.glb",
+    "Building_19_1_C.glb",
+    "Building_19_1_D.glb",
+    "Building_19_1_E.glb",
+    "Building_19_1_F.glb",
+    "Building_19_1_G.glb",
+    "Building_19_1_H.glb",
+    "Building_19_1_I.glb",
+    "Building_19_1_J.glb",
+    "Building_19_2_A.glb",
+    "Building_19_2_B.glb",
+    "Building_19_2_C.glb",
+    "Building_19_2_D.glb",
+    "Building_19_2_E.glb",
+    "Building_19_2_F.glb",
+    "Building_19_2_G.glb",
+    "Building_19_2_H.glb",
+    "Building_19_2_I.glb",
+    "Building_19_2_J.glb",
+    "Building_19_3_A.glb",
+    "Building_19_3_B.glb",
+    "Building_19_3_C.glb",
+    "Building_19_3_D.glb",
+    "Building_19_3_E.glb",
+    "Building_19_3_F.glb",
+    "Building_19_3_G.glb",
+    "Building_19_3_H.glb",
+    "Building_19_3_I.glb",
+    "Building_19_3_J.glb"
+   ],
+   "sizes": {
+    "Building_19_1_A.glb": [
+     7.7,
+     12.5,
+     6.7,
+     -1.9,
+     -6.2
+    ],
+    "Building_19_1_B.glb": [
+     7.7,
+     12.5,
+     6.7,
+     -1.9,
+     -6.2
+    ],
+    "Building_19_1_C.glb": [
+     7.7,
+     12.5,
+     6.7,
+     -1.9,
+     -6.2
+    ],
+    "Building_19_1_D.glb": [
+     7.7,
+     12.5,
+     6.7,
+     -1.9,
+     -6.2
+    ],
+    "Building_19_1_E.glb": [
+     7.7,
+     12.5,
+     6.7,
+     -1.9,
+     -6.2
+    ],
+    "Building_19_1_F.glb": [
+     7.7,
+     12.5,
+     6.7,
+     -1.9,
+     -6.2
+    ],
+    "Building_19_1_G.glb": [
+     7.7,
+     12.5,
+     6.7,
+     -1.9,
+     -6.2
+    ],
+    "Building_19_1_H.glb": [
+     7.7,
+     12.5,
+     6.7,
+     -1.9,
+     -6.2
+    ],
+    "Building_19_1_I.glb": [
+     7.7,
+     12.5,
+     6.7,
+     -1.9,
+     -6.2
+    ],
+    "Building_19_1_J.glb": [
+     7.7,
+     12.5,
+     6.7,
+     -1.9,
+     -6.2
+    ],
+    "Building_19_2_A.glb": [
+     7.7,
+     9.4,
+     6.7,
+     -1.9,
+     -4.7
+    ],
+    "Building_19_2_B.glb": [
+     7.7,
+     9.4,
+     6.7,
+     -1.9,
+     -4.7
+    ],
+    "Building_19_2_C.glb": [
+     7.7,
+     9.4,
+     6.7,
+     -1.9,
+     -4.7
+    ],
+    "Building_19_2_D.glb": [
+     7.7,
+     9.4,
+     6.7,
+     -1.9,
+     -4.7
+    ],
+    "Building_19_2_E.glb": [
+     7.7,
+     9.4,
+     6.7,
+     -1.9,
+     -4.7
+    ],
+    "Building_19_2_F.glb": [
+     7.7,
+     9.4,
+     6.7,
+     -1.9,
+     -4.7
+    ],
+    "Building_19_2_G.glb": [
+     7.7,
+     9.4,
+     6.7,
+     -1.9,
+     -4.7
+    ],
+    "Building_19_2_H.glb": [
+     7.7,
+     9.4,
+     6.7,
+     -1.9,
+     -4.7
+    ],
+    "Building_19_2_I.glb": [
+     7.7,
+     9.4,
+     6.7,
+     -1.9,
+     -4.7
+    ],
+    "Building_19_2_J.glb": [
+     7.7,
+     9.4,
+     6.7,
+     -1.9,
+     -4.7
+    ],
+    "Building_19_3_A.glb": [
+     7.7,
+     7.3,
+     6.7,
+     -1.9,
+     -3.6
+    ],
+    "Building_19_3_B.glb": [
+     7.7,
+     7.3,
+     6.7,
+     -1.9,
+     -3.6
+    ],
+    "Building_19_3_C.glb": [
+     7.7,
+     7.3,
+     6.7,
+     -1.9,
+     -3.6
+    ],
+    "Building_19_3_D.glb": [
+     7.7,
+     7.3,
+     6.7,
+     -1.9,
+     -3.6
+    ],
+    "Building_19_3_E.glb": [
+     7.7,
+     7.3,
+     6.7,
+     -1.9,
+     -3.6
+    ],
+    "Building_19_3_F.glb": [
+     7.7,
+     7.3,
+     6.7,
+     -1.9,
+     -3.6
+    ],
+    "Building_19_3_G.glb": [
+     7.7,
+     7.3,
+     6.7,
+     -1.9,
+     -3.6
+    ],
+    "Building_19_3_H.glb": [
+     7.7,
+     7.3,
+     6.7,
+     -1.9,
+     -3.6
+    ],
+    "Building_19_3_I.glb": [
+     7.7,
+     7.3,
+     6.7,
+     -1.9,
+     -3.6
+    ],
+    "Building_19_3_J.glb": [
+     7.7,
+     7.3,
+     6.7,
+     -1.9,
+     -3.6
+    ]
+   }
+  },
+  "B20": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 20/",
+   "variants": [
+    "Building_20_1_A.glb",
+    "Building_20_1_B.glb",
+    "Building_20_1_C.glb",
+    "Building_20_1_D.glb",
+    "Building_20_1_E.glb",
+    "Building_20_1_F.glb",
+    "Building_20_1_G.glb",
+    "Building_20_1_H.glb",
+    "Building_20_1_I.glb",
+    "Building_20_1_J.glb",
+    "Building_20_2_A.glb",
+    "Building_20_2_B.glb",
+    "Building_20_2_C.glb",
+    "Building_20_2_D.glb",
+    "Building_20_2_E.glb",
+    "Building_20_2_F.glb",
+    "Building_20_2_G.glb",
+    "Building_20_2_H.glb",
+    "Building_20_2_I.glb",
+    "Building_20_2_J.glb",
+    "Building_20_3_A.glb",
+    "Building_20_3_B.glb",
+    "Building_20_3_C.glb",
+    "Building_20_3_D.glb",
+    "Building_20_3_E.glb",
+    "Building_20_3_F.glb",
+    "Building_20_3_G.glb",
+    "Building_20_3_H.glb",
+    "Building_20_3_I.glb",
+    "Building_20_3_J.glb"
+   ],
+   "sizes": {
+    "Building_20_1_A.glb": [
+     7.7,
+     18.3,
+     12.5,
+     1.9,
+     6.1
+    ],
+    "Building_20_1_B.glb": [
+     7.7,
+     18.3,
+     12.5,
+     1.9,
+     6.1
+    ],
+    "Building_20_1_C.glb": [
+     7.7,
+     18.3,
+     12.5,
+     1.9,
+     6.1
+    ],
+    "Building_20_1_D.glb": [
+     7.7,
+     18.3,
+     12.5,
+     1.9,
+     6.1
+    ],
+    "Building_20_1_E.glb": [
+     7.7,
+     18.3,
+     12.5,
+     1.9,
+     6.1
+    ],
+    "Building_20_1_F.glb": [
+     7.7,
+     18.3,
+     12.5,
+     1.9,
+     6.1
+    ],
+    "Building_20_1_G.glb": [
+     7.7,
+     18.3,
+     12.5,
+     1.9,
+     6.1
+    ],
+    "Building_20_1_H.glb": [
+     7.7,
+     18.3,
+     12.5,
+     1.9,
+     6.1
+    ],
+    "Building_20_1_I.glb": [
+     7.7,
+     18.3,
+     12.5,
+     1.9,
+     6.1
+    ],
+    "Building_20_1_J.glb": [
+     7.7,
+     18.3,
+     12.5,
+     1.9,
+     6.1
+    ],
+    "Building_20_2_A.glb": [
+     7.7,
+     18.3,
+     9.4,
+     1.9,
+     6.1
+    ],
+    "Building_20_2_B.glb": [
+     7.7,
+     18.3,
+     9.4,
+     1.9,
+     6.1
+    ],
+    "Building_20_2_C.glb": [
+     7.7,
+     18.3,
+     9.4,
+     1.9,
+     6.1
+    ],
+    "Building_20_2_D.glb": [
+     7.7,
+     18.3,
+     9.4,
+     1.9,
+     6.1
+    ],
+    "Building_20_2_E.glb": [
+     7.7,
+     18.3,
+     9.4,
+     1.9,
+     6.1
+    ],
+    "Building_20_2_F.glb": [
+     7.7,
+     18.3,
+     9.4,
+     1.9,
+     6.1
+    ],
+    "Building_20_2_G.glb": [
+     7.7,
+     18.3,
+     9.4,
+     1.9,
+     6.1
+    ],
+    "Building_20_2_H.glb": [
+     7.7,
+     18.3,
+     9.4,
+     1.9,
+     6.1
+    ],
+    "Building_20_2_I.glb": [
+     7.7,
+     18.3,
+     9.4,
+     1.9,
+     6.1
+    ],
+    "Building_20_2_J.glb": [
+     7.7,
+     18.3,
+     9.4,
+     1.9,
+     6.1
+    ],
+    "Building_20_3_A.glb": [
+     7.7,
+     18.3,
+     7.3,
+     1.9,
+     6.1
+    ],
+    "Building_20_3_B.glb": [
+     7.7,
+     18.3,
+     7.3,
+     1.9,
+     6.1
+    ],
+    "Building_20_3_C.glb": [
+     7.7,
+     18.3,
+     7.3,
+     1.9,
+     6.1
+    ],
+    "Building_20_3_D.glb": [
+     7.7,
+     18.3,
+     7.3,
+     1.9,
+     6.1
+    ],
+    "Building_20_3_E.glb": [
+     7.7,
+     18.3,
+     7.3,
+     1.9,
+     6.1
+    ],
+    "Building_20_3_F.glb": [
+     7.7,
+     18.3,
+     7.3,
+     1.9,
+     6.1
+    ],
+    "Building_20_3_G.glb": [
+     7.7,
+     18.3,
+     7.3,
+     1.9,
+     6.1
+    ],
+    "Building_20_3_H.glb": [
+     7.7,
+     18.3,
+     7.3,
+     1.9,
+     6.1
+    ],
+    "Building_20_3_I.glb": [
+     7.7,
+     18.3,
+     7.3,
+     1.9,
+     6.1
+    ],
+    "Building_20_3_J.glb": [
+     7.7,
+     18.3,
+     7.3,
+     1.9,
+     6.1
+    ]
+   }
+  },
+  "B21": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 21/",
+   "variants": [
+    "Building_21_1_A.glb",
+    "Building_21_1_B.glb",
+    "Building_21_1_C.glb",
+    "Building_21_1_D.glb",
+    "Building_21_1_E.glb",
+    "Building_21_1_F.glb",
+    "Building_21_1_G.glb",
+    "Building_21_1_H.glb",
+    "Building_21_1_I.glb",
+    "Building_21_1_J.glb",
+    "Building_21_1_K.glb",
+    "Building_21_2_A.glb",
+    "Building_21_2_B.glb",
+    "Building_21_2_C.glb",
+    "Building_21_2_D.glb",
+    "Building_21_2_E.glb",
+    "Building_21_2_F.glb",
+    "Building_21_2_G.glb",
+    "Building_21_2_H.glb",
+    "Building_21_2_I.glb",
+    "Building_21_2_J.glb",
+    "Building_21_2_K.glb",
+    "Building_21_3_A.glb",
+    "Building_21_3_B.glb",
+    "Building_21_3_C.glb",
+    "Building_21_3_D.glb",
+    "Building_21_3_E.glb",
+    "Building_21_3_F.glb",
+    "Building_21_3_G.glb",
+    "Building_21_3_H.glb",
+    "Building_21_3_I.glb",
+    "Building_21_3_J.glb",
+    "Building_21_3_K.glb",
+    "Building_21_4_A.glb",
+    "Building_21_4_B.glb",
+    "Building_21_4_C.glb",
+    "Building_21_4_D.glb",
+    "Building_21_4_E.glb",
+    "Building_21_4_F.glb",
+    "Building_21_4_G.glb",
+    "Building_21_4_H.glb",
+    "Building_21_4_I.glb",
+    "Building_21_4_J.glb",
+    "Building_21_4_K.glb",
+    "Building_21_5_A.glb",
+    "Building_21_5_B.glb",
+    "Building_21_5_C.glb",
+    "Building_21_5_D.glb",
+    "Building_21_5_E.glb",
+    "Building_21_5_F.glb",
+    "Building_21_5_G.glb",
+    "Building_21_5_H.glb",
+    "Building_21_5_I.glb",
+    "Building_21_5_J.glb",
+    "Building_21_5_K.glb"
+   ],
+   "sizes": {
+    "Building_21_1_A.glb": [
+     7.8,
+     7.1,
+     18.2,
+     -0.3,
+     0.0
+    ],
+    "Building_21_1_B.glb": [
+     7.8,
+     7.1,
+     18.2,
+     -0.3,
+     0.0
+    ],
+    "Building_21_1_C.glb": [
+     7.8,
+     7.1,
+     18.2,
+     -0.3,
+     0.0
+    ],
+    "Building_21_1_D.glb": [
+     7.8,
+     7.1,
+     18.2,
+     -0.3,
+     0.0
+    ],
+    "Building_21_1_E.glb": [
+     7.8,
+     7.1,
+     18.2,
+     -0.3,
+     0.0
+    ],
+    "Building_21_1_F.glb": [
+     7.8,
+     7.1,
+     18.2,
+     -0.3,
+     0.0
+    ],
+    "Building_21_1_G.glb": [
+     7.8,
+     7.1,
+     18.2,
+     -0.3,
+     0.0
+    ],
+    "Building_21_1_H.glb": [
+     7.8,
+     7.1,
+     18.2,
+     -0.3,
+     0.0
+    ],
+    "Building_21_1_I.glb": [
+     7.8,
+     7.1,
+     18.2,
+     -0.3,
+     0.0
+    ],
+    "Building_21_1_J.glb": [
+     7.8,
+     7.1,
+     18.2,
+     -0.3,
+     0.0
+    ],
+    "Building_21_1_K.glb": [
+     7.8,
+     7.1,
+     18.2,
+     -0.3,
+     0.0
+    ],
+    "Building_21_2_A.glb": [
+     7.8,
+     7.1,
+     14.9,
+     -0.3,
+     0.0
+    ],
+    "Building_21_2_B.glb": [
+     7.8,
+     7.1,
+     14.9,
+     -0.3,
+     0.0
+    ],
+    "Building_21_2_C.glb": [
+     7.8,
+     7.1,
+     14.9,
+     -0.3,
+     0.0
+    ],
+    "Building_21_2_D.glb": [
+     7.8,
+     7.1,
+     14.9,
+     -0.3,
+     0.0
+    ],
+    "Building_21_2_E.glb": [
+     7.8,
+     7.1,
+     14.9,
+     -0.3,
+     0.0
+    ],
+    "Building_21_2_F.glb": [
+     7.8,
+     7.1,
+     14.9,
+     -0.3,
+     0.0
+    ],
+    "Building_21_2_G.glb": [
+     7.8,
+     7.1,
+     14.9,
+     -0.3,
+     0.0
+    ],
+    "Building_21_2_H.glb": [
+     7.8,
+     7.1,
+     14.9,
+     -0.3,
+     0.0
+    ],
+    "Building_21_2_I.glb": [
+     7.8,
+     7.1,
+     14.9,
+     -0.3,
+     0.0
+    ],
+    "Building_21_2_J.glb": [
+     7.8,
+     7.1,
+     14.9,
+     -0.3,
+     0.0
+    ],
+    "Building_21_2_K.glb": [
+     7.8,
+     7.1,
+     14.9,
+     -0.3,
+     0.0
+    ],
+    "Building_21_3_A.glb": [
+     7.8,
+     7.1,
+     11.4,
+     -0.3,
+     0.0
+    ],
+    "Building_21_3_B.glb": [
+     7.8,
+     7.1,
+     11.4,
+     -0.3,
+     0.0
+    ],
+    "Building_21_3_C.glb": [
+     7.8,
+     7.1,
+     11.4,
+     -0.3,
+     0.0
+    ],
+    "Building_21_3_D.glb": [
+     7.8,
+     7.1,
+     11.4,
+     -0.3,
+     0.0
+    ],
+    "Building_21_3_E.glb": [
+     7.8,
+     7.1,
+     11.4,
+     -0.3,
+     0.0
+    ],
+    "Building_21_3_F.glb": [
+     7.8,
+     7.1,
+     11.4,
+     -0.3,
+     0.0
+    ],
+    "Building_21_3_G.glb": [
+     7.8,
+     7.1,
+     11.4,
+     -0.3,
+     0.0
+    ],
+    "Building_21_3_H.glb": [
+     7.8,
+     7.1,
+     11.4,
+     -0.3,
+     0.0
+    ],
+    "Building_21_3_I.glb": [
+     7.8,
+     7.1,
+     11.4,
+     -0.3,
+     0.0
+    ],
+    "Building_21_3_J.glb": [
+     7.8,
+     7.1,
+     11.4,
+     -0.3,
+     0.0
+    ],
+    "Building_21_3_K.glb": [
+     7.8,
+     7.1,
+     11.4,
+     -0.3,
+     0.0
+    ],
+    "Building_21_4_A.glb": [
+     7.8,
+     7.1,
+     7.8,
+     -0.3,
+     0.0
+    ],
+    "Building_21_4_B.glb": [
+     7.8,
+     7.1,
+     7.8,
+     -0.3,
+     0.0
+    ],
+    "Building_21_4_C.glb": [
+     7.8,
+     7.1,
+     7.8,
+     -0.3,
+     0.0
+    ],
+    "Building_21_4_D.glb": [
+     7.8,
+     7.1,
+     7.8,
+     -0.3,
+     0.0
+    ],
+    "Building_21_4_E.glb": [
+     7.8,
+     7.1,
+     7.8,
+     -0.3,
+     0.0
+    ],
+    "Building_21_4_F.glb": [
+     7.8,
+     7.1,
+     7.8,
+     -0.3,
+     0.0
+    ],
+    "Building_21_4_G.glb": [
+     7.8,
+     7.1,
+     7.8,
+     -0.3,
+     0.0
+    ],
+    "Building_21_4_H.glb": [
+     7.8,
+     7.1,
+     7.8,
+     -0.3,
+     0.0
+    ],
+    "Building_21_4_I.glb": [
+     7.8,
+     7.1,
+     7.8,
+     -0.3,
+     0.0
+    ],
+    "Building_21_4_J.glb": [
+     7.8,
+     7.1,
+     7.8,
+     -0.3,
+     0.0
+    ],
+    "Building_21_4_K.glb": [
+     7.8,
+     7.1,
+     7.8,
+     -0.3,
+     0.0
+    ],
+    "Building_21_5_A.glb": [
+     7.8,
+     7.1,
+     4.0,
+     -0.3,
+     0.0
+    ],
+    "Building_21_5_B.glb": [
+     7.8,
+     7.1,
+     4.0,
+     -0.3,
+     0.0
+    ],
+    "Building_21_5_C.glb": [
+     7.8,
+     7.1,
+     4.0,
+     -0.3,
+     0.0
+    ],
+    "Building_21_5_D.glb": [
+     7.8,
+     7.1,
+     4.0,
+     -0.3,
+     0.0
+    ],
+    "Building_21_5_E.glb": [
+     7.8,
+     7.1,
+     4.0,
+     -0.3,
+     0.0
+    ],
+    "Building_21_5_F.glb": [
+     7.8,
+     7.1,
+     4.0,
+     -0.3,
+     0.0
+    ],
+    "Building_21_5_G.glb": [
+     7.8,
+     7.1,
+     4.0,
+     -0.3,
+     0.0
+    ],
+    "Building_21_5_H.glb": [
+     7.8,
+     7.1,
+     4.0,
+     -0.3,
+     0.0
+    ],
+    "Building_21_5_I.glb": [
+     7.8,
+     7.1,
+     4.0,
+     -0.3,
+     0.0
+    ],
+    "Building_21_5_J.glb": [
+     7.8,
+     7.1,
+     4.0,
+     -0.3,
+     0.0
+    ],
+    "Building_21_5_K.glb": [
+     7.8,
+     7.1,
+     4.0,
+     -0.3,
+     0.0
+    ]
+   }
+  },
+  "B22": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 22/",
+   "variants": [
+    "Building_22_1_A.glb",
+    "Building_22_1_B.glb",
+    "Building_22_1_C.glb",
+    "Building_22_1_D.glb",
+    "Building_22_1_E.glb",
+    "Building_22_1_F.glb",
+    "Building_22_1_G.glb",
+    "Building_22_1_H.glb",
+    "Building_22_2_A.glb",
+    "Building_22_2_B.glb",
+    "Building_22_2_C.glb",
+    "Building_22_2_D.glb",
+    "Building_22_2_E.glb",
+    "Building_22_2_F.glb",
+    "Building_22_2_G.glb",
+    "Building_22_2_H.glb",
+    "Building_22_3_A.glb",
+    "Building_22_3_B.glb",
+    "Building_22_3_C.glb",
+    "Building_22_3_D.glb",
+    "Building_22_3_E.glb",
+    "Building_22_3_F.glb",
+    "Building_22_3_G.glb",
+    "Building_22_3_H.glb"
+   ],
+   "sizes": {
+    "Building_22_1_A.glb": [
+     31.1,
+     31.3,
+     11.7,
+     -7.7,
+     -0.8
+    ],
+    "Building_22_1_B.glb": [
+     31.1,
+     31.3,
+     11.7,
+     -7.7,
+     -0.8
+    ],
+    "Building_22_1_C.glb": [
+     31.1,
+     31.3,
+     11.7,
+     -7.7,
+     -0.8
+    ],
+    "Building_22_1_D.glb": [
+     31.1,
+     31.3,
+     11.7,
+     -7.7,
+     -0.8
+    ],
+    "Building_22_1_E.glb": [
+     31.1,
+     31.3,
+     11.7,
+     -7.7,
+     -0.8
+    ],
+    "Building_22_1_F.glb": [
+     31.1,
+     31.3,
+     11.7,
+     -7.7,
+     -0.8
+    ],
+    "Building_22_1_G.glb": [
+     31.1,
+     31.3,
+     11.7,
+     -7.7,
+     -0.8
+    ],
+    "Building_22_1_H.glb": [
+     31.1,
+     31.3,
+     11.7,
+     -7.7,
+     -0.8
+    ],
+    "Building_22_2_A.glb": [
+     31.1,
+     31.3,
+     6.2,
+     -7.7,
+     -0.9
+    ],
+    "Building_22_2_B.glb": [
+     31.1,
+     31.3,
+     6.2,
+     -7.7,
+     -0.9
+    ],
+    "Building_22_2_C.glb": [
+     31.1,
+     31.3,
+     6.2,
+     -7.7,
+     -0.9
+    ],
+    "Building_22_2_D.glb": [
+     31.1,
+     31.3,
+     6.2,
+     -7.7,
+     -0.9
+    ],
+    "Building_22_2_E.glb": [
+     31.1,
+     31.3,
+     6.2,
+     -7.7,
+     -0.9
+    ],
+    "Building_22_2_F.glb": [
+     31.1,
+     31.3,
+     6.2,
+     -7.7,
+     -0.9
+    ],
+    "Building_22_2_G.glb": [
+     31.1,
+     31.3,
+     6.2,
+     -7.7,
+     -0.9
+    ],
+    "Building_22_2_H.glb": [
+     31.1,
+     31.3,
+     6.2,
+     -7.7,
+     -0.9
+    ],
+    "Building_22_3_A.glb": [
+     12.5,
+     31.0,
+     6.7,
+     -0.0,
+     -0.0
+    ],
+    "Building_22_3_B.glb": [
+     12.5,
+     31.0,
+     6.7,
+     -0.0,
+     -0.0
+    ],
+    "Building_22_3_C.glb": [
+     12.5,
+     31.0,
+     6.7,
+     -0.0,
+     -0.0
+    ],
+    "Building_22_3_D.glb": [
+     12.5,
+     31.0,
+     6.7,
+     -0.0,
+     -0.0
+    ],
+    "Building_22_3_E.glb": [
+     12.5,
+     31.0,
+     6.7,
+     -0.0,
+     -0.0
+    ],
+    "Building_22_3_F.glb": [
+     12.5,
+     31.0,
+     6.7,
+     -0.0,
+     -0.0
+    ],
+    "Building_22_3_G.glb": [
+     12.5,
+     31.0,
+     6.7,
+     -0.0,
+     -0.0
+    ],
+    "Building_22_3_H.glb": [
+     12.5,
+     31.0,
+     6.7,
+     -0.0,
+     -0.0
+    ]
+   }
+  },
+  "B23": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 23/",
+   "variants": [
+    "Building_23_A.glb",
+    "Building_23_B.glb",
+    "Building_23_C.glb",
+    "Building_23_D.glb",
+    "Building_23_E.glb",
+    "Building_23_F.glb",
+    "Building_23_G.glb"
+   ],
+   "sizes": {
+    "Building_23_A.glb": [
+     20.7,
+     29.7,
+     12.1,
+     0.9,
+     -0.0
+    ],
+    "Building_23_B.glb": [
+     20.7,
+     29.7,
+     12.1,
+     0.9,
+     -0.0
+    ],
+    "Building_23_C.glb": [
+     20.7,
+     29.7,
+     12.1,
+     0.9,
+     -0.0
+    ],
+    "Building_23_D.glb": [
+     20.7,
+     29.7,
+     12.1,
+     0.9,
+     -0.0
+    ],
+    "Building_23_E.glb": [
+     20.7,
+     29.7,
+     12.1,
+     0.9,
+     -0.0
+    ],
+    "Building_23_F.glb": [
+     20.7,
+     29.7,
+     12.1,
+     0.9,
+     -0.0
+    ],
+    "Building_23_G.glb": [
+     20.7,
+     29.7,
+     12.1,
+     0.9,
+     -0.0
+    ]
+   }
+  },
+  "B24": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 24/",
+   "variants": [
+    "Building_24_A.glb",
+    "Building_24_B.glb",
+    "Building_24_C.glb",
+    "Building_24_D.glb",
+    "Building_24_E.glb",
+    "Building_24_F.glb",
+    "Building_24_G.glb",
+    "Building_24_H.glb",
+    "Building_24_I.glb",
+    "Building_24_J.glb",
+    "Building_24_K.glb",
+    "Building_24_L.glb",
+    "Building_24_M.glb",
+    "Building_24_N.glb"
+   ],
+   "sizes": {
+    "Building_24_A.glb": [
+     5.4,
+     8.9,
+     8.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_24_B.glb": [
+     5.4,
+     8.9,
+     8.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_24_C.glb": [
+     5.4,
+     8.9,
+     8.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_24_D.glb": [
+     5.4,
+     8.9,
+     8.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_24_E.glb": [
+     5.4,
+     8.9,
+     8.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_24_F.glb": [
+     5.4,
+     8.9,
+     8.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_24_G.glb": [
+     5.4,
+     8.9,
+     8.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_24_H.glb": [
+     5.4,
+     8.9,
+     8.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_24_I.glb": [
+     5.4,
+     8.9,
+     8.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_24_J.glb": [
+     5.4,
+     8.9,
+     8.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_24_K.glb": [
+     5.4,
+     8.9,
+     8.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_24_L.glb": [
+     5.4,
+     8.9,
+     8.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_24_M.glb": [
+     5.4,
+     8.9,
+     8.5,
+     -0.5,
+     -0.0
+    ],
+    "Building_24_N.glb": [
+     5.4,
+     8.9,
+     8.5,
+     -0.5,
+     -0.0
+    ]
+   }
+  },
+  "B25": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 25/",
+   "variants": [
+    "Building_25_10_A.glb",
+    "Building_25_10_B.glb",
+    "Building_25_10_C.glb",
+    "Building_25_10_D.glb",
+    "Building_25_10_E.glb",
+    "Building_25_10_F.glb",
+    "Building_25_10_G.glb",
+    "Building_25_10_H.glb",
+    "Building_25_11_A.glb",
+    "Building_25_11_B.glb",
+    "Building_25_11_C.glb",
+    "Building_25_11_D.glb",
+    "Building_25_11_E.glb",
+    "Building_25_11_F.glb",
+    "Building_25_11_G.glb",
+    "Building_25_11_H.glb",
+    "Building_25_1_A.glb",
+    "Building_25_1_B.glb",
+    "Building_25_1_C.glb",
+    "Building_25_1_D.glb",
+    "Building_25_1_E.glb",
+    "Building_25_1_F.glb",
+    "Building_25_1_G.glb",
+    "Building_25_1_H.glb",
+    "Building_25_2_A.glb",
+    "Building_25_2_B.glb",
+    "Building_25_2_C.glb",
+    "Building_25_2_D.glb",
+    "Building_25_2_E.glb",
+    "Building_25_2_F.glb",
+    "Building_25_2_G.glb",
+    "Building_25_2_H.glb",
+    "Building_25_3_A.glb",
+    "Building_25_3_B.glb",
+    "Building_25_3_C.glb",
+    "Building_25_3_D.glb",
+    "Building_25_3_E.glb",
+    "Building_25_3_F.glb",
+    "Building_25_3_G.glb",
+    "Building_25_3_H.glb",
+    "Building_25_4_A.glb",
+    "Building_25_4_B.glb",
+    "Building_25_4_C.glb",
+    "Building_25_4_D.glb",
+    "Building_25_4_E.glb",
+    "Building_25_4_F.glb",
+    "Building_25_4_G.glb",
+    "Building_25_4_H.glb",
+    "Building_25_5_A.glb",
+    "Building_25_5_B.glb",
+    "Building_25_5_C.glb",
+    "Building_25_5_D.glb",
+    "Building_25_5_E.glb",
+    "Building_25_5_F.glb",
+    "Building_25_5_G.glb",
+    "Building_25_5_H.glb",
+    "Building_25_6_A.glb",
+    "Building_25_6_B.glb",
+    "Building_25_6_C.glb",
+    "Building_25_6_D.glb",
+    "Building_25_6_E.glb",
+    "Building_25_6_F.glb",
+    "Building_25_6_G.glb",
+    "Building_25_6_H.glb",
+    "Building_25_7_A.glb",
+    "Building_25_7_B.glb",
+    "Building_25_7_C.glb",
+    "Building_25_7_D.glb",
+    "Building_25_7_E.glb",
+    "Building_25_7_F.glb",
+    "Building_25_7_G.glb",
+    "Building_25_7_H.glb",
+    "Building_25_8_A.glb",
+    "Building_25_8_B.glb",
+    "Building_25_8_C.glb",
+    "Building_25_8_D.glb",
+    "Building_25_8_E.glb",
+    "Building_25_8_F.glb",
+    "Building_25_8_G.glb",
+    "Building_25_8_H.glb",
+    "Building_25_9_A.glb",
+    "Building_25_9_B.glb",
+    "Building_25_9_C.glb",
+    "Building_25_9_D.glb",
+    "Building_25_9_E.glb",
+    "Building_25_9_F.glb",
+    "Building_25_9_G.glb",
+    "Building_25_9_H.glb"
+   ],
+   "sizes": {
+    "Building_25_10_A.glb": [
+     16.8,
+     27.3,
+     11.6,
+     4.3,
+     -5.7
+    ],
+    "Building_25_10_B.glb": [
+     16.8,
+     27.3,
+     11.6,
+     4.3,
+     -5.7
+    ],
+    "Building_25_10_C.glb": [
+     16.8,
+     27.3,
+     11.6,
+     4.3,
+     -5.7
+    ],
+    "Building_25_10_D.glb": [
+     16.8,
+     27.3,
+     11.6,
+     4.3,
+     -5.7
+    ],
+    "Building_25_10_E.glb": [
+     16.8,
+     27.3,
+     11.6,
+     4.3,
+     -5.7
+    ],
+    "Building_25_10_F.glb": [
+     16.8,
+     27.3,
+     11.6,
+     4.3,
+     -5.7
+    ],
+    "Building_25_10_G.glb": [
+     16.8,
+     27.3,
+     11.6,
+     4.3,
+     -5.7
+    ],
+    "Building_25_10_H.glb": [
+     16.8,
+     27.3,
+     11.6,
+     4.3,
+     -5.7
+    ],
+    "Building_25_11_A.glb": [
+     16.8,
+     27.3,
+     7.9,
+     4.3,
+     -5.7
+    ],
+    "Building_25_11_B.glb": [
+     16.8,
+     27.3,
+     7.9,
+     4.3,
+     -5.7
+    ],
+    "Building_25_11_C.glb": [
+     16.8,
+     27.3,
+     7.9,
+     4.3,
+     -5.7
+    ],
+    "Building_25_11_D.glb": [
+     16.8,
+     27.3,
+     7.9,
+     4.3,
+     -5.7
+    ],
+    "Building_25_11_E.glb": [
+     16.8,
+     27.3,
+     7.9,
+     4.3,
+     -5.7
+    ],
+    "Building_25_11_F.glb": [
+     16.8,
+     27.3,
+     7.9,
+     4.3,
+     -5.7
+    ],
+    "Building_25_11_G.glb": [
+     16.8,
+     27.3,
+     7.9,
+     4.3,
+     -5.7
+    ],
+    "Building_25_11_H.glb": [
+     16.8,
+     27.3,
+     7.9,
+     4.3,
+     -5.7
+    ],
+    "Building_25_1_A.glb": [
+     12.9,
+     14.8,
+     20.1,
+     2.3,
+     0.6
+    ],
+    "Building_25_1_B.glb": [
+     12.9,
+     14.8,
+     20.1,
+     2.3,
+     0.6
+    ],
+    "Building_25_1_C.glb": [
+     12.9,
+     14.8,
+     20.1,
+     2.3,
+     0.6
+    ],
+    "Building_25_1_D.glb": [
+     12.9,
+     14.8,
+     20.1,
+     2.3,
+     0.6
+    ],
+    "Building_25_1_E.glb": [
+     12.9,
+     14.8,
+     20.1,
+     2.3,
+     0.6
+    ],
+    "Building_25_1_F.glb": [
+     12.9,
+     14.8,
+     20.1,
+     2.3,
+     0.6
+    ],
+    "Building_25_1_G.glb": [
+     12.9,
+     14.8,
+     20.1,
+     2.3,
+     0.6
+    ],
+    "Building_25_1_H.glb": [
+     12.9,
+     14.8,
+     20.1,
+     2.3,
+     0.6
+    ],
+    "Building_25_2_A.glb": [
+     12.9,
+     14.8,
+     16.0,
+     2.3,
+     0.6
+    ],
+    "Building_25_2_B.glb": [
+     12.9,
+     14.8,
+     16.0,
+     2.3,
+     0.6
+    ],
+    "Building_25_2_C.glb": [
+     12.9,
+     14.8,
+     16.0,
+     2.3,
+     0.6
+    ],
+    "Building_25_2_D.glb": [
+     12.9,
+     14.8,
+     16.0,
+     2.3,
+     0.6
+    ],
+    "Building_25_2_E.glb": [
+     12.9,
+     14.8,
+     16.0,
+     2.3,
+     0.6
+    ],
+    "Building_25_2_F.glb": [
+     12.9,
+     14.8,
+     16.0,
+     2.3,
+     0.6
+    ],
+    "Building_25_2_G.glb": [
+     12.9,
+     14.8,
+     16.0,
+     2.3,
+     0.6
+    ],
+    "Building_25_2_H.glb": [
+     12.9,
+     14.8,
+     16.0,
+     2.3,
+     0.6
+    ],
+    "Building_25_3_A.glb": [
+     12.9,
+     14.8,
+     11.6,
+     2.3,
+     0.6
+    ],
+    "Building_25_3_B.glb": [
+     12.9,
+     14.8,
+     11.6,
+     2.3,
+     0.6
+    ],
+    "Building_25_3_C.glb": [
+     12.9,
+     14.8,
+     11.6,
+     2.3,
+     0.6
+    ],
+    "Building_25_3_D.glb": [
+     12.9,
+     14.8,
+     11.6,
+     2.3,
+     0.6
+    ],
+    "Building_25_3_E.glb": [
+     12.9,
+     14.8,
+     11.6,
+     2.3,
+     0.6
+    ],
+    "Building_25_3_F.glb": [
+     12.9,
+     14.8,
+     11.6,
+     2.3,
+     0.6
+    ],
+    "Building_25_3_G.glb": [
+     12.9,
+     14.8,
+     11.6,
+     2.3,
+     0.6
+    ],
+    "Building_25_3_H.glb": [
+     12.9,
+     14.8,
+     11.6,
+     2.3,
+     0.6
+    ],
+    "Building_25_4_A.glb": [
+     12.9,
+     14.8,
+     7.9,
+     2.3,
+     0.6
+    ],
+    "Building_25_4_B.glb": [
+     12.9,
+     14.8,
+     7.9,
+     2.3,
+     0.6
+    ],
+    "Building_25_4_C.glb": [
+     12.9,
+     14.8,
+     7.9,
+     2.3,
+     0.6
+    ],
+    "Building_25_4_D.glb": [
+     12.9,
+     14.8,
+     7.9,
+     2.3,
+     0.6
+    ],
+    "Building_25_4_E.glb": [
+     12.9,
+     14.8,
+     7.9,
+     2.3,
+     0.6
+    ],
+    "Building_25_4_F.glb": [
+     12.9,
+     14.8,
+     7.9,
+     2.3,
+     0.6
+    ],
+    "Building_25_4_G.glb": [
+     12.9,
+     14.8,
+     7.9,
+     2.3,
+     0.6
+    ],
+    "Building_25_4_H.glb": [
+     12.9,
+     14.8,
+     7.9,
+     2.3,
+     0.6
+    ],
+    "Building_25_5_A.glb": [
+     12.9,
+     29.4,
+     20.1,
+     2.2,
+     0.0
+    ],
+    "Building_25_5_B.glb": [
+     12.9,
+     29.4,
+     20.1,
+     2.2,
+     0.0
+    ],
+    "Building_25_5_C.glb": [
+     12.9,
+     29.4,
+     20.1,
+     2.2,
+     0.0
+    ],
+    "Building_25_5_D.glb": [
+     12.9,
+     29.4,
+     20.1,
+     2.2,
+     0.0
+    ],
+    "Building_25_5_E.glb": [
+     12.9,
+     29.4,
+     20.1,
+     2.2,
+     0.0
+    ],
+    "Building_25_5_F.glb": [
+     12.9,
+     29.4,
+     20.1,
+     2.2,
+     0.0
+    ],
+    "Building_25_5_G.glb": [
+     12.9,
+     29.4,
+     20.1,
+     2.2,
+     0.0
+    ],
+    "Building_25_5_H.glb": [
+     12.9,
+     29.4,
+     20.1,
+     2.2,
+     0.0
+    ],
+    "Building_25_6_A.glb": [
+     12.9,
+     29.4,
+     16.0,
+     2.2,
+     0.0
+    ],
+    "Building_25_6_B.glb": [
+     12.9,
+     29.4,
+     16.0,
+     2.2,
+     0.0
+    ],
+    "Building_25_6_C.glb": [
+     12.9,
+     29.4,
+     16.0,
+     2.2,
+     0.0
+    ],
+    "Building_25_6_D.glb": [
+     12.9,
+     29.4,
+     16.0,
+     2.2,
+     0.0
+    ],
+    "Building_25_6_E.glb": [
+     12.9,
+     29.4,
+     16.0,
+     2.2,
+     0.0
+    ],
+    "Building_25_6_F.glb": [
+     12.9,
+     29.4,
+     16.0,
+     2.2,
+     0.0
+    ],
+    "Building_25_6_G.glb": [
+     12.9,
+     29.4,
+     16.0,
+     2.2,
+     0.0
+    ],
+    "Building_25_6_H.glb": [
+     12.9,
+     29.4,
+     16.0,
+     2.2,
+     0.0
+    ],
+    "Building_25_7_A.glb": [
+     12.9,
+     29.4,
+     11.6,
+     2.2,
+     0.0
+    ],
+    "Building_25_7_B.glb": [
+     12.9,
+     29.4,
+     11.6,
+     2.2,
+     0.0
+    ],
+    "Building_25_7_C.glb": [
+     12.9,
+     29.4,
+     11.6,
+     2.2,
+     0.0
+    ],
+    "Building_25_7_D.glb": [
+     12.9,
+     29.4,
+     11.6,
+     2.2,
+     0.0
+    ],
+    "Building_25_7_E.glb": [
+     12.9,
+     29.4,
+     11.6,
+     2.2,
+     0.0
+    ],
+    "Building_25_7_F.glb": [
+     12.9,
+     29.4,
+     11.6,
+     2.2,
+     0.0
+    ],
+    "Building_25_7_G.glb": [
+     12.9,
+     29.4,
+     11.6,
+     2.2,
+     0.0
+    ],
+    "Building_25_7_H.glb": [
+     12.9,
+     29.4,
+     11.6,
+     2.2,
+     0.0
+    ],
+    "Building_25_8_A.glb": [
+     16.8,
+     27.3,
+     20.1,
+     4.3,
+     -5.7
+    ],
+    "Building_25_8_B.glb": [
+     16.8,
+     27.3,
+     20.1,
+     4.3,
+     -5.7
+    ],
+    "Building_25_8_C.glb": [
+     16.8,
+     27.3,
+     20.1,
+     4.3,
+     -5.7
+    ],
+    "Building_25_8_D.glb": [
+     16.8,
+     27.3,
+     20.1,
+     4.3,
+     -5.7
+    ],
+    "Building_25_8_E.glb": [
+     16.8,
+     27.3,
+     20.1,
+     4.3,
+     -5.7
+    ],
+    "Building_25_8_F.glb": [
+     16.8,
+     27.3,
+     20.1,
+     4.3,
+     -5.7
+    ],
+    "Building_25_8_G.glb": [
+     16.8,
+     27.3,
+     20.1,
+     4.3,
+     -5.7
+    ],
+    "Building_25_8_H.glb": [
+     16.8,
+     27.3,
+     20.1,
+     4.3,
+     -5.7
+    ],
+    "Building_25_9_A.glb": [
+     16.8,
+     27.3,
+     16.0,
+     4.3,
+     -5.7
+    ],
+    "Building_25_9_B.glb": [
+     16.8,
+     27.3,
+     16.0,
+     4.3,
+     -5.7
+    ],
+    "Building_25_9_C.glb": [
+     16.8,
+     27.3,
+     16.0,
+     4.3,
+     -5.7
+    ],
+    "Building_25_9_D.glb": [
+     16.8,
+     27.3,
+     16.0,
+     4.3,
+     -5.7
+    ],
+    "Building_25_9_E.glb": [
+     16.8,
+     27.3,
+     16.0,
+     4.3,
+     -5.7
+    ],
+    "Building_25_9_F.glb": [
+     16.8,
+     27.3,
+     16.0,
+     4.3,
+     -5.7
+    ],
+    "Building_25_9_G.glb": [
+     16.8,
+     27.3,
+     16.0,
+     4.3,
+     -5.7
+    ],
+    "Building_25_9_H.glb": [
+     16.8,
+     27.3,
+     16.0,
+     4.3,
+     -5.7
+    ]
+   }
+  },
+  "B26": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 26/",
+   "variants": [
+    "Building_26_A.glb",
+    "Building_26_B.glb",
+    "Building_26_C.glb",
+    "Building_26_D.glb",
+    "Building_26_E.glb",
+    "Building_26_F.glb",
+    "Building_26_G.glb",
+    "Building_26_H.glb",
+    "Building_26_I.glb",
+    "Building_26_J.glb",
+    "Building_26_K.glb",
+    "Building_26_L.glb",
+    "Building_26_M.glb",
+    "Building_26_M_001.glb",
+    "Building_26_O.glb",
+    "Building_26_O_001.glb"
+   ],
+   "sizes": {
+    "Building_26_A.glb": [
+     9.2,
+     7.1,
+     10.4,
+     -0.5,
+     0.0
+    ],
+    "Building_26_B.glb": [
+     9.2,
+     7.1,
+     10.4,
+     -0.5,
+     0.0
+    ],
+    "Building_26_C.glb": [
+     9.2,
+     7.1,
+     10.4,
+     -0.5,
+     0.0
+    ],
+    "Building_26_D.glb": [
+     9.2,
+     7.1,
+     10.4,
+     -0.5,
+     0.0
+    ],
+    "Building_26_E.glb": [
+     9.2,
+     7.1,
+     10.4,
+     -0.5,
+     0.0
+    ],
+    "Building_26_F.glb": [
+     9.2,
+     7.1,
+     10.4,
+     -0.5,
+     0.0
+    ],
+    "Building_26_G.glb": [
+     9.2,
+     7.1,
+     10.4,
+     -0.5,
+     0.0
+    ],
+    "Building_26_H.glb": [
+     9.2,
+     7.1,
+     10.4,
+     -0.5,
+     0.0
+    ],
+    "Building_26_I.glb": [
+     9.2,
+     7.1,
+     10.4,
+     -0.5,
+     0.0
+    ],
+    "Building_26_J.glb": [
+     9.2,
+     7.1,
+     10.4,
+     -0.5,
+     0.0
+    ],
+    "Building_26_K.glb": [
+     9.2,
+     7.1,
+     10.4,
+     -0.5,
+     0.0
+    ],
+    "Building_26_L.glb": [
+     9.2,
+     7.1,
+     10.4,
+     -0.5,
+     0.0
+    ],
+    "Building_26_M.glb": [
+     9.2,
+     7.1,
+     10.4,
+     -0.5,
+     0.0
+    ],
+    "Building_26_M_001.glb": [
+     9.2,
+     7.1,
+     10.4,
+     -0.5,
+     0.0
+    ],
+    "Building_26_O.glb": [
+     9.2,
+     7.1,
+     10.4,
+     -0.5,
+     0.0
+    ],
+    "Building_26_O_001.glb": [
+     9.2,
+     7.1,
+     10.4,
+     -0.5,
+     0.0
+    ]
+   }
+  },
+  "B27": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 27/",
+   "variants": [
+    "Building_27_A.glb",
+    "Building_27_B.glb",
+    "Building_27_C.glb",
+    "Building_27_D.glb",
+    "Building_27_E.glb",
+    "Building_27_F.glb",
+    "Building_27_G.glb",
+    "Building_27_H.glb",
+    "Building_27_I.glb",
+    "Building_27_J.glb",
+    "Building_27_K.glb",
+    "Building_27_L.glb",
+    "Building_27_M.glb",
+    "Building_27_N.glb",
+    "Building_27_O.glb",
+    "Building_27_P.glb",
+    "Building_27_R.glb",
+    "Building_27_S.glb",
+    "Building_27_T.glb"
+   ],
+   "sizes": {
+    "Building_27_A.glb": [
+     7.7,
+     11.6,
+     19.7,
+     0.0,
+     0.0
+    ],
+    "Building_27_B.glb": [
+     7.7,
+     11.6,
+     19.7,
+     0.0,
+     0.0
+    ],
+    "Building_27_C.glb": [
+     7.7,
+     11.6,
+     19.7,
+     0.0,
+     0.0
+    ],
+    "Building_27_D.glb": [
+     7.7,
+     11.6,
+     19.7,
+     0.0,
+     0.0
+    ],
+    "Building_27_E.glb": [
+     7.7,
+     11.6,
+     19.7,
+     0.0,
+     0.0
+    ],
+    "Building_27_F.glb": [
+     7.7,
+     11.6,
+     19.7,
+     0.0,
+     0.0
+    ],
+    "Building_27_G.glb": [
+     7.7,
+     11.6,
+     19.7,
+     0.0,
+     0.0
+    ],
+    "Building_27_H.glb": [
+     7.7,
+     11.6,
+     19.7,
+     0.0,
+     0.0
+    ],
+    "Building_27_I.glb": [
+     7.7,
+     11.6,
+     19.7,
+     0.0,
+     0.0
+    ],
+    "Building_27_J.glb": [
+     7.7,
+     11.6,
+     19.7,
+     0.0,
+     0.0
+    ],
+    "Building_27_K.glb": [
+     7.7,
+     11.6,
+     19.7,
+     0.0,
+     0.0
+    ],
+    "Building_27_L.glb": [
+     7.7,
+     11.6,
+     19.7,
+     0.0,
+     0.0
+    ],
+    "Building_27_M.glb": [
+     7.7,
+     11.6,
+     19.7,
+     0.0,
+     0.0
+    ],
+    "Building_27_N.glb": [
+     7.7,
+     11.6,
+     19.7,
+     0.0,
+     0.0
+    ],
+    "Building_27_O.glb": [
+     7.7,
+     11.6,
+     19.7,
+     0.0,
+     0.0
+    ],
+    "Building_27_P.glb": [
+     7.7,
+     11.6,
+     19.7,
+     0.0,
+     0.0
+    ],
+    "Building_27_R.glb": [
+     7.7,
+     11.6,
+     19.7,
+     0.0,
+     0.0
+    ],
+    "Building_27_S.glb": [
+     7.7,
+     11.6,
+     19.7,
+     0.0,
+     0.0
+    ],
+    "Building_27_T.glb": [
+     7.7,
+     11.6,
+     19.7,
+     0.0,
+     0.0
+    ]
+   }
+  },
+  "FACTORY": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Factory/",
+   "variants": [
+    "Building_Fabric_3_A.glb",
+    "Building_Fabric_3_B.glb",
+    "Building_Fabric_3_C.glb",
+    "Building_Fabric_3_D.glb",
+    "Building_Factory_1_A.glb",
+    "Building_Factory_1_B.glb",
+    "Building_Factory_1_C.glb",
+    "Building_Factory_1_C_001.glb",
+    "Building_Factory_1_D.glb",
+    "Building_Factory_2_A.glb",
+    "Building_Factory_2_B.glb",
+    "Building_Factory_2_C.glb",
+    "Building_Factory_2_D.glb",
+    "Building_Factory_3_A.glb",
+    "Building_Factory_3_B.glb",
+    "Building_Factory_3_D.glb",
+    "Building_Factory_4_A.glb",
+    "Building_Factory_4_B.glb",
+    "Building_Factory_4_C.glb",
+    "Building_Factory_4_D.glb"
+   ],
+   "sizes": {
+    "Building_Fabric_3_A.glb": [
+     6.6,
+     15.3,
+     4.6,
+     -0.1,
+     0.0
+    ],
+    "Building_Fabric_3_B.glb": [
+     6.6,
+     15.3,
+     4.6,
+     -0.1,
+     0.0
+    ],
+    "Building_Fabric_3_C.glb": [
+     6.6,
+     15.3,
+     4.6,
+     -0.1,
+     0.0
+    ],
+    "Building_Fabric_3_D.glb": [
+     6.6,
+     15.3,
+     4.6,
+     -0.1,
+     0.0
+    ],
+    "Building_Factory_1_A.glb": [
+     10.3,
+     19.1,
+     9.3,
+     -0.7,
+     0.1
+    ],
+    "Building_Factory_1_B.glb": [
+     10.3,
+     19.1,
+     9.3,
+     -0.7,
+     0.1
+    ],
+    "Building_Factory_1_C.glb": [
+     10.3,
+     19.1,
+     9.3,
+     -0.7,
+     0.1
+    ],
+    "Building_Factory_1_C_001.glb": [
+     9.0,
+     14.4,
+     7.9,
+     -0.1,
+     2.4
+    ],
+    "Building_Factory_1_D.glb": [
+     10.3,
+     19.1,
+     9.3,
+     -0.7,
+     0.1
+    ],
+    "Building_Factory_2_A.glb": [
+     9.1,
+     14.7,
+     6.7,
+     -0.1,
+     -0.0
+    ],
+    "Building_Factory_2_B.glb": [
+     9.1,
+     14.7,
+     6.7,
+     -0.1,
+     -0.0
+    ],
+    "Building_Factory_2_C.glb": [
+     9.1,
+     14.7,
+     6.7,
+     -0.1,
+     -0.0
+    ],
+    "Building_Factory_2_D.glb": [
+     9.1,
+     14.7,
+     6.7,
+     -0.1,
+     -0.0
+    ],
+    "Building_Factory_3_A.glb": [
+     9.0,
+     14.4,
+     7.9,
+     -0.1,
+     2.4
+    ],
+    "Building_Factory_3_B.glb": [
+     9.0,
+     14.4,
+     7.9,
+     -0.1,
+     2.4
+    ],
+    "Building_Factory_3_D.glb": [
+     9.0,
+     14.4,
+     7.9,
+     -0.1,
+     2.4
+    ],
+    "Building_Factory_4_A.glb": [
+     18.2,
+     28.6,
+     11.6,
+     4.5,
+     9.5
+    ],
+    "Building_Factory_4_B.glb": [
+     18.2,
+     28.6,
+     11.6,
+     4.5,
+     9.5
+    ],
+    "Building_Factory_4_C.glb": [
+     18.2,
+     28.6,
+     11.6,
+     4.5,
+     9.5
+    ],
+    "Building_Factory_4_D.glb": [
+     18.2,
+     28.6,
+     11.6,
+     4.5,
+     9.5
+    ]
+   }
+  },
+  "GASTANK": {
+   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Factory/",
+   "variants": [
+    "GasTank_1_A.glb",
+    "GasTank_1_B.glb",
+    "GasTank_1_C.glb",
+    "GasTank_1_D.glb",
+    "GasTank_1_E.glb",
+    "GasTank_1_F.glb",
+    "GasTank_1_G.glb",
+    "GasTank_1_H.glb",
+    "GasTank_2_A.glb",
+    "GasTank_2_B.glb",
+    "GasTank_2_C.glb",
+    "GasTank_2_D.glb",
+    "GasTank_2_E.glb",
+    "GasTank_2_F.glb",
+    "GasTank_2_G.glb",
+    "GasTank_2_H.glb"
+   ],
+   "sizes": {
+    "GasTank_1_A.glb": [
+     2.8,
+     3.8,
+     7.6,
+     0.0,
+     0.5
+    ],
+    "GasTank_1_B.glb": [
+     2.8,
+     3.8,
+     7.6,
+     0.0,
+     0.5
+    ],
+    "GasTank_1_C.glb": [
+     2.8,
+     3.8,
+     7.6,
+     0.0,
+     0.5
+    ],
+    "GasTank_1_D.glb": [
+     2.8,
+     3.8,
+     7.6,
+     0.0,
+     0.5
+    ],
+    "GasTank_1_E.glb": [
+     2.8,
+     3.8,
+     7.6,
+     0.0,
+     0.5
+    ],
+    "GasTank_1_F.glb": [
+     2.8,
+     3.8,
+     7.6,
+     0.0,
+     0.5
+    ],
+    "GasTank_1_G.glb": [
+     2.8,
+     3.8,
+     7.6,
+     0.0,
+     0.5
+    ],
+    "GasTank_1_H.glb": [
+     2.8,
+     3.8,
+     7.6,
+     0.0,
+     0.5
+    ],
+    "GasTank_2_A.glb": [
+     9.0,
+     9.4,
+     7.9,
+     0.0,
+     0.4
+    ],
+    "GasTank_2_B.glb": [
+     9.0,
+     9.4,
+     7.9,
+     0.0,
+     0.4
+    ],
+    "GasTank_2_C.glb": [
+     9.0,
+     9.4,
+     7.9,
+     0.0,
+     0.4
+    ],
+    "GasTank_2_D.glb": [
+     9.0,
+     9.4,
+     7.9,
+     0.0,
+     0.4
+    ],
+    "GasTank_2_E.glb": [
+     9.0,
+     9.4,
+     7.9,
+     0.0,
+     0.4
+    ],
+    "GasTank_2_F.glb": [
+     9.0,
+     9.4,
+     7.9,
+     0.0,
+     0.4
+    ],
+    "GasTank_2_G.glb": [
+     9.0,
+     9.4,
+     7.9,
+     0.0,
+     0.4
+    ],
+    "GasTank_2_H.glb": [
+     9.0,
+     9.4,
+     7.9,
+     0.0,
+     0.4
+    ]
+   }
+  }
+ }
+}

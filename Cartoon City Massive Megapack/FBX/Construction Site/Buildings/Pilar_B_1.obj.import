@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://fu5ikyhokiy5"
+path="res://.godot/imported/Pilar_B_1.obj-46de7b5a14c2f4e7508782058591a963.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Pilar_B_1.obj-46de7b5a14c2f4e7508782058591a963.mesh"]
+
+source_file="res://Cartoon City Massive Megapack/FBX/Construction Site/Buildings/Pilar_B_1.obj"
+dest_files=["res://.godot/imported/Pilar_B_1.obj-46de7b5a14c2f4e7508782058591a963.mesh", "res://.godot/imported/Pilar_B_1.obj-46de7b5a14c2f4e7508782058591a963.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

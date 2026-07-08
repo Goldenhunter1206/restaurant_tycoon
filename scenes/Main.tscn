@@ -1,0 +1,63 @@
+[gd_scene format=3 uid="uid://155xx7s6y6ta"]
+
+[ext_resource type="PackedScene" uid="uid://cdsn357x1gpdb" path="res://scenes/world/City.tscn" id="1_elqb8"]
+[ext_resource type="Script" uid="uid://dt8egejut2weo" path="res://scripts/camera/rts_camera.gd" id="2_vcsgt"]
+[ext_resource type="Script" uid="uid://bh8rgkee11mwf" path="res://scripts/ui/time_hud.gd" id="3_c01mt"]
+[ext_resource type="Script" uid="uid://ddpxhf05x54hq" path="res://scripts/ui/dev_inspector.gd" id="4_nxtc6"]
+[ext_resource type="Script" uid="uid://fckim1oua1s4" path="res://scripts/world/day_night.gd" id="5_jlsqs"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_rvslj"]
+sky_top_color = Color(0.35, 0.58, 0.92, 1)
+sky_horizon_color = Color(0.78, 0.86, 0.95, 1)
+ground_bottom_color = Color(0.4, 0.5, 0.4, 1)
+ground_horizon_color = Color(0.78, 0.86, 0.95, 1)
+
+[sub_resource type="Sky" id="Sky_0bbpv"]
+sky_material = SubResource("ProceduralSkyMaterial_rvslj")
+
+[sub_resource type="Environment" id="Environment_rarhs"]
+background_mode = 2
+sky = SubResource("Sky_0bbpv")
+ambient_light_source = 3
+tonemap_mode = 2
+
+[node name="Main" type="Node3D" unique_id=709500702]
+
+[node name="City" parent="." unique_id=1923338249 instance=ExtResource("1_elqb8")]
+
+[node name="Agents" type="Node3D" parent="." unique_id=252929223]
+
+[node name="Citizens" type="Node3D" parent="Agents" unique_id=1404000779]
+
+[node name="Vehicles" type="Node3D" parent="Agents" unique_id=785383072]
+
+[node name="CameraRig" type="Node3D" parent="." unique_id=397000210]
+script = ExtResource("2_vcsgt")
+
+[node name="Camera3D" type="Camera3D" parent="CameraRig" unique_id=1426378022]
+transform = Transform3D(1, 0, 0, 0, 0.70710677, 0.70710677, 0, -0.70710677, 0.70710677, 0, 60, 60)
+current = true
+far = 1500.0
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=280314052]
+transform = Transform3D(0.81915206, 0.46984634, -0.32898995, 0, 0.57357645, 0.81915206, 0.57357645, -0.6710101, 0.46984634, 0, 0, 0)
+light_energy = 1.3
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1134311641]
+environment = SubResource("Environment_rarhs")
+
+[node name="UILayer" type="CanvasLayer" parent="." unique_id=275958517]
+
+[node name="TimeHud" type="Control" parent="UILayer" unique_id=37755681]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("3_c01mt")
+
+[node name="DevInspector" type="Control" parent="UILayer" unique_id=2095403684]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("4_nxtc6")
+
+[node name="DayNight" type="Node" parent="." unique_id=945369612]
+script = ExtResource("5_jlsqs")

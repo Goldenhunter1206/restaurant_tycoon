@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://cbvld2vst7n4x"
+path="res://.godot/imported/ConcrateSlabs_B_3_2.obj-9398e86310329cd9944e910d6943b4dc.mesh"
+
+[deps]
+
+files=["res://.godot/imported/ConcrateSlabs_B_3_2.obj-9398e86310329cd9944e910d6943b4dc.mesh"]
+
+source_file="res://Cartoon City Massive Megapack/FBX/Construction Site/Buildings/ConcrateSlabs_B_3_2.obj"
+dest_files=["res://.godot/imported/ConcrateSlabs_B_3_2.obj-9398e86310329cd9944e910d6943b4dc.mesh", "res://.godot/imported/ConcrateSlabs_B_3_2.obj-9398e86310329cd9944e910d6943b4dc.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

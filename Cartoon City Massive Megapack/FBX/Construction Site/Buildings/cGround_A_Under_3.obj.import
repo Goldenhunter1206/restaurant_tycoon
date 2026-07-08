@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://tubqb7p5xo87"
+path="res://.godot/imported/cGround_A_Under_3.obj-aebfc64cadc603f2098ff69a6c8e70bb.mesh"
+
+[deps]
+
+files=["res://.godot/imported/cGround_A_Under_3.obj-aebfc64cadc603f2098ff69a6c8e70bb.mesh"]
+
+source_file="res://Cartoon City Massive Megapack/FBX/Construction Site/Buildings/cGround_A_Under_3.obj"
+dest_files=["res://.godot/imported/cGround_A_Under_3.obj-aebfc64cadc603f2098ff69a6c8e70bb.mesh", "res://.godot/imported/cGround_A_Under_3.obj-aebfc64cadc603f2098ff69a6c8e70bb.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

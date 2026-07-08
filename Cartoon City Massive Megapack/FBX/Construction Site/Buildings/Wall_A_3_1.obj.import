@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://bigp0mw3ec182"
+path="res://.godot/imported/Wall_A_3_1.obj-dcf3e8f32bdf93863f809aa0165094fd.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Wall_A_3_1.obj-dcf3e8f32bdf93863f809aa0165094fd.mesh"]
+
+source_file="res://Cartoon City Massive Megapack/FBX/Construction Site/Buildings/Wall_A_3_1.obj"
+dest_files=["res://.godot/imported/Wall_A_3_1.obj-dcf3e8f32bdf93863f809aa0165094fd.mesh", "res://.godot/imported/Wall_A_3_1.obj-dcf3e8f32bdf93863f809aa0165094fd.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

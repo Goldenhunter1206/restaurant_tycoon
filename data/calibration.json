@@ -1,0 +1,37 @@
+{
+	"tile_size": 8.0,
+	"road_surface_y": 0.2,
+	"kerb_top_y": 0.41,
+	"asset_scale": 1.0,
+	"character_height": 1.61,
+	"car_length": 3.64,
+	"traffic_light_height": 4.4,
+	"motorway_piece_width": 18.0,
+	"road_pieces": {
+		"straight_sidewalks": "Road_%s_1",
+		"straight_plain": "Road_%s_2",
+		"straight_crosswalk": "Road_%s_2_1",
+		"straight_long_dirt": "Road_%s_3",
+		"merge_taper": "Road_%s_4",
+		"t_junction_east": "Road_%s_5",
+		"t_junction_west": "Road_%s_6",
+		"intersection_4way": "Road_%s_7",
+		"curve_90": "Road_%s_8",
+		"corner_junction": "Road_%s_9",
+		"crosswalk_half_pink": "Road_%s_11",
+		"plaza_orange": "Road_%s_12",
+		"crosswalk_half_white": "Road_%s_13",
+		"edge_strip": "Road_%s_14",
+		"straight_alt": "Road_%s_15",
+		"curb_bulb_a": "Road_%s_16",
+		"curb_bulb_b": "Road_%s_18"
+	},
+	"notes": {
+		"orientation": "Standard road pieces are 8x8 m, origin-centered, lanes running along Z (north-south). Rotate 90deg for east-west.",
+		"aabb_road": "pos (-4, 0, -4) size (8, 0.41, 8) - the 0.41 top is the kerb; asphalt is lower.",
+		"motorway": "Road_X_2L_1_* and 2L_2_* are 18 m wide 4-lane divided pieces, some with side-junction cutouts.",
+		"parking": "ParkingRoad_X_1..7 are road-with-parking-lane pieces, some 16 m long, A_3 has perpendicular bays.",
+		"medians": "RoadMid_1/2/3_A..E are ~3x4 m green median strips with end caps.",
+		"themes": "Road color themes A, B, C exist for nearly every piece."
+	}
+}
