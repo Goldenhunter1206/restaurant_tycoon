@@ -24,6 +24,11 @@ const KIND_SEGMENT: int = 0
 const KIND_TURN: int = 1
 const KIND_MOTORWAY: int = 2
 
+## Cell size for the node spatial index (ring queries by ambient life,
+## leisure strolling). ~4 tiles: big enough that ring scans touch few
+## cells, small enough to avoid huge buckets.
+const CELL_SIZE: float = 32.0
+
 @export var lane_points: PackedVector3Array
 @export var lane_from: PackedInt32Array
 @export var lane_to: PackedInt32Array
@@ -47,6 +52,8 @@ var _side_adj: Dictionary = {}        # node id -> Array[edge index]
 var _lane_edge_by_pair: Dictionary = {}   # "from:to" -> edge index
 var _lane_astar := AStar3D.new()
 var _side_astar := AStar3D.new()
+var _side_cells: Dictionary = {}      # Vector2i cell -> PackedInt32Array side node ids
+var _lane_cells: Dictionary = {}      # Vector2i cell -> PackedInt32Array lane node ids
 var _runtime_ready: bool = false
 
 
@@ -75,7 +82,20 @@ func build_runtime() -> void:
 				_side_adj[node_id] = []
 			_side_adj[node_id].append(e)
 		_side_astar.connect_points(side_from[e], side_to[e], true)
+	_side_cells.clear()
+	_lane_cells.clear()
+	for idx in range(side_points.size()):
+		_cell_insert(_side_cells, side_points[idx], idx)
+	for idx in range(lane_points.size()):
+		_cell_insert(_lane_cells, lane_points[idx], idx)
 	_runtime_ready = true
+
+
+func _cell_insert(cells: Dictionary, pos: Vector3, idx: int) -> void:
+	var cell := Vector2i(floori(pos.x / CELL_SIZE), floori(pos.z / CELL_SIZE))
+	var arr: PackedInt32Array = cells.get(cell, PackedInt32Array())
+	arr.append(idx)
+	cells[cell] = arr
 
 
 func lane_out_edges(node_id: int) -> Array:
@@ -125,6 +145,39 @@ func find_side_path(start_node: int, goal_node: int) -> PackedInt32Array:
 	var out := PackedInt32Array()
 	for node_id in ids:
 		out.append(int(node_id))
+	return out
+
+
+func side_nodes_near(pos: Vector3, min_d: float, max_d: float) -> PackedInt32Array:
+	## Sidewalk node ids in the ring [min_d, max_d] around pos (XZ plane).
+	if not _runtime_ready:
+		build_runtime()
+	return _nodes_near(_side_cells, side_points, pos, min_d, max_d)
+
+
+func lane_nodes_near(pos: Vector3, min_d: float, max_d: float) -> PackedInt32Array:
+	## Lane node ids in the ring [min_d, max_d] around pos (XZ plane).
+	if not _runtime_ready:
+		build_runtime()
+	return _nodes_near(_lane_cells, lane_points, pos, min_d, max_d)
+
+
+func _nodes_near(cells: Dictionary, points: PackedVector3Array, pos: Vector3, min_d: float, max_d: float) -> PackedInt32Array:
+	var out := PackedInt32Array()
+	var r := int(ceil(max_d / CELL_SIZE))
+	var cx := floori(pos.x / CELL_SIZE)
+	var cz := floori(pos.z / CELL_SIZE)
+	var min_sq := min_d * min_d
+	var max_sq := max_d * max_d
+	for ix in range(cx - r, cx + r + 1):
+		for iz in range(cz - r, cz + r + 1):
+			var bucket: PackedInt32Array = cells.get(Vector2i(ix, iz), PackedInt32Array())
+			for node_id in bucket:
+				var dx := points[node_id].x - pos.x
+				var dz := points[node_id].z - pos.z
+				var d_sq := dx * dx + dz * dz
+				if d_sq >= min_sq and d_sq <= max_sq:
+					out.append(node_id)
 	return out
 
 

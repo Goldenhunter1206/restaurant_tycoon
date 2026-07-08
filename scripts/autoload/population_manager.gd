@@ -4,8 +4,12 @@ extends Node
 ## building registry is filled.
 
 const POPULATION_SEED: int = 20260707
-const CITIZEN_COUNT: int = 300
-const CAR_OWNER_TARGET: int = 60      # private cars; service vehicles come on top
+const CITIZEN_COUNT: int = 550
+const CAR_OWNER_TARGET: int = 60      # private cars granted INSIDE the seeded loop
+## Total owners after the deterministic post-pass. Do NOT raise
+## CAR_OWNER_TARGET instead: it gates rng.randf() draws inside the
+## generation loop, so changing it corrupts names/jobs of later citizens.
+const CAR_OWNER_TOTAL: int = 280
 
 const FIRST_NAMES: Array[String] = [
 	"Rosa", "Milo", "Greta", "Otto", "Luna", "Felix", "Ida", "Bruno", "Clara",
@@ -90,7 +94,7 @@ func _generate_population() -> void:
 			"wake_hour": 6.0 + rng.randf_range(0.0, 2.0),
 			"work_start": 8.0 + rng.randf_range(-0.5, 1.5),
 			"work_hours": 8.0 + rng.randf_range(-1.0, 1.0),
-			"home_hour": 20.5 + rng.randf_range(-1.5, 2.0),
+			"home_hour": 20.0 + rng.randf_range(-2.0, 3.5),
 			"leisure_spots": [],
 		}
 		# Job assignment: service jobs go to the first N citizens, the
@@ -112,12 +116,7 @@ func _generate_population() -> void:
 			rec["wake_hour"] = 19.5 + rng.randf_range(0.0, 1.5)
 			rec["home_hour"] = 7.5 + rng.randf_range(0.0, 1.0)
 		# Car ownership by district wealth.
-		var car_chance := 0.3
-		match String(home["district"]):
-			"R": car_chance = 0.8
-			"N": car_chance = 0.55
-			"P": car_chance = 0.2
-			_: car_chance = 0.3
+		var car_chance := _car_chance(String(home["district"]))
 		if car_owners < CAR_OWNER_TARGET and rec["job_type"] != "none" and rng.randf() < car_chance:
 			rec["owns_car"] = true
 			car_owners += 1
@@ -126,6 +125,39 @@ func _generate_population() -> void:
 			spots.append(leisure_pool[rng.randi_range(0, leisure_pool.size() - 1)])
 		rec["leisure_spots"] = spots
 		citizens_data.append(rec)
+	_grant_extra_cars()
+
+
+func _car_chance(district: String) -> float:
+	match district:
+		"R": return 0.8
+		"N": return 0.55
+		"P": return 0.2
+		_: return 0.3
+
+
+func _grant_extra_cars() -> void:
+	## Top up from the in-loop 60 to CAR_OWNER_TOTAL using a SEPARATE RNG
+	## stream, so the deterministic population (seed POPULATION_SEED) is
+	## byte-identical for the first citizens. District-weighted; all
+	## citizens eligible (unemployed drive to leisure too).
+	var rng := RandomNumberGenerator.new()
+	rng.seed = POPULATION_SEED + 2
+	var owners := 0
+	for rec: Dictionary in citizens_data:
+		if rec["owns_car"]:
+			owners += 1
+	var guard := 0
+	while owners < CAR_OWNER_TOTAL and guard < 128:
+		guard += 1
+		for rec: Dictionary in citizens_data:
+			if owners >= CAR_OWNER_TOTAL:
+				break
+			if rec["owns_car"]:
+				continue
+			if rng.randf() < _car_chance(String(rec["district"])):
+				rec["owns_car"] = true
+				owners += 1
 
 
 func _pick_weighted_home(rng: RandomNumberGenerator, homes: Array[Dictionary], slots: Dictionary) -> Dictionary:
@@ -168,6 +200,7 @@ func _spawn_citizens() -> void:
 	var model_rng := RandomNumberGenerator.new()
 	model_rng.seed = POPULATION_SEED + 1
 	var parent := get_tree().current_scene.get_node("Agents/Citizens")
+	var batch := 0
 	for rec: Dictionary in citizens_data:
 		var citizen := citizen_scene.instantiate()
 		citizen.setup(rec)
@@ -176,6 +209,22 @@ func _spawn_citizens() -> void:
 			var model: String = _character_models[model_rng.randi_range(0, _character_models.size() - 1)]
 			citizen.set_model(model, _anim_library)
 		citizens.append(citizen)
+		# Spread instantiation + GLB loads over frames to avoid a
+		# multi-second startup stall.
+		batch += 1
+		if batch % 60 == 0:
+			await get_tree().process_frame
+	# Spawn each owner's car parked at their home curb (TrafficManager is
+	# initialized by now — its deferred init ran during the awaits above).
+	var car_batch := 0
+	for citizen: Node in citizens:
+		# Skip owners who already self-spawned a car (a citizen can commute
+		# during these spawn frames and lazy-fetch its car first).
+		if citizen.data["owns_car"] and citizen.owned_vehicle == null:
+			TrafficManager.spawn_citizen_car(citizen)
+			car_batch += 1
+			if car_batch % 30 == 0:
+				await get_tree().process_frame
 
 
 func _collect_character_models() -> void:
@@ -198,6 +247,23 @@ func _load_animation_library() -> void:
 		if libs.size() > 0:
 			_anim_library = player.get_animation_library(libs[0])
 	inst.free()
+
+
+func ensure_assets_loaded() -> void:
+	## Lets other systems (ambient life) reuse the character models and
+	## the shared animation library without duplicating loads.
+	if _character_models.is_empty():
+		_collect_character_models()
+	if _anim_library == null:
+		_load_animation_library()
+
+
+func character_model_paths() -> Array[String]:
+	return _character_models
+
+
+func animation_library() -> AnimationLibrary:
+	return _anim_library
 
 
 func citizen_by_id(citizen_id: int) -> Node:

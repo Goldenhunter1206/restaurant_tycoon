@@ -16,13 +16,20 @@ const LINES: int = 17                # BLOCKS + 1 road lines per axis
 
 ## Interior width (m) of each block column/row. Must be multiples of 8.
 ## Downtown (i 4..10, j 4..7) is dense; edges are wide suburban blocks.
-const COL_INTERIORS: Array[int] = [40, 40, 40, 48, 32, 32, 32, 32, 32, 32, 32, 40, 48, 48, 48, 40]
-const ROW_INTERIORS: Array[int] = [48, 48, 40, 40, 32, 32, 32, 32, 40, 40, 40, 40, 40, 48, 48, 48]
+const COL_INTERIORS: Array[int] = [48, 40, 32, 48, 32, 40, 24, 32, 32, 40, 32, 48, 40, 56, 40, 48]
+const ROW_INTERIORS: Array[int] = [56, 40, 48, 40, 32, 24, 32, 40, 32, 48, 40, 32, 48, 40, 56, 48]
 
 const MOTORWAY_X: float = -53.0      # centerline; east edge -44 mates with 5 avenue tiles spanning -44..-4
 const MOTORWAY_Z_START: float = -80.0
 const MOTORWAY_Z_END: float = 850.0
 const AVENUE_ROWS: Array[int] = [3, 11]   # horizontal lines extended west to the motorway
+
+## Grand avenues: prominent arterials given a boulevard treatment — widened
+## planted building setbacks plus double tree + lamp rows on both sides. The
+## road topology stays a normal street (no special junctions), so it reads as
+## a leafy boulevard while keeping traffic and the graph unchanged.
+const GRAND_AVENUE_V: Array[int] = [6, 11]   # vertical arterial line indices
+const GRAND_AVENUE_H: Array[int] = [10]      # horizontal arterial line indices
 const ROADS_DIR: String = "res://Cartoon City Massive Megapack/gLTF 2/Roads/"
 
 # Direction bitmask (world): N = -Z, S = +Z, E = +X, W = -X.
@@ -43,22 +50,22 @@ const PIECE_CURVE: int = S | W           # Road_X_8
 ## D downtown, C commercial, I industrial, R rich suburb, N normal
 ## suburb, P poor suburb, K central park, G pocket park, X construction.
 const ZONING: Array[String] = [
-	"RRRRRRRRRRRRRRRR",
-	"RRRRRRRRRRRRRRRR",
-	"RRRRRRRRRGRRRRRR",
-	"CCCCCCCCCCCCNNNN",
-	"PPPCDDDDDDDCNNNN",
-	"PPPCDDDDDDDCNNNN",
-	"PPCCDDDDDDDCNNNN",
-	"PPPCDDDDDDDCNNNN",
-	"PPPCCDDKKDCCNNNN",
-	"PPPCCDDKKDCCNNNN",
-	"PPPNCCCCCCCNNNGN",
-	"CCCCCCCCCCCCCNNN",
-	"PPNNNNNGNNNXNNNN",
-	"IIIIIIIIIIIIIIII",
-	"IIIIIIIIIIIIIIII",
-	"IIIIIIIIIIIIIIII",
+	"RRRGRRRNRRRRRRCC",
+	"RRRRRNRRRRRGRRCC",
+	"NNRRRRRGRRRNNCCC",
+	"NNXCCCCCCCCCNCCC",
+	"PPCCDDDDDDCCNNRR",
+	"PPPCDDDDDDDCNNRR",
+	"PPCCDDDGDDDCCNXR",
+	"PPPCDDDKKDDCNNNR",
+	"PPPCCDDKKDDCCNNN",
+	"PPPNCDDDDDCCGNNN",
+	"PPNNCCCCCCCCNNNN",
+	"PCCNNNCNNXNNGNNN",
+	"PPXNNNCNNCNNNNCN",
+	"IINIICIIINIIGIIN",
+	"IIIIIXIINIICIIII",
+	"IIIICIIIIIIIINII",
 ]
 
 
@@ -71,22 +78,47 @@ static func district(bi: int, bj: int) -> String:
 ## Superblocks [block_i, block_j, w, h]: interior road segments removed
 ## so the covered blocks merge into one large lot.
 const SUPERBLOCKS: Array = [
-	[7, 8, 2, 2],     # central park
-	[5, 5, 1, 2],     # downtown plaza (two blocks merged N-S)
-	[9, 6, 2, 1],     # downtown superblock (two blocks merged E-W)
-	[1, 0, 2, 1],     # rich north: estate lots
-	[5, 0, 2, 1],     # rich north
-	[12, 0, 2, 2],    # rich north-east: golf-course-sized estate
-	[13, 5, 2, 2],    # normal east suburb
-	[12, 9, 2, 1],    # normal east suburb
-	[0, 6, 2, 1],     # poor west
+	[7, 7, 2, 2],     # central park (KK)
+	[5, 5, 1, 2],     # downtown plaza (two D blocks merged N-S)
+	[4, 4, 2, 1],     # downtown superblock (E-W)
+	[8, 10, 2, 1],    # commercial superblock south of downtown
+	[12, 0, 2, 1],    # rich north estate
+	[14, 4, 2, 2],    # rich east: large estate
+	[13, 9, 2, 2],    # normal east suburb: big lot
+	[0, 5, 2, 1],     # poor west campus
 	[1, 9, 1, 2],     # poor west
+	[0, 11, 1, 2],    # poor west
 	[0, 13, 2, 2],    # industrial south-west
 	[3, 13, 2, 2],    # industrial
-	[6, 13, 2, 2],    # industrial
-	[10, 13, 2, 2],   # industrial
+	[6, 14, 2, 2],    # industrial
+	[9, 14, 2, 2],    # industrial
 	[13, 13, 2, 2],   # industrial south-east
 ]
+
+## Non-rectangular merged lots: each entry is a list of [bi, bj] block cells
+## forming one connected (usually L-shaped) super-lot. Interior road segments
+## between two cells of the same cluster are removed, exactly like SUPERBLOCKS.
+const LSHAPE_CLUSTERS: Array = [
+	[[10, 9], [11, 9], [10, 10]],   # commercial L south-east of downtown
+	[[12, 1], [13, 1], [13, 2]],    # rich L-estate, north-east
+	[[8, 0], [9, 0], [9, 1]],       # rich L-estate, north
+]
+
+
+static func _cluster_map() -> Dictionary:
+	## "bi,bj" -> cluster id for every merged block (rectangles + L-shapes).
+	var m := {}
+	var cid := 0
+	for sb: Array in SUPERBLOCKS:
+		for i in range(sb[0], sb[0] + sb[2]):
+			for j in range(sb[1], sb[1] + sb[3]):
+				m["%d,%d" % [i, j]] = cid
+		cid += 1
+	for cluster: Array in LSHAPE_CLUSTERS:
+		for cell: Array in cluster:
+			m["%d,%d" % [cell[0], cell[1]]] = cid
+		cid += 1
+	return m
 
 
 static func line_x(i: int) -> float:
@@ -113,29 +145,29 @@ static func line_theme(index: int) -> String:
 
 
 static func removed_v_segments() -> Dictionary:
-	## Keys "i,j": vertical-line i segment between rows j and j+1.
+	## Keys "i,j": vertical-line i segment between rows j and j+1, removed when
+	## the blocks it divides ((i-1,j) west and (i,j) east) share a merged lot.
+	var m := _cluster_map()
 	var removed := {}
-	for sb: Array in SUPERBLOCKS:
-		var bi: int = sb[0]
-		var bj: int = sb[1]
-		var w: int = sb[2]
-		var h: int = sb[3]
-		for i in range(bi + 1, bi + w):
-			for j in range(bj, bj + h):
+	for i in range(1, LINES - 1):
+		for j in range(BLOCKS):
+			var wk := "%d,%d" % [i - 1, j]
+			var ek := "%d,%d" % [i, j]
+			if m.has(wk) and m.has(ek) and m[wk] == m[ek]:
 				removed["%d,%d" % [i, j]] = true
 	return removed
 
 
 static func removed_h_segments() -> Dictionary:
-	## Keys "i,j": horizontal-line j segment between cols i and i+1.
+	## Keys "i,j": horizontal-line j segment between cols i and i+1, removed when
+	## the blocks it divides ((i,j-1) north and (i,j) south) share a merged lot.
+	var m := _cluster_map()
 	var removed := {}
-	for sb: Array in SUPERBLOCKS:
-		var bi: int = sb[0]
-		var bj: int = sb[1]
-		var w: int = sb[2]
-		var h: int = sb[3]
-		for j in range(bj + 1, bj + h):
-			for i in range(bi, bi + w):
+	for j in range(1, LINES - 1):
+		for i in range(BLOCKS):
+			var nk := "%d,%d" % [i, j - 1]
+			var sk := "%d,%d" % [i, j]
+			if m.has(nk) and m.has(sk) and m[nk] == m[sk]:
 				removed["%d,%d" % [i, j]] = true
 	return removed
 

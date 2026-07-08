@@ -42,6 +42,11 @@ static func build_placements(catalog: Dictionary) -> Array[Dictionary]:
 			for j in range(bj, bj + sb[3]):
 				claimed["%d,%d" % [i, j]] = true
 		_fill_lot(out, catalog, bi, bj, sb[2], sb[3], true)
+	# Non-rectangular L-shaped merged lots.
+	for cluster: Array in CityBuilder.LSHAPE_CLUSTERS:
+		for cell: Array in cluster:
+			claimed["%d,%d" % [cell[0], cell[1]]] = true
+		_fill_cluster(out, catalog, cluster, CityBuilder.district(cluster[0][0], cluster[0][1]))
 	for bi in range(CityBuilder.BLOCKS):
 		for bj in range(CityBuilder.BLOCKS):
 			if claimed.has("%d,%d" % [bi, bj]):
@@ -117,45 +122,77 @@ static func _pick_variant(catalog: Dictionary, rng: RandomNumberGenerator, fam_k
 
 
 static func _fill_perimeter(out: Array[Dictionary], catalog: Dictionary, rng: RandomNumberGenerator, district: String, bi: int, bj: int, x0: float, x1: float, z0: float, z1: float) -> void:
-	var pool: Array = POOLS[district]
-	var setback: float = SETBACK[district]
-	var depth_limit_ns := (z1 - z0) * 0.5 - 1.5
-	var depth_limit_ew := (x1 - x0) * 0.5 - 1.5
-	var corner := 14.0
-	# faces: [start, end, is_horizontal, rot_y, corner_margin, depth_limit]
-	var faces := [
-		[x0, x1, true, 180.0, 0.0, depth_limit_ns],    # N face, front looks -Z
-		[x0, x1, true, 0.0, 0.0, depth_limit_ns],      # S face, front looks +Z
-		[z0, z1, false, 270.0, corner, depth_limit_ew],  # W face, front looks -X
-		[z0, z1, false, 90.0, corner, depth_limit_ew],   # E face, front looks +X
-	]
-	var face_ids := [0, 1, 2, 3]
-	for f in face_ids:
+	for f in [0, 1, 2, 3]:
 		if not _face_has_road(bi, bj, 1, 1, f):
 			continue
-		var fd: Array = faces[f]
-		var start: float = fd[0] + fd[4]
-		var end: float = fd[1] - fd[4]
-		var cursor := start + rng.randf_range(GAP_MIN[district], GAP_MAX[district]) * 0.5
-		var guard := 0
-		while guard < 30:
-			guard += 1
-			var b := _pick_variant(catalog, rng, pool[rng.randi_range(0, pool.size() - 1)])
-			if b["d"] > fd[5]:
+		var corner := 0.0 if f < 2 else 14.0
+		_march_face(out, catalog, rng, district, bi, bj, x0, x1, z0, z1, f, corner)
+
+
+## Fill one lot face (0=N,1=S,2=W,3=E) with a row of street-fronting buildings.
+static func _march_face(out: Array[Dictionary], catalog: Dictionary, rng: RandomNumberGenerator, district: String, bi: int, bj: int, x0: float, x1: float, z0: float, z1: float, face_id: int, corner: float) -> void:
+	var pool: Array = POOLS[district]
+	var setback: float = SETBACK[district] + _avenue_setback(bi, bj, face_id)
+	var is_h := face_id < 2
+	var depth_limit := ((z1 - z0) if is_h else (x1 - x0)) * 0.5 - 1.5
+	var rot: float
+	var range_start: float
+	var range_end: float
+	match face_id:
+		0: rot = 180.0; range_start = x0; range_end = x1
+		1: rot = 0.0; range_start = x0; range_end = x1
+		2: rot = 270.0; range_start = z0; range_end = z1
+		_: rot = 90.0; range_start = z0; range_end = z1
+	var cursor := range_start + corner + rng.randf_range(GAP_MIN[district], GAP_MAX[district]) * 0.5
+	var end := range_end - corner
+	var guard := 0
+	while guard < 30:
+		guard += 1
+		var b := _pick_variant(catalog, rng, pool[rng.randi_range(0, pool.size() - 1)])
+		if b["d"] > depth_limit:
+			continue
+		if cursor + b["w"] > end:
+			break
+		var along: float = cursor + b["w"] * 0.5
+		var pos: Vector3
+		if is_h:
+			var depth_z: float = (z0 + setback + b["d"] * 0.5) if rot == 180.0 else (z1 - setback - b["d"] * 0.5)
+			pos = Vector3(along, 0, depth_z)
+		else:
+			var depth_x: float = (x0 + setback + b["d"] * 0.5) if rot == 270.0 else (x1 - setback - b["d"] * 0.5)
+			pos = Vector3(depth_x, 0, along)
+		_emit(out, b, pos, rot, district, bi, bj)
+		cursor += b["w"] + rng.randf_range(GAP_MIN[district], GAP_MAX[district])
+
+
+## Fill a non-rectangular (L-shaped) cluster: buildings on every cell edge whose
+## neighbour is outside the cluster (an exposed street frontage).
+static func _fill_cluster(out: Array[Dictionary], catalog: Dictionary, cells: Array, district: String) -> void:
+	if not POOLS.has(district):
+		return
+	var rng := RandomNumberGenerator.new()
+	rng.seed = MASTER_SEED * 39916801 ^ int(cells[0][0]) * 2654435761 ^ int(cells[0][1]) * 40503
+	var cellset := {}
+	for c: Array in cells:
+		cellset["%d,%d" % [c[0], c[1]]] = true
+	var neigh := [[0, -1], [0, 1], [-1, 0], [1, 0]]   # N, S, W, E
+	for c: Array in cells:
+		var bi: int = c[0]
+		var bj: int = c[1]
+		if CityBuilder.district(bi, bj) in ["K", "G", "X"]:
+			continue
+		var x0 := CityBuilder.line_x(bi) + 4.0
+		var x1 := CityBuilder.line_x(bi + 1) - 4.0
+		var z0 := CityBuilder.line_z(bj) + 4.0
+		var z1 := CityBuilder.line_z(bj + 1) - 4.0
+		for f in range(4):
+			var nk := "%d,%d" % [bi + neigh[f][0], bj + neigh[f][1]]
+			if cellset.has(nk):
 				continue
-			if cursor + b["w"] > end:
-				break
-			var along: float = cursor + b["w"] * 0.5
-			var pos: Vector3
-			var rot: float = fd[3]
-			if fd[2]:  # horizontal face (N/S)
-				var depth_z: float = (z0 + setback + b["d"] * 0.5) if rot == 180.0 else (z1 - setback - b["d"] * 0.5)
-				pos = Vector3(along, 0, depth_z)
-			else:
-				var depth_x: float = (x0 + setback + b["d"] * 0.5) if rot == 270.0 else (x1 - setback - b["d"] * 0.5)
-				pos = Vector3(depth_x, 0, along)
-			_emit(out, b, pos, rot, district, bi, bj)
-			cursor += b["w"] + rng.randf_range(GAP_MIN[district], GAP_MAX[district])
+			if not _face_has_road(bi, bj, 1, 1, f):
+				continue
+			var corner := 2.0 if f < 2 else 6.0
+			_march_face(out, catalog, rng, district, bi, bj, x0, x1, z0, z1, f, corner)
 
 
 static func _place_centered(out: Array[Dictionary], catalog: Dictionary, rng: RandomNumberGenerator, district: String, bi: int, bj: int, fams: Array, x0: float, x1: float, z0: float, z1: float) -> void:
@@ -190,6 +227,15 @@ static func _fill_industrial(out: Array[Dictionary], catalog: Dictionary, rng: R
 		var t := _pick_variant(catalog, rng, "GASTANK")
 		var pos := Vector3(x1 - t["w"] * 0.5 - 2.0, 0, z1 - t["d"] * 0.5 - 2.0)
 		_emit(out, t, pos, 0.0, "I", bi, bj)
+
+
+## Extra planted setback (m) when a lot face fronts a grand avenue.
+static func _avenue_setback(bi: int, bj: int, face_id: int) -> float:
+	match face_id:
+		0: return 5.0 if bj in CityBuilder.GRAND_AVENUE_H else 0.0
+		1: return 5.0 if (bj + 1) in CityBuilder.GRAND_AVENUE_H else 0.0
+		2: return 5.0 if bi in CityBuilder.GRAND_AVENUE_V else 0.0
+		_: return 5.0 if (bi + 1) in CityBuilder.GRAND_AVENUE_V else 0.0
 
 
 static func _emit(out: Array[Dictionary], b: Dictionary, pos: Vector3, rot: float, district: String, bi: int, bj: int) -> void:

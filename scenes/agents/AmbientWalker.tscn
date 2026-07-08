@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://cbg230csxhvco"]
+
+[ext_resource type="Script" uid="uid://cg4n884wyg2ij" path="res://scripts/agents/ambient_walker.gd" id="1_np6bb"]
+
+[node name="AmbientWalker" type="Node3D" unique_id=1333089993]
+script = ExtResource("1_np6bb")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=77046680]
