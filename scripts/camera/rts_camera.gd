@@ -2,6 +2,8 @@ class_name RtsCamera
 extends Node3D
 ## Pizza-Connection-style RTS camera rig. WASD/edge pan, wheel zoom,
 ## Q/E rotate, R/F tilt. Attach to CameraRig (child Camera3D expected).
+## Clicking a citizen or car enters a strict chase-cam follow mode; Esc,
+## right-click, or clicking empty ground returns to the free RTS view.
 
 const PAN_SPEED: float = 60.0
 const EDGE_MARGIN: float = 8.0
@@ -11,9 +13,22 @@ const ZOOM_STEP: float = 1.12
 const TILT_MIN: float = 25.0
 const TILT_MAX: float = 80.0
 
+## Chase-cam follow tuning.
+const FOLLOW_DIST_START: float = 9.0
+const FOLLOW_DIST_MIN: float = 4.0
+const FOLLOW_DIST_MAX: float = 25.0
+const FOLLOW_HEIGHT: float = 4.0
+const FOLLOW_LERP: float = 8.0
+const FOLLOW_LOOK_UP: float = 1.2
+
 var zoom_dist: float = 90.0
 var yaw_deg: float = 0.0
 var tilt_deg: float = 52.0
+
+## Follow mode: the selected agent (Citizen/Vehicle) to chase, or null
+## for the normal free RTS camera.
+var _follow: Node3D = null
+var _follow_dist: float = FOLLOW_DIST_START
 
 var _last_mouse_pos: Vector2 = Vector2.INF
 var _mouse_idle_time: float = 999.0
@@ -24,9 +39,18 @@ var _mouse_idle_time: float = 999.0
 func _ready() -> void:
 	position = Vector3(280, 0, 300)
 	_apply()
+	SelectionManager.entity_selected.connect(_on_entity_selected)
+	SelectionManager.selection_cleared.connect(_stop_follow)
 
 
 func _process(delta: float) -> void:
+	# Follow mode overrides all free-camera input while a target is chased.
+	if _follow != null:
+		if is_instance_valid(_follow):
+			_follow_update(delta)
+		else:
+			_stop_follow()
+		return
 	var move := Vector2.ZERO
 	if Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP):
 		move.y -= 1.0
@@ -76,6 +100,19 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _follow != null:
+		# In follow mode the wheel adjusts chase distance; right-click or
+		# Esc drops back to the free camera.
+		if event is InputEventMouseButton and event.pressed:
+			if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+				_follow_dist = clampf(_follow_dist / ZOOM_STEP, FOLLOW_DIST_MIN, FOLLOW_DIST_MAX)
+			elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+				_follow_dist = clampf(_follow_dist * ZOOM_STEP, FOLLOW_DIST_MIN, FOLLOW_DIST_MAX)
+			elif event.button_index == MOUSE_BUTTON_RIGHT:
+				_stop_follow()
+		elif event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+			_stop_follow()
+		return
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
 			zoom_dist = clampf(zoom_dist / ZOOM_STEP, ZOOM_MIN, ZOOM_MAX)
@@ -88,3 +125,61 @@ func _apply() -> void:
 	var tilt_rad := deg_to_rad(tilt_deg)
 	_cam.position = Vector3(0, zoom_dist * sin(tilt_rad), zoom_dist * cos(tilt_rad))
 	_cam.rotation_degrees = Vector3(-tilt_deg, 0, 0)
+
+
+# --- Chase-cam follow -------------------------------------------------
+
+func _on_entity_selected(info: Dictionary, entity: Node) -> void:
+	## Clicking a citizen/vehicle follows it; a building (or anything else)
+	## leaves/skips follow mode.
+	var kind := String(info.get("kind", ""))
+	if (kind == "citizen" or kind == "vehicle") and entity is Node3D:
+		_start_follow(entity)
+	else:
+		_stop_follow()
+
+
+func _start_follow(node: Node3D) -> void:
+	_follow = node
+	_follow_dist = FOLLOW_DIST_START
+	# Collapse the child camera onto the rig so the rig transform IS the
+	# camera; _follow_update then drives the rig directly with look_at.
+	_cam.transform = Transform3D.IDENTITY
+
+
+func _stop_follow() -> void:
+	if _follow == null:
+		return
+	_follow = null
+	# Resume free RTS control from wherever the chase cam ended up, so the
+	# hand-off is not jarring.
+	yaw_deg = rotation_degrees.y
+	position.x = clampf(position.x, -120.0, 820.0)
+	position.z = clampf(position.z, -120.0, 900.0)
+	_apply()
+
+
+func _active_follow_node() -> Node3D:
+	## A citizen who is driving is frozen/invisible while its car carries
+	## the motion — chase the car instead.
+	if _follow is Citizen:
+		var c := _follow as Citizen
+		if c.state == Citizen.CState.DRIVING and is_instance_valid(c.owned_vehicle):
+			return c.owned_vehicle
+	return _follow
+
+
+func _follow_update(delta: float) -> void:
+	var n := _active_follow_node()
+	if n == null or not is_instance_valid(n):
+		_stop_follow()
+		return
+	# Agent heading is local +Z; sit behind it and a little above.
+	var fwd := n.global_transform.basis.z
+	fwd.y = 0.0
+	if fwd.length_squared() < 0.0001:
+		fwd = Vector3(0, 0, 1)
+	fwd = fwd.normalized()
+	var target := n.global_position - fwd * _follow_dist + Vector3.UP * FOLLOW_HEIGHT
+	global_position = global_position.lerp(target, 1.0 - exp(-FOLLOW_LERP * delta))
+	look_at(n.global_position + Vector3.UP * FOLLOW_LOOK_UP, Vector3.UP)

@@ -18,7 +18,11 @@ const CITY_SCRIPT: String = "res://scripts/world/city.gd"
 const DECOR_SCRIPT: String = "res://scripts/gen/decor_placer.gd"
 const PARK_SCRIPT: String = "res://scripts/gen/park_placer.gd"
 const SIDEWALK_SCRIPT: String = "res://scripts/gen/sidewalk_placer.gd"
+const CONCRETE_SCRIPT: String = "res://scripts/gen/concrete_placer.gd"
+const YARD_SCRIPT: String = "res://scripts/gen/suburban_yard_placer.gd"
 const GROUND_ALBEDO: Color = Color(0.45, 0.76, 0.32)
+const GROUND_GRASS_TEX: String = "res://Cartoon City Massive Megapack/gLTF 2/Tiles/GrassTile_D_1_Grass.png"
+const GROUND_UV_TILES: float = 120.0   # texture repeats across the 1500 m plane (~12.5 m per tile)
 const VIS_RANGE_END: float = 900.0
 const VIS_RANGE_MARGIN: float = 80.0
 
@@ -50,6 +54,8 @@ static func rebuild_all(with_decor: bool = true) -> Dictionary:
 	if with_decor:
 		var sw: Object = load(SIDEWALK_SCRIPT)
 		counts["sidewalks"] = sw.build(root)
+		var cp: Object = load(CONCRETE_SCRIPT)
+		counts["concrete"] = cp.build(root)
 		var dp: Object = load(DECOR_SCRIPT)
 		counts["decor"] = dp.build(root)
 		var pp: Object = load(PARK_SCRIPT)
@@ -58,6 +64,8 @@ static func rebuild_all(with_decor: bool = true) -> Dictionary:
 		counts["signage"] = SignPlacer.build(root)
 		counts["construction"] = ConstructionPlacer.build(root)
 		counts["parked_cars"] = ParkedCarPlacer.build(root)
+		var yp: Object = load(YARD_SCRIPT)
+		counts["yards"] = yp.build(root, placements)
 
 	_set_owner_rec(root, root)
 	var packed := PackedScene.new()
@@ -100,10 +108,15 @@ static func _build_buildings(root: Node3D, cache: Dictionary, placements: Array[
 		body.set_meta("btype", p["type"])
 		body.set_meta("family", p["family"])
 		body.set_meta("size", Vector3(p["w"], p["h"], p["d"]))
+		body.set_meta("front_dir", p.get("front", Vector3(0, 0, 1)))
 		grp.add_child(body)
 		var vis: Node = _cached_scene(cache, p["path"]).instantiate()
 		body.add_child(vis)
 		_apply_vis_range(vis)
+		var su: Vector3 = p.get("standup", Vector3.ZERO)
+		if su != Vector3.ZERO and vis is Node3D:
+			(vis as Node3D).rotation_degrees = su
+		_sit_on_ground(vis)
 		var col := CollisionShape3D.new()
 		col.shape = _cached_box(shape_cache, p["w"], p["h"], p["d"])
 		col.position = Vector3(0.0, p["h"] * 0.5, 0.0)
@@ -152,7 +165,15 @@ static func _build_ground(root: Node3D) -> void:
 	var pm := PlaneMesh.new()
 	pm.size = Vector2(1500.0, 1500.0)
 	var mat := StandardMaterial3D.new()
-	mat.albedo_color = GROUND_ALBEDO
+	var tex: Texture2D = load(GROUND_GRASS_TEX)
+	if tex != null:
+		mat.albedo_texture = tex
+		mat.uv1_scale = Vector3(GROUND_UV_TILES, GROUND_UV_TILES, 1.0)
+		mat.albedo_color = Color.WHITE
+	else:
+		mat.albedo_color = GROUND_ALBEDO
+	mat.roughness = 1.0
+	mat.metallic = 0.0
 	pm.material = mat
 	mi.mesh = pm
 	var ext := CityBuilder.city_extent()
@@ -166,6 +187,33 @@ static func _dir_vec(bit: int) -> Vector3:
 		S: return Vector3(0, 0, 1)
 		E: return Vector3(1, 0, 0)
 		_: return Vector3(-1, 0, 0)
+
+
+## Some pack building glbs have their origin at the model CENTRE (e.g. Building_2
+## has min-y ~= -3.1), so placing them at y=0 sinks half the building underground
+## and it reads as a flat slab. Offset the visual up so its base sits on y=0.
+static func _sit_on_ground(vis: Node) -> void:
+	if not (vis is Node3D):
+		return
+	var miny := _mesh_min_y(vis, Transform3D.IDENTITY)
+	if miny < 1.0e8 and absf(miny) > 0.05:
+		(vis as Node3D).position.y -= miny
+
+
+static func _mesh_min_y(node: Node, xf: Transform3D) -> float:
+	var m := xf
+	if node is Node3D:
+		m = xf * (node as Node3D).transform
+	var lo := 1.0e9
+	if node is MeshInstance3D and (node as MeshInstance3D).mesh != null:
+		var a: AABB = (node as MeshInstance3D).mesh.get_aabb()
+		for ix in [0.0, 1.0]:
+			for iy in [0.0, 1.0]:
+				for iz in [0.0, 1.0]:
+					lo = minf(lo, (m * (a.position + Vector3(a.size.x * ix, a.size.y * iy, a.size.z * iz))).y)
+	for c in node.get_children():
+		lo = minf(lo, _mesh_min_y(c, m))
+	return lo
 
 
 ## Balanced far-field fade so only distant buildings thin out; the near/mid

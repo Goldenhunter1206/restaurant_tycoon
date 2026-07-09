@@ -16,7 +16,10 @@ func _register_buildings() -> void:
 		if not body.has_meta("building_id"):
 			continue
 		var size: Vector3 = body.get_meta("size")
-		var front_dir := body.global_transform.basis.z.normalized()
+		# The entrance is usually on a side face, so the bake stores the true front
+		# direction; fall back to basis.z for anything without it.
+		var front_dir: Vector3 = body.get_meta("front_dir", body.global_transform.basis.z)
+		front_dir = front_dir.normalized()
 		var door_pos: Vector3 = body.global_position + front_dir * (size.z * 0.5 + 1.2)
 		var info := {
 			"id": int(body.get_meta("building_id")),

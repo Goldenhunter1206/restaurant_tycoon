@@ -15,7 +15,7 @@ const CARS: Array[String] = [
 
 const SEED: int = 141421356
 const CAR_OFFSET: float = 1.1     # kerb-to-car-centre, into the road
-const CAR_Y: float = 0.0
+const CAR_Y: float = 0.24     # car mesh sits ~0.24 m below its origin (wheels)
 const CAR_SPACING: float = 5.5
 const CORNER_CLEAR: float = 7.0   # keep clear of intersections / crosswalks
 const EDGE_PROB: float = 0.38     # fraction of eligible curb edges that get a row
