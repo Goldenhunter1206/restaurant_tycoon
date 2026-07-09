@@ -1,0 +1,7 @@
+[mcp_servers.godotiq]
+command = "uvx"
+args = ["godotiq"]
+
+[mcp_servers.godotiq.env]
+GODOTIQ_PROJECT_ROOT = "/Users/moritz/Code/pizza/new-game-project"
+GODOTIQ_LICENSE_KEY = "GODOTIQ-6F582E04-F2BE-41A0-BADD-27E885AB3CBB"

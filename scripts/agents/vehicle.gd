@@ -10,6 +10,9 @@ const CITY_SPEED: float = 9.0
 const MOTORWAY_SPEED: float = 17.0
 const LOD_NEAR: float = 90.0
 const LOD_MID: float = 220.0
+const ROAD_SURFACE_Y: float = 0.319   # asphalt top in world space
+const LANE_NODE_Y: float = 0.2        # y the road-graph lane nodes sit at
+const CURB_PARK_OFFSET: float = 1.65  # lane-centre -> parked-car centre, toward the kerb
 
 var kind: String = "civilian"
 var state: VState = VState.PARKED
@@ -37,13 +40,31 @@ func set_model(model_path: String) -> void:
 		return
 	var model: Node3D = scene.instantiate()
 	model.name = "Model"
-	# Cars in this pack face +X at rest; our forward convention is +Z
-	# (yaw from atan2(x, z)), so pre-rotate the mesh -90 deg.
-	model.rotation_degrees = Vector3(0, -90, 0)
+	# Cars in this pack face -X at rest; our forward convention is +Z
+	# (yaw from atan2(x, z)), so pre-rotate the mesh +90 deg.
+	model.rotation_degrees = Vector3(0, 90, 0)
+	# Ground the wheels on the asphalt: the lane nodes we follow sit at
+	# LANE_NODE_Y, the road surface is higher, and the car origin is min_y
+	# above the wheels. (Yaw-only rotation above leaves min_y unchanged.)
+	model.position.y = ROAD_SURFACE_Y - LANE_NODE_Y - _model_lowest_y(model, Transform3D.IDENTITY)
 	add_child(model)
 	for mesh: MeshInstance3D in model.find_children("*", "MeshInstance3D", true, false):
 		mesh.visibility_range_end = 350.0
 		mesh.visibility_range_end_margin = 15.0
+
+
+func _model_lowest_y(node: Node, accum: Transform3D) -> float:
+	## Lowest mesh point relative to the model origin, so set_model can drop
+	## the wheels onto the road surface regardless of the car variant.
+	var local := accum
+	if node is Node3D:
+		local = accum * (node as Node3D).transform
+	var lowest := INF
+	if node is MeshInstance3D and (node as MeshInstance3D).mesh != null:
+		lowest = ((local * (node as MeshInstance3D).mesh.get_aabb()) as AABB).position.y
+	for c in node.get_children():
+		lowest = minf(lowest, _model_lowest_y(c, local))
+	return 0.0 if lowest == INF else lowest
 
 
 func _ready() -> void:
@@ -74,7 +95,7 @@ func park_at(lane_pos: Vector3, heading: Vector3, jitter: float) -> void:
 	goal_desc = "parked"
 	set_process(false)
 	var right := Vector3(-heading.z, 0, heading.x)
-	global_position = lane_pos + right * 1.5 + heading * jitter
+	global_position = lane_pos + right * CURB_PARK_OFFSET + heading * jitter
 	rotation.y = atan2(heading.x, heading.z)
 
 

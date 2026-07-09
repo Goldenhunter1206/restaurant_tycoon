@@ -1,9 +1,17 @@
 class_name BuildingDressingPlacer
 extends RefCounted
 ## Dresses buildings with rooftop clutter, rooftop billboards and fire escapes.
-## Driven off BuildingPlacer placements (world pos + rot_y + w/h/d + district +
-## type), so props sit on roofs and against facades. All MultiMesh (via
-## MeshBatch) under a "BuildingDressing" group. Deterministic per building id.
+## Driven off BuildingPlacer placements (world pos + rot_y + district + type).
+##
+## Placement is done in each building's BODY-LOCAL frame, using the model's
+## MEASURED mesh AABB (loaded + measured at bake time), NOT the catalog w/h/d.
+## The catalog dims are unreliable for dressing: the entrance-yaw fix in
+## BuildingPlacer swaps w<->d for most families, and every mesh is offset from
+## its body origin by (center_x, center_z) -- so trusting w/d/pos put props on a
+## transposed, off-centre footprint and floated fire escapes off the facade.
+## Measuring the real AABB and building transforms as body_xf * local_xf fixes
+## both the height (true roof top) and the horizontal centring in one shot.
+## All MultiMesh (via MeshBatch) under a "BuildingDressing" group. Deterministic.
 
 const RP := "res://Cartoon City Massive Megapack/gLTF 2/Roof Props/"
 const SP := "res://Cartoon City Massive Megapack/gLTF 2/Street Props/"
@@ -21,8 +29,10 @@ const ROOF_BILLBOARDS: Array[String] = [
 	RP + "Bilboard_1_A.glb", RP + "Bilboard_1_B.glb",
 	RP + "Bilboard_1_C.glb", RP + "Bilboard_1_D.glb",
 ]
-# FireEscape_A_2 is an already-upright ~3.3 m section, thin on local X (faces
-# +X), so it mounts directly onto a building's +X/-X facade (see _dress).
+# FireEscape_A_2 is an already-upright section, thin on local X (faces +X), so it
+# mounts directly onto a building's +X/-X facade with the building basis (see
+# _dress). Measured AABB: x[-0.40,0.37] y[0.00,3.25] z[-0.19,2.40] (origin at the
+# base; the constants below encode that so it hangs flush against the wall).
 const FE_ASSET := SP + "FireEscape_A_2.glb"
 
 const SEED: int = 314159265
@@ -34,10 +44,14 @@ const ROOF_PROB: float = 0.42
 const ROOF_MAX: int = 8            # props per roof cap
 const BILL_MIN_H: float = 24.0
 const BILL_SCALE: float = 1.6
+const BILL_EDGE_INSET: float = 1.2 # billboard back-off from the roof +Z edge
 const FE_MIN_H: float = 9.0
 const FE_SECTION: float = 3.3      # FireEscape_A_2 upright section height
 const FE_START: float = 3.0        # first landing above the ground floor
 const FE_MAX: int = 4
+const FE_MOUNT: float = 0.40       # escape mesh -X face offset from its origin
+const FE_ZC: float = 1.10          # escape mesh Z-centre offset from its origin
+const FE_BITE: float = 0.15        # sink slightly into the facade so it reads as attached
 
 
 static func build(root: Node3D, placements: Array) -> int:
@@ -45,12 +59,13 @@ static func build(root: Node3D, placements: Array) -> int:
 	grp.name = "BuildingDressing"
 	root.add_child(grp)
 	var cache := {}
+	var mcache := {}       # path -> measured body-local bounds
 	var roof_x := {}       # path -> Array[Transform3D]
 	var bill_x := {}       # path -> Array[Transform3D]
 	var fe_x: Array = []   # single asset -> Array[Transform3D]
 
 	for idx in range(placements.size()):
-		_dress(placements[idx] as Dictionary, idx, roof_x, bill_x, fe_x)
+		_dress(placements[idx] as Dictionary, idx, roof_x, bill_x, fe_x, mcache)
 
 	var total := 0
 	var roof_node := Node3D.new()
@@ -80,61 +95,126 @@ static func build(root: Node3D, placements: Array) -> int:
 	return total
 
 
-static func _dress(p: Dictionary, idx: int, roof_x: Dictionary, bill_x: Dictionary, fe_x: Array) -> void:
+static func _dress(p: Dictionary, idx: int, roof_x: Dictionary, bill_x: Dictionary, fe_x: Array, mcache: Dictionary) -> void:
 	var h: float = p["h"]
-	var w: float = p["w"]
-	var d: float = p["d"]
 	var district: String = p["district"]
 	var btype: String = p["type"]
 	var pos: Vector3 = p["pos"]
 	var basis := Basis(Vector3.UP, deg_to_rad(p["rot_y"]))
+	var body_xf := Transform3D(basis, pos)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = SEED ^ (idx * 2654435761)
 	var commercial := district == "D" or district == "C"
 	var roofy := commercial or btype == "office" or btype == "civic"
 
-	# Rooftop clutter on a jittered grid inset from the roof edge.
-	if roofy and h >= ROOF_MIN_H:
-		var roof_center := pos + Vector3(0.0, h, 0.0)
+	# Cheap eligibility gate on the catalog height (h is the true model height --
+	# only w/d are swapped by the entrance-yaw fix, never h). Only measure the
+	# real mesh when the building will actually be dressed.
+	var want_roof := roofy and h >= ROOF_MIN_H
+	var want_fe := commercial and h >= FE_MIN_H
+	if not (want_roof or want_fe):
+		return
+
+	var m: Dictionary = _measure(p["path"], p.get("standup", Vector3.ZERO), mcache)
+	var minx: float = m["minx"]
+	var maxx: float = m["maxx"]
+	var minz: float = m["minz"]
+	var maxz: float = m["maxz"]
+	var roof_y: float = m["roof_y"]
+	if roof_y <= 0.0:
+		return
+	var cx := (minx + maxx) * 0.5
+	var cz := (minz + maxz) * 0.5
+
+	# Rooftop clutter on a jittered grid inset from the real roof edge, at the
+	# real roof height. Props have their origin at the base, so y = roof_y sits
+	# them on the roof.
+	if want_roof:
 		var placed := 0
-		var lx := -w * 0.5 + ROOF_INSET
-		while lx <= w * 0.5 - ROOF_INSET and placed < ROOF_MAX:
-			var lz := -d * 0.5 + ROOF_INSET
-			while lz <= d * 0.5 - ROOF_INSET and placed < ROOF_MAX:
+		var lx := minx + ROOF_INSET
+		while lx <= maxx - ROOF_INSET and placed < ROOF_MAX:
+			var lz := minz + ROOF_INSET
+			while lz <= maxz - ROOF_INSET and placed < ROOF_MAX:
 				if rng.randf() < ROOF_PROB:
-					var local := Vector3(lx + rng.randf_range(-1.0, 1.0), 0.0, lz + rng.randf_range(-1.0, 1.0))
-					var wp: Vector3 = roof_center + basis * local
+					var local := Vector3(lx + rng.randf_range(-1.0, 1.0), roof_y, lz + rng.randf_range(-1.0, 1.0))
 					var path: String = ROOF_PROPS[rng.randi_range(0, ROOF_PROPS.size() - 1)]
 					var s := rng.randf_range(0.8, 1.15)
 					var yaw := rng.randf_range(0.0, TAU)
 					if not roof_x.has(path):
 						roof_x[path] = []
-					roof_x[path].append(Transform3D(Basis(Vector3.UP, yaw).scaled(Vector3(s, s, s)), wp))
+					var lxf := Transform3D(Basis(Vector3.UP, yaw).scaled(Vector3(s, s, s)), local)
+					roof_x[path].append(body_xf * lxf)
 					placed += 1
 				lz += ROOF_STEP
 			lx += ROOF_STEP
 
-	# Rooftop billboard on the tallest towers, at the street-facing (+Z) edge.
+	# Rooftop billboard on the tallest towers, at the roof's +Z edge, facing +Z.
 	if commercial and h >= BILL_MIN_H:
-		var wp := pos + Vector3(0.0, h, 0.0) + basis * Vector3(0.0, 0.0, d * 0.5 - 1.2)
+		var local := Vector3(cx, roof_y, maxz - BILL_EDGE_INSET)
 		var path: String = ROOF_BILLBOARDS[rng.randi_range(0, ROOF_BILLBOARDS.size() - 1)]
 		if not bill_x.has(path):
 			bill_x[path] = []
-		bill_x[path].append(Transform3D(basis.scaled(Vector3(BILL_SCALE, BILL_SCALE, BILL_SCALE)), wp))
+		var lxf := Transform3D(Basis().scaled(Vector3(BILL_SCALE, BILL_SCALE, BILL_SCALE)), local)
+		bill_x[path].append(body_xf * lxf)
 
-	# Fire escape: a stack of upright sections flush to one side facade.
-	# FireEscape_A_2 is already upright and faces +X, so the building's own basis
-	# (optionally flipped 180 deg for the -X side) mounts it directly -- no
-	# stand-up rotation. It is 0.8 thin on X, 2.6 wide on Z, 3.3 tall.
-	if commercial and h >= FE_MIN_H:
-		var base_yaw := deg_to_rad(p["rot_y"])
-		if rng.randf() < 0.5:
-			base_yaw += PI
-		var fb := Basis(Vector3.UP, base_yaw)
-		var outward := fb.x
-		var tangent := fb.z
-		var count := clampi(int((h - FE_START) / FE_SECTION), 1, FE_MAX)
+	# Fire escape: a stack of upright sections flush to one side facade. Built in
+	# body-local space against the real +X (or -X) wall so it hangs on the mesh,
+	# not on the body origin. FireEscape_A_2 is upright and its inner face is on
+	# its local -X (FE_MOUNT from origin); on the -X wall it is turned 180 deg.
+	if want_fe:
+		var side := 1.0 if rng.randf() < 0.5 else -1.0
+		var fb: Basis
+		var wall_x: float
+		if side > 0.0:
+			fb = Basis()                      # escape +X -> body +X (outward)
+			wall_x = maxx
+		else:
+			fb = Basis(Vector3.UP, PI)        # escape +X -> body -X (outward)
+			wall_x = minx
+		var origin_x := wall_x + side * (FE_MOUNT - FE_BITE)
+		var origin_z := cz - side * FE_ZC     # centre the section along the wall
+		var count := clampi(int((roof_y - FE_START) / FE_SECTION), 1, FE_MAX)
 		for k in range(count):
-			var anchor: Vector3 = pos + outward * (w * 0.5 + 0.4) - tangent * 1.1
-			anchor.y = FE_START + float(k) * FE_SECTION
-			fe_x.append(Transform3D(fb, anchor))
+			var local := Vector3(origin_x, FE_START + float(k) * FE_SECTION, origin_z)
+			fe_x.append(body_xf * Transform3D(fb, local))
+
+
+## Load + measure a model's mesh AABB in its body-local frame (standup applied,
+## matching CityRebuilder). Returns roof_y (true height above the ground-sat
+## base) and the x/z bounds. Cached per path. Editor/bake-time only.
+static func _measure(path: String, standup: Vector3, mcache: Dictionary) -> Dictionary:
+	if mcache.has(path):
+		return mcache[path]
+	var res := {"minx": 0.0, "maxx": 0.0, "minz": 0.0, "maxz": 0.0, "roof_y": 0.0}
+	var ps: PackedScene = load(path)
+	if ps != null:
+		var inst: Node = ps.instantiate()
+		if standup != Vector3.ZERO and inst is Node3D:
+			(inst as Node3D).rotation_degrees = standup
+		var acc: Array = [Vector3(1.0e9, 1.0e9, 1.0e9), Vector3(-1.0e9, -1.0e9, -1.0e9)]
+		_aabb(inst, Transform3D.IDENTITY, acc)
+		inst.free()
+		if acc[0].x < 1.0e8:
+			res = {
+				"minx": acc[0].x, "maxx": acc[1].x,
+				"minz": acc[0].z, "maxz": acc[1].z,
+				"roof_y": acc[1].y - acc[0].y,
+			}
+	mcache[path] = res
+	return res
+
+
+static func _aabb(node: Node, xf: Transform3D, acc: Array) -> void:
+	var m := xf
+	if node is Node3D:
+		m = xf * (node as Node3D).transform
+	if node is MeshInstance3D and (node as MeshInstance3D).mesh != null:
+		var a: AABB = (node as MeshInstance3D).mesh.get_aabb()
+		for ix in [0.0, 1.0]:
+			for iy in [0.0, 1.0]:
+				for iz in [0.0, 1.0]:
+					var wp: Vector3 = m * (a.position + Vector3(a.size.x * ix, a.size.y * iy, a.size.z * iz))
+					acc[0] = Vector3(minf(acc[0].x, wp.x), minf(acc[0].y, wp.y), minf(acc[0].z, wp.z))
+					acc[1] = Vector3(maxf(acc[1].x, wp.x), maxf(acc[1].y, wp.y), maxf(acc[1].z, wp.z))
+	for c in node.get_children():
+		_aabb(c, m, acc)

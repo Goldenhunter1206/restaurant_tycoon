@@ -14,8 +14,11 @@ const CARS: Array[String] = [
 ]
 
 const SEED: int = 141421356
-const CAR_OFFSET: float = 1.1     # kerb-to-car-centre, into the road
-const CAR_Y: float = 0.24     # car mesh sits ~0.24 m below its origin (wheels)
+const CAR_OFFSET: float = 0.75    # tile-edge-to-car-centre. The drivable asphalt
+                                  # only reaches +/-3.0 (raised kerb 3.0..4.0), so
+                                  # this parks the car hard in the gutter and keeps
+                                  # the +/-1.6 driving lane clear of the fender.
+const ROAD_SURFACE_Y: float = 0.319   # asphalt top in world space (road glbs sit at y=0)
 const CAR_SPACING: float = 5.5
 const CORNER_CLEAR: float = 7.0   # keep clear of intersections / crosswalks
 const EDGE_PROB: float = 0.38     # fraction of eligible curb edges that get a row
@@ -58,9 +61,28 @@ static func build(root: Node3D) -> int:
 		var xs: Array = car_x[v]
 		if xs.is_empty():
 			continue
+		# Lift every instance of this variant so its wheels rest on the
+		# asphalt: the pack's car origins sit min_y below the wheels.
+		var lift := ROAD_SURFACE_Y - _model_min_y(CARS[v], cache)
+		for k in range(xs.size()):
+			var xf: Transform3D = xs[k]
+			xf.origin.y = lift
+			xs[k] = xf
 		total += xs.size()
 		MeshBatch.emit(grp, "Car%d" % v, CARS[v], xs, cache)
 	return total
+
+
+static func _model_min_y(path: String, cache: Dictionary) -> float:
+	## Lowest point of the car mesh relative to its origin (wheels sit below
+	## the body-centre origin in this pack). Reuses the memoized submesh
+	## extraction the MultiMesh batcher already builds.
+	var submeshes: Array = MeshBatch.extract_meshes(path, cache)
+	var min_y := INF
+	for sm: Dictionary in submeshes:
+		var box: AABB = (sm["xform"] as Transform3D) * (sm["mesh"] as Mesh).get_aabb()
+		min_y = minf(min_y, box.position.y)
+	return 0.0 if min_y == INF else min_y
 
 
 static func _car_row(car_x: Array, rng: RandomNumberGenerator, a0: float, a1: float,
@@ -72,7 +94,8 @@ static func _car_row(car_x: Array, rng: RandomNumberGenerator, a0: float, a1: fl
 	var t: float = a0 + CORNER_CLEAR + rng.randf_range(0.0, 3.0)
 	while t < a1 - CORNER_CLEAR:
 		if rng.randf() < GAP_PROB:
-			var pos: Vector3 = Vector3(t, CAR_Y, fixed) if along_x else Vector3(fixed, CAR_Y, t)
+			# y is filled in per variant at emit time (wheel-grounding lift).
+			var pos: Vector3 = Vector3(t, 0.0, fixed) if along_x else Vector3(fixed, 0.0, t)
 			var v: int = rng.randi_range(0, CARS.size() - 1)
 			var yaw: float
 			if along_x:

@@ -18,25 +18,43 @@ const PAVE_Y: float = 0.0
 const FURN_Y: float = 0.1          # furniture rests on the pavement top
 const CURB_INSET: float = 0.75     # furniture distance from the curb into the sidewalk
 const CORNER_CLEAR: float = 5.0    # keep furniture away from intersections
+const MARGIN: float = 0.5          # min clear gap between adjacent furniture footprints
+const ROAD_CLEAR: float = 0.2      # deep prop's road-side face kept this far behind the kerb
+const DEEP_DEPTH: float = 1.5      # props deeper than this get pushed back / facade-checked
+const RESERVE_INFLATE: float = 0.6 # margin grown around a reserved footprint
+const RESERVE_MIN_EXTENT: float = 1.5  # props this big (either axis) reserve space from decor
 const SEED: int = 51413
+
+## Typical building-front setback from the kerb per district (mirrors
+## BuildingPlacer.SETBACK); grand-avenue faces add +5 m. Used to skip bulky
+## props that would otherwise punch through a downtown frontage.
+const SETBACK := {"D": 0.6, "C": 0.6, "N": 3.5, "R": 6.0, "P": 0.8, "I": 3.0}
+
+## World-XZ footprints of bulky furniture, filled during build() and read by
+## DecorPlacer so it never plants a tree/lamp inside a kiosk, bus stop, etc.
+static var reserved_rects: Array[Rect2] = []
 
 ## Furniture table. d = allowed district letters ("" = any); along = long prop
 ## laid parallel to the kerb; big = bulky prop (commercial frontages only).
+## sx/sz/cx/cz = measured model-local AABB size and centre offset (metres) from
+## each glb, used for along-kerb interval packing, the deep-prop inset push and
+## the decor reservation rects. Do not hand-edit; re-measure from the glb AABBs.
 const FURN: Array[Dictionary] = [
-	{"p": SP + "Hydrant.glb", "w": 4, "d": ""},
-	{"p": NP + "Trashbin_1_A.glb", "w": 4, "d": ""},
-	{"p": SP + "PostBox_1_A.glb", "w": 2, "d": ""},
-	{"p": SP + "Bench_4_A.glb", "w": 3, "d": "DCNRP", "along": true},
-	{"p": SP + "Parkomat.glb", "w": 3, "d": "DC"},
-	{"p": SP + "NewspaperH.glb", "w": 2, "d": "DC"},
-	{"p": SP + "BikePlace.glb", "w": 2, "d": "DCNP", "along": true},
-	{"p": SP + "BusStop_A.glb", "w": 1, "d": "DC", "big": true},
-	{"p": SP + "Kiosk_1_A.glb", "w": 1, "d": "DC", "big": true},
-	{"p": SP + "FoodCart_1_A.glb", "w": 1, "d": "D", "big": true},
+	{"p": SP + "Hydrant.glb", "w": 4, "d": "", "sx": 0.41, "sz": 0.59, "cx": -0.02, "cz": 0.00},
+	{"p": NP + "Trashbin_1_A.glb", "w": 4, "d": "", "sx": 0.45, "sz": 0.45, "cx": 0.00, "cz": 0.00},
+	{"p": SP + "PostBox_1_A.glb", "w": 2, "d": "", "sx": 0.51, "sz": 0.57, "cx": 0.00, "cz": 0.00},
+	{"p": SP + "Bench_4_A.glb", "w": 3, "d": "DCNRP", "along": true, "sx": 0.61, "sz": 1.94, "cx": 0.00, "cz": 0.00},
+	{"p": SP + "Parkomat.glb", "w": 3, "d": "DC", "sx": 0.18, "sz": 0.34, "cx": 0.01, "cz": -0.01},
+	{"p": SP + "NewspaperH.glb", "w": 2, "d": "DC", "sx": 0.49, "sz": 0.57, "cx": -0.19, "cz": 0.01},
+	{"p": SP + "BikePlace.glb", "w": 2, "d": "DCNP", "along": true, "sx": 0.58, "sz": 1.73, "cx": -0.01, "cz": 0.00},
+	{"p": SP + "BusStop_A.glb", "w": 1, "d": "DC", "big": true, "sx": 1.53, "sz": 4.03, "cx": 0.61, "cz": 0.00},
+	{"p": SP + "Kiosk_1_A.glb", "w": 1, "d": "DC", "big": true, "sx": 2.97, "sz": 4.54, "cx": 0.09, "cz": 0.08},
+	{"p": SP + "FoodCart_1_A.glb", "w": 1, "d": "D", "big": true, "sx": 2.44, "sz": 2.65, "cx": -0.11, "cz": -0.20},
 ]
 
 
 static func build(root: Node3D) -> Dictionary:
+	reserved_rects.clear()
 	var grp := Node3D.new()
 	grp.name = "Sidewalks"
 	root.add_child(grp)
@@ -114,17 +132,24 @@ static func _gather(paver_xforms: Array, kerb_xforms: Array, furn_xforms: Dictio
 			if e_road:
 				_pave_row(paver_xforms, z0 + BAND, z1 - BAND, x1 - BAND * 0.5, false)
 				_kerb_row(kerb_xforms, z0 + BAND, z1 - BAND, x1, false)
-			# Street furniture along each kerb.
+			# Street furniture along each kerb. Pass the kerb line (not a pre-insetted
+			# coordinate) plus the district's building-front distance so deep props can
+			# be set back and facade-checked per edge.
 			if dist == "" or dist == "X":
 				continue
+			var set_base: float = SETBACK.get(dist, 6.0)
 			if n_road:
-				_furn_row(furn_xforms, x0, x1, z0 + CURB_INSET, true, Vector3(0, 0, -1), dist, bi * 71 + bj)
+				_furn_row(furn_xforms, x0, x1, z0, true, Vector3(0, 0, -1), dist,
+					set_base + (5.0 if bj in CityBuilder.GRAND_AVENUE_H else 0.0), bi * 71 + bj)
 			if s_road:
-				_furn_row(furn_xforms, x0, x1, z1 - CURB_INSET, true, Vector3(0, 0, 1), dist, bi * 71 + bj + 313)
+				_furn_row(furn_xforms, x0, x1, z1, true, Vector3(0, 0, 1), dist,
+					set_base + (5.0 if (bj + 1) in CityBuilder.GRAND_AVENUE_H else 0.0), bi * 71 + bj + 313)
 			if w_road:
-				_furn_row(furn_xforms, z0, z1, x0 + CURB_INSET, false, Vector3(-1, 0, 0), dist, bi * 91 + bj + 613)
+				_furn_row(furn_xforms, z0, z1, x0, false, Vector3(-1, 0, 0), dist,
+					set_base + (5.0 if bi in CityBuilder.GRAND_AVENUE_V else 0.0), bi * 91 + bj + 613)
 			if e_road:
-				_furn_row(furn_xforms, z0, z1, x1 - CURB_INSET, false, Vector3(1, 0, 0), dist, bi * 91 + bj + 907)
+				_furn_row(furn_xforms, z0, z1, x1, false, Vector3(1, 0, 0), dist,
+					set_base + (5.0 if (bi + 1) in CityBuilder.GRAND_AVENUE_V else 0.0), bi * 91 + bj + 907)
 
 
 static func _pave_row(paver_xforms: Array, a0: float, a1: float, fixed: float, along_x: bool) -> void:
@@ -150,23 +175,80 @@ static func _kerb_row(kerb_xforms: Array, a0: float, a1: float, fixed: float, al
 		kerb_xforms[v].append(Transform3D(Basis(Vector3.UP, yaw), pos))
 
 
-static func _furn_row(furn: Dictionary, a0: float, a1: float, fixed: float, along_x: bool,
-		face: Vector3, dist: String, salt: int) -> void:
+static func _furn_row(furn: Dictionary, a0: float, a1: float, kerb: float, along_x: bool,
+		face: Vector3, dist: String, front_dist: float, salt: int) -> void:
 	if a1 - a0 < 2.0 * CORNER_CLEAR + 2.0:
 		return
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = SEED ^ (salt * 2654435761)
 	var yaw_base: float = atan2(face.x, face.z)
+	# Perpendicular axis sign: face_perp points toward the road, inward into the lot.
+	var face_perp: float = face.z if along_x else face.x
+	var inward: float = -face_perp
 	var t: float = a0 + CORNER_CLEAR + rng.randf_range(0.0, 4.0)
+	# Along-kerb right edge of the last committed prop's footprint. Everything on
+	# this kerb shares one line, so a single 1D interval frontier keeps props from
+	# overlapping: a candidate is nudged forward until its measured footprint clears
+	# the previous one by MARGIN. The RNG call sequence (pick then step) is never
+	# altered and the pass is strictly left-to-right, so output stays deterministic.
+	var frontier: float = -INF
 	while t < a1 - CORNER_CLEAR:
 		var item: Dictionary = _pick(rng, dist)
 		if not item.is_empty():
+			var along: bool = item.get("along", false)
+			var sx: float = item["sx"]
+			var sz: float = item["sz"]
+			var yaw: float = yaw_base + (PI * 0.5 if along else 0.0)
+			# Footprint is axis-aligned in world XZ (yaw is a multiple of 90 deg).
+			var swap: bool = (int(round(yaw / (PI * 0.5))) & 1) == 1
+			var ex: float = (sz if swap else sx) * 0.5
+			var ez: float = (sx if swap else sz) * 0.5
+			var wc: Vector2 = Vector2(item["cx"], item["cz"]).rotated(-yaw)
+			# Along-kerb interval (centre offset + half-extent along the kerb axis).
+			var along_c: float = wc.x if along_x else wc.y
+			var along_e: float = ex if along_x else ez
+			# Perpendicular reach toward the road and into the lot.
+			var perp_c: float = wc.y if along_x else wc.x
+			var depth_e: float = ez if along_x else ex
+			var reach_road: float = depth_e + face_perp * perp_c
+			var reach_lot: float = depth_e - face_perp * perp_c
+			# Deep props are set back so their road face clears the kerb by ROAD_CLEAR;
+			# small props keep the base inset.
+			var inset: float = maxf(CURB_INSET, reach_road + ROAD_CLEAR)
+			var deep: bool = (reach_road + reach_lot) > DEEP_DEPTH
+			# A deep prop that would punch through the building frontage is dropped
+			# (roll already consumed, so the stream is undisturbed).
+			if deep and inset + reach_lot > front_dist:
+				t += rng.randf_range(11.0, 17.0)
+				continue
+			# Along-kerb overlap guard.
+			if t + along_c - along_e < frontier + MARGIN:
+				t = frontier + MARGIN - along_c + along_e
+			if t >= a1 - CORNER_CLEAR:
+				break
+			frontier = t + along_c + along_e
+			var fixed: float = kerb + inward * inset
 			var pos: Vector3 = Vector3(t, FURN_Y, fixed) if along_x else Vector3(fixed, FURN_Y, t)
-			var yaw: float = yaw_base + (PI * 0.5 if item.get("along", false) else 0.0)
 			if not furn.has(item["p"]):
 				furn[item["p"]] = []
 			furn[item["p"]].append(Transform3D(Basis(Vector3.UP, yaw), pos))
+			# Reserve bulky footprints (world XZ, inflated) so DecorPlacer skips any
+			# tree/lamp that would land inside them.
+			if maxf(sx, sz) >= RESERVE_MIN_EXTENT:
+				reserved_rects.append(Rect2(
+					pos.x + wc.x - ex - RESERVE_INFLATE, pos.z + wc.y - ez - RESERVE_INFLATE,
+					2.0 * (ex + RESERVE_INFLATE), 2.0 * (ez + RESERVE_INFLATE)))
 		t += rng.randf_range(11.0, 17.0)
+
+
+## True when (px, pz) lies inside any bulky-furniture footprint reserved this
+## build. Read by DecorPlacer to avoid planting trees/lamps inside props.
+static func is_reserved(px: float, pz: float) -> bool:
+	var p := Vector2(px, pz)
+	for r: Rect2 in reserved_rects:
+		if r.has_point(p):
+			return true
+	return false
 
 
 static func _pick(rng: RandomNumberGenerator, dist: String) -> Dictionary:

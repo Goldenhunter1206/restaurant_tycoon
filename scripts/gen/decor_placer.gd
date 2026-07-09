@@ -113,7 +113,10 @@ static func _line_side(tree_xforms: Array, lamp_xforms: Array, tree_start: Vecto
 	var l: float = lamp_spacing * 0.5
 	while l < length:
 		var lyaw: float = 0.0 if along_z else PI * 0.5
-		lamp_xforms.append(Transform3D(Basis(Vector3.UP, lyaw), lamp_start + axis * l))
+		var lpos: Vector3 = lamp_start + axis * l
+		# Skip lamps that fall inside a bulky sidewalk prop (no RNG here to disturb).
+		if not SidewalkPlacer.is_reserved(lpos.x, lpos.z):
+			lamp_xforms.append(Transform3D(Basis(Vector3.UP, lyaw), lpos))
 		l += lamp_spacing
 
 
@@ -121,6 +124,10 @@ static func _place_tree(tree_xforms: Array, rng: RandomNumberGenerator, pos: Vec
 	var v := rng.randi_range(0, TREES.size() - 1)
 	var s := rng.randf_range(0.85, 1.2)
 	var yaw := rng.randf_range(0.0, TAU)
+	# Consume the rolls first, then drop the tree if it lands inside a bulky
+	# sidewalk prop, so the RNG stream for later placements is unaffected.
+	if SidewalkPlacer.is_reserved(pos.x, pos.z):
+		return
 	tree_xforms[v].append(Transform3D(Basis(Vector3.UP, yaw).scaled(Vector3(s, s, s)), pos))
 
 

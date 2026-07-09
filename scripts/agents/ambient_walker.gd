@@ -43,6 +43,9 @@ func setup(model_path: String, anim_lib: AnimationLibrary, seed_value: int) -> v
 		return
 	var model: Node3D = scene.instantiate()
 	model.name = "Model"
+	# Characters face -Z at rest; our travel convention is +Z
+	# (yaw from atan2(x, z)), so pre-rotate the mesh 180 deg.
+	model.rotation_degrees = Vector3(0, 180, 0)
 	add_child(model)
 	_model = model
 	for mesh: MeshInstance3D in model.find_children("*", "MeshInstance3D", true, false):
