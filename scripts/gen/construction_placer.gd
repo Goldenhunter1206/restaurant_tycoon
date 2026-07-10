@@ -86,6 +86,32 @@ static func build(root: Node3D) -> int:
 	return count
 
 
+## Where a sparse mini-site would dig in block (bi, bj), as a world-XZ keep-out
+## Rect2 — or null when that block rolls no mini-site. Single owner of the
+## mini-site seed formula so other placers (IndustrialDressingPlacer) can keep
+## clear without depending on build order. Must mirror the decision in build().
+static func mini_site_rect(bi: int, bj: int) -> Variant:
+	var dist := CityBuilder.district(bi, bj)
+	if dist == "" or dist == "K" or dist == "G" or dist == "X":
+		return null
+	if _merged_cells().has("%d,%d" % [bi, bj]):
+		return null
+	var x0 := CityBuilder.line_x(bi) + 4.0
+	var x1 := CityBuilder.line_x(bi + 1) - 4.0
+	var z0 := CityBuilder.line_z(bj) + 4.0
+	var z1 := CityBuilder.line_z(bj + 1) - 4.0
+	if (x1 - x0) <= MINI_MIN_SIZE or (z1 - z0) <= MINI_MIN_SIZE:
+		return null
+	var rng := RandomNumberGenerator.new()
+	rng.seed = SEED ^ ((bi * 83492791 ^ bj * 19349663) * 2654435761)
+	if rng.randf() >= MINI_PROB:
+		return null
+	# Dig dirt spans center +/- 3, the cone/barrier ring reaches ~3.8 m out.
+	var cx := (x0 + x1) * 0.5
+	var cz := (z0 + z1) * 0.5
+	return Rect2(cx - 5.5, cz - 5.5, 11.0, 11.0)
+
+
 static func _merged_cells() -> Dictionary:
 	var m := {}
 	for sb: Array in CityBuilder.SUPERBLOCKS:

@@ -39,19 +39,18 @@ const SEED: int = 314159265
 
 const ROOF_MIN_H: float = 12.0
 const ROOF_INSET: float = 1.8      # keep props off the roof edge
-const ROOF_STEP: float = 3.6
-const ROOF_PROB: float = 0.42
-const ROOF_MAX: int = 8            # props per roof cap
+const ROOF_STEP: float = 4.5
+const ROOF_MAX: int = 3            # curated props per roof cap
 const BILL_MIN_H: float = 24.0
 const BILL_SCALE: float = 1.6
 const BILL_EDGE_INSET: float = 1.2 # billboard back-off from the roof +Z edge
 const FE_MIN_H: float = 9.0
 const FE_SECTION: float = 3.3      # FireEscape_A_2 upright section height
 const FE_START: float = 3.0        # first landing above the ground floor
-const FE_MAX: int = 4
+const FE_MAX: int = 3
 const FE_MOUNT: float = 0.40       # escape mesh -X face offset from its origin
 const FE_ZC: float = 1.10          # escape mesh Z-centre offset from its origin
-const FE_BITE: float = 0.15        # sink slightly into the facade so it reads as attached
+const FE_BITE: float = 0.04        # minimal facade bite: attached, never visibly embedded
 
 
 static func build(root: Node3D, placements: Array) -> int:
@@ -111,7 +110,9 @@ static func _dress(p: Dictionary, idx: int, roof_x: Dictionary, bill_x: Dictiona
 	# only w/d are swapped by the entrance-yaw fix, never h). Only measure the
 	# real mesh when the building will actually be dressed.
 	var want_roof := roofy and h >= ROOF_MIN_H
-	var want_fe := commercial and h >= FE_MIN_H
+	# Escapes are reserved for the few building types that plausibly need them.
+	# This avoids a noisy, game-like repetition on every commercial facade.
+	var want_fe := (btype == "office" or btype == "factory") and h >= FE_MIN_H
 	if not (want_roof or want_fe):
 		return
 
@@ -130,23 +131,29 @@ static func _dress(p: Dictionary, idx: int, roof_x: Dictionary, bill_x: Dictiona
 	# real roof height. Props have their origin at the base, so y = roof_y sits
 	# them on the roof.
 	if want_roof:
+		# Deliberate roof layouts: a small, aligned service cluster, never a
+		# random scatter. The placement index only chooses one of three curated
+		# asset trios; spacing, scale and orientation stay consistent city-wide.
+		var layout: Array[String] = [
+			ROOF_PROPS[0], ROOF_PROPS[3], ROOF_PROPS[6],
+		]
+		var slots: Array[Vector2] = [
+			Vector2(minx + ROOF_INSET, minz + ROOF_INSET),
+			Vector2(maxx - ROOF_INSET, minz + ROOF_INSET),
+			Vector2(minx + ROOF_INSET, maxz - ROOF_INSET),
+		]
 		var placed := 0
-		var lx := minx + ROOF_INSET
-		while lx <= maxx - ROOF_INSET and placed < ROOF_MAX:
-			var lz := minz + ROOF_INSET
-			while lz <= maxz - ROOF_INSET and placed < ROOF_MAX:
-				if rng.randf() < ROOF_PROB:
-					var local := Vector3(lx + rng.randf_range(-1.0, 1.0), roof_y, lz + rng.randf_range(-1.0, 1.0))
-					var path: String = ROOF_PROPS[rng.randi_range(0, ROOF_PROPS.size() - 1)]
-					var s := rng.randf_range(0.8, 1.15)
-					var yaw := rng.randf_range(0.0, TAU)
-					if not roof_x.has(path):
-						roof_x[path] = []
-					var lxf := Transform3D(Basis(Vector3.UP, yaw).scaled(Vector3(s, s, s)), local)
-					roof_x[path].append(body_xf * lxf)
-					placed += 1
-				lz += ROOF_STEP
-			lx += ROOF_STEP
+		for slot: Vector2 in slots:
+			if placed >= ROOF_MAX:
+				break
+			if slot.x > maxx - ROOF_INSET or slot.y > maxz - ROOF_INSET:
+				continue
+			var path: String = layout[(idx + placed) % layout.size()]
+			if not roof_x.has(path):
+				roof_x[path] = []
+			var local := Vector3(slot.x, roof_y, slot.y)
+			roof_x[path].append(body_xf * Transform3D(Basis(), local))
+			placed += 1
 
 	# Rooftop billboard on the tallest towers, at the roof's +Z edge, facing +Z.
 	if commercial and h >= BILL_MIN_H:
@@ -162,21 +169,33 @@ static func _dress(p: Dictionary, idx: int, roof_x: Dictionary, bill_x: Dictiona
 	# not on the body origin. FireEscape_A_2 is upright and its inner face is on
 	# its local -X (FE_MOUNT from origin); on the -X wall it is turned 180 deg.
 	if want_fe:
-		var side := 1.0 if rng.randf() < 0.5 else -1.0
+		# Mount a single stack on the facade opposite the entrance. This is a
+		# stable, readable rear-service treatment rather than a random side choice.
+		var front: Vector3 = p.get("front", Vector3.FORWARD)
+		var local_front := body_xf.basis.inverse() * front.normalized()
+		var rear := -local_front
 		var fb: Basis
-		var wall_x: float
-		if side > 0.0:
-			fb = Basis()                      # escape +X -> body +X (outward)
-			wall_x = maxx
+		var local: Vector3
+		if absf(rear.x) >= absf(rear.z):
+			var side_x := 1.0 if rear.x >= 0.0 else -1.0
+			var wall_x := maxx if side_x > 0.0 else minx
+			fb = Basis() if side_x > 0.0 else Basis(Vector3.UP, PI)
+			local = Vector3(wall_x + side_x * (FE_MOUNT - FE_BITE), FE_START, cz - side_x * FE_ZC)
 		else:
-			fb = Basis(Vector3.UP, PI)        # escape +X -> body -X (outward)
-			wall_x = minx
-		var origin_x := wall_x + side * (FE_MOUNT - FE_BITE)
-		var origin_z := cz - side * FE_ZC     # centre the section along the wall
+			var side_z := 1.0 if rear.z >= 0.0 else -1.0
+			var wall_z := maxz if side_z > 0.0 else minz
+			fb = Basis(Vector3.UP, -PI * 0.5) if side_z > 0.0 else Basis(Vector3.UP, PI * 0.5)
+			local = Vector3(cx - side_z * FE_ZC, FE_START, wall_z + side_z * (FE_MOUNT - FE_BITE))
 		var count := clampi(int((roof_y - FE_START) / FE_SECTION), 1, FE_MAX)
 		for k in range(count):
-			var local := Vector3(origin_x, FE_START + float(k) * FE_SECTION, origin_z)
+			local.y = FE_START + float(k) * FE_SECTION
 			fe_x.append(body_xf * Transform3D(fb, local))
+
+
+## Public alias so other placers (GraffitiPlacer) reuse the same measured
+## body-local bounds instead of re-deriving them from the catalog.
+static func measure(path: String, standup: Vector3, mcache: Dictionary) -> Dictionary:
+	return _measure(path, standup, mcache)
 
 
 ## Load + measure a model's mesh AABB in its body-local frame (standup applied,

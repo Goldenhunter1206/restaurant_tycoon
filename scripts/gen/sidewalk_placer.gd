@@ -22,7 +22,7 @@ const MARGIN: float = 0.5          # min clear gap between adjacent furniture fo
 const ROAD_CLEAR: float = 0.2      # deep prop's road-side face kept this far behind the kerb
 const DEEP_DEPTH: float = 1.5      # props deeper than this get pushed back / facade-checked
 const RESERVE_INFLATE: float = 0.6 # margin grown around a reserved footprint
-const RESERVE_MIN_EXTENT: float = 1.5  # props this big (either axis) reserve space from decor
+const RESERVE_MIN_EXTENT: float = 0.0  # every item reserves a buffer from trees and lamps
 const SEED: int = 51413
 
 ## Typical building-front setback from the kerb per district (mirrors
@@ -185,7 +185,8 @@ static func _furn_row(furn: Dictionary, a0: float, a1: float, kerb: float, along
 	# Perpendicular axis sign: face_perp points toward the road, inward into the lot.
 	var face_perp: float = face.z if along_x else face.x
 	var inward: float = -face_perp
-	var t: float = a0 + CORNER_CLEAR + rng.randf_range(0.0, 4.0)
+	# Fixed anchors make each frontage calm and intentional, not scattered.
+	var t: float = a0 + CORNER_CLEAR + 2.0
 	# Along-kerb right edge of the last committed prop's footprint. Everything on
 	# this kerb shares one line, so a single 1D interval frontier keeps props from
 	# overlapping: a candidate is nudged forward until its measured footprint clears
@@ -193,7 +194,7 @@ static func _furn_row(furn: Dictionary, a0: float, a1: float, kerb: float, along
 	# altered and the pass is strictly left-to-right, so output stays deterministic.
 	var frontier: float = -INF
 	while t < a1 - CORNER_CLEAR:
-		var item: Dictionary = _pick(rng, dist)
+		var item: Dictionary = _pick_curated(dist, int((t - a0) / 14.0) + salt)
 		if not item.is_empty():
 			var along: bool = item.get("along", false)
 			var sx: float = item["sx"]
@@ -219,7 +220,7 @@ static func _furn_row(furn: Dictionary, a0: float, a1: float, kerb: float, along
 			# A deep prop that would punch through the building frontage is dropped
 			# (roll already consumed, so the stream is undisturbed).
 			if deep and inset + reach_lot > front_dist:
-				t += rng.randf_range(11.0, 17.0)
+				t += 14.0
 				continue
 			# Along-kerb overlap guard.
 			if t + along_c - along_e < frontier + MARGIN:
@@ -238,7 +239,7 @@ static func _furn_row(furn: Dictionary, a0: float, a1: float, kerb: float, along
 				reserved_rects.append(Rect2(
 					pos.x + wc.x - ex - RESERVE_INFLATE, pos.z + wc.y - ez - RESERVE_INFLATE,
 					2.0 * (ex + RESERVE_INFLATE), 2.0 * (ez + RESERVE_INFLATE)))
-		t += rng.randf_range(11.0, 17.0)
+		t += 14.0
 
 
 ## True when (px, pz) lies inside any bulky-furniture footprint reserved this
@@ -251,23 +252,15 @@ static func is_reserved(px: float, pz: float) -> bool:
 	return false
 
 
-static func _pick(rng: RandomNumberGenerator, dist: String) -> Dictionary:
-	var pool: Array = []
-	var total := 0
-	for item: Dictionary in FURN:
-		var d: String = item["d"]
-		if d != "" and not d.contains(dist):
-			continue
-		total += int(item["w"])
-		pool.append(item)
-	if pool.is_empty():
-		return {}
-	var roll := rng.randi_range(0, total - 1)
-	for item: Dictionary in pool:
-		roll -= int(item["w"])
-		if roll < 0:
-			return item
-	return pool[0]
+static func _pick_curated(dist: String, step: int) -> Dictionary:
+	# A small editorial palette per district. Large kiosks and carts are kept
+	# out of this automatic pass; they need bespoke plaza placement instead.
+	var palette: Array[int] = [0, 1, 2, 3]
+	if dist == "D" or dist == "C":
+		palette = [4, 6, 3, 2, 0]
+	elif dist == "N" or dist == "R" or dist == "P":
+		palette = [3, 1, 0, 2]
+	return FURN[palette[posmod(step, palette.size())]]
 
 
 static func _emit_mm(parent: Node3D, base_name: String, glb_path: String, xforms: Array, cache: Dictionary) -> void:
