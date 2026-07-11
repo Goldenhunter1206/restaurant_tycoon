@@ -38,6 +38,22 @@ func setup(rest: RestaurantState) -> void:
 		sign.scale = Vector3.ONE * 1.6
 		_bobber.add_child(sign)
 
+	var assets: GDScript = load("res://scripts/ui/ui_assets.gd")
+	var pin_tex: Texture2D = assets.pin(&"pizza")
+	if pin_tex != null:
+		var pin: Sprite3D = Sprite3D.new()
+		pin.texture = pin_tex
+		pin.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		pin.fixed_size = true
+		pin.pixel_size = 0.0042
+		pin.no_depth_test = true
+		pin.render_priority = 10
+		# Layer 20: overlay markers, excluded from the minimap bake camera
+		# (fixed_size sprites would render huge into the ortho bake).
+		pin.layers = 1 << 19
+		pin.position.y = 4.2
+		_bobber.add_child(pin)
+
 	var label: Label3D = Label3D.new()
 	label.text = rest.restaurant_name
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED

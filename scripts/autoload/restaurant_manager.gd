@@ -297,18 +297,25 @@ func _tick_restaurant(rest: RestaurantState, now: int, dm: int, _hour: int) -> v
 			per_hour = def.waiter_customers_per_hour
 		var cap: float = maxf(2.0, float(waiters) * 2.0)
 		rest.waiter_credits = minf(rest.waiter_credits + float(waiters) * per_hour / 60.0 * float(dm), cap)
-	# Kitchen: fill free cook slots from the backlog, then advance active jobs.
-	var cook_slots: int = _cook_slots(rest, hourf)
-	while rest.cooking.size() < cook_slots and not rest.cook_backlog.is_empty():
+	# Kitchen: assign each live cook slot so the UI can show who owns every dish.
+	var cook_slots: Array[Dictionary] = _cook_slot_descriptors(rest, hourf)
+	while rest.cooking.size() < cook_slots.size() and not rest.cook_backlog.is_empty():
 		var order: FoodOrder = rest.cook_backlog.pop_front()
 		if order.state == FoodOrder.State.CANCELLED:
 			continue
+		var slot: Dictionary = cook_slots[rest.cooking.size()]
 		order.state = FoodOrder.State.COOKING
 		EconomyManager.transact(&"ingredients", -order.ingredient_cost)
 		rest.today["expenses"] = float(rest.today.get("expenses", 0.0)) + order.ingredient_cost
-		rest.cooking.append({"order": order, "minutes_left": order.prep_minutes})
+		rest.cooking.append({
+			"order": order,
+			"minutes_left": order.prep_minutes,
+			"cook_uid": slot["cook_uid"],
+			"cook_name": slot["cook_name"],
+			"slot_index": slot["slot_index"],
+		})
 		order_state_changed.emit(order)
-	var active: int = mini(cook_slots, rest.cooking.size())
+	var active: int = mini(cook_slots.size(), rest.cooking.size())
 	for i: int in range(rest.cooking.size() - 1, -1, -1):
 		var job: Dictionary = rest.cooking[i]
 		var order: FoodOrder = job["order"]
@@ -316,7 +323,14 @@ func _tick_restaurant(rest: RestaurantState, now: int, dm: int, _hour: int) -> v
 			rest.cooking.remove_at(i)
 			continue
 		if i >= active:
+			job["cook_uid"] = -1
+			job["cook_name"] = "Waiting for a cook"
+			job["slot_index"] = -1
 			continue
+		var active_slot: Dictionary = cook_slots[i]
+		job["cook_uid"] = active_slot["cook_uid"]
+		job["cook_name"] = active_slot["cook_name"]
+		job["slot_index"] = active_slot["slot_index"]
 		job["minutes_left"] = float(job["minutes_left"]) - float(dm)
 		if float(job["minutes_left"]) <= 0.0:
 			rest.cooking.remove_at(i)
@@ -437,15 +451,130 @@ func record_category_sale(rest: RestaurantState, dish_id: StringName) -> void:
 	rest.today["by_category"] = by_cat
 
 
-func _cook_slots(rest: RestaurantState, hourf: float) -> int:
-	var slots: int = 0
+func _cook_slot_descriptors(rest: RestaurantState, hourf: float) -> Array[Dictionary]:
+	var slots: Array[Dictionary] = []
 	for member: StaffMember in rest.staff:
 		if not member.on_shift(hourf):
 			continue
 		var def: StaffTypeDef = staff_types.get(member.type_id)
-		if def != null:
-			slots += def.cook_slots
+		if def == null or def.cook_slots <= 0:
+			continue
+		for slot_index: int in def.cook_slots:
+			slots.append({
+				"cook_uid": member.uid,
+				"cook_name": member.staff_name,
+				"slot_index": slot_index,
+			})
 	return slots
+
+
+func operations_snapshot(building_id: int) -> Dictionary:
+	var rest: RestaurantState = by_building.get(building_id)
+	if rest == null:
+		return {}
+	var now: int = GameClock.total_minutes()
+	var hourf: float = GameClock.game_hours
+	var cooking_rows: Array[Dictionary] = []
+	for job: Dictionary in rest.cooking:
+		var order: FoodOrder = job.get("order")
+		if order == null:
+			continue
+		cooking_rows.append({
+			"order_id": order.order_id,
+			"dish": String(order.dish_id).replace("_", " ").capitalize(),
+			"cook_name": String(job.get("cook_name", "Waiting for a cook")),
+			"minutes_left": maxf(0.0, float(job.get("minutes_left", 0.0))),
+			"delivery": order.is_delivery,
+		})
+	var queue_rows: Array[Dictionary] = []
+	var oldest_queue_wait: int = 0
+	for waiting: Dictionary in rest.dine_queue:
+		var citizen: Node = waiting.get("citizen")
+		var waited: int = maxi(0, now - int(waiting.get("arrived_minute", now)))
+		oldest_queue_wait = maxi(oldest_queue_wait, waited)
+		var citizen_data: Variant = citizen.get("data") if is_instance_valid(citizen) else {}
+		queue_rows.append({
+			"name": citizen_data.get("name", "Citizen") if citizen_data is Dictionary else "Citizen",
+			"dish": String(waiting.get("dish_id", &"")).replace("_", " ").capitalize(),
+			"wait_minutes": waited,
+		})
+	var oldest_kitchen_wait: int = 0
+	for queued_order: FoodOrder in rest.cook_backlog:
+		oldest_kitchen_wait = maxi(oldest_kitchen_wait, now - queued_order.placed_minute)
+	var ready_count: int = 0
+	var oldest_ready_wait: int = 0
+	for ready_order: FoodOrder in DeliveryManager.ready_queue:
+		if ready_order.restaurant_id != building_id:
+			continue
+		ready_count += 1
+		oldest_ready_wait = maxi(oldest_ready_wait, now - ready_order.placed_minute)
+	var driver_rows: Array[Dictionary] = []
+	var idle_drivers: int = 0
+	for driver_slot: Dictionary in DeliveryManager.rosters.get(building_id, []):
+		var member: StaffMember = driver_slot.get("member")
+		var driver: Node = driver_slot.get("node")
+		if member == null:
+			continue
+		var idle: bool = is_instance_valid(driver) and driver.has_method("is_idle") and driver.is_idle()
+		if idle and member.on_shift(hourf):
+			idle_drivers += 1
+		driver_rows.append({
+			"name": member.staff_name,
+			"on_shift": member.on_shift(hourf),
+			"idle": idle,
+			"status": String(driver.get("goal_desc")) if is_instance_valid(driver) else "unavailable",
+		})
+	var snapshot: Dictionary = {
+		"building_id": building_id,
+		"restaurant_name": rest.restaurant_name,
+		"open": rest.is_open(hourf),
+		"tables_occupied": rest.tables_occupied,
+		"table_count": rest.table_count,
+		"dine_queue": queue_rows,
+		"oldest_queue_wait": oldest_queue_wait,
+		"cook_backlog": rest.cook_backlog.size(),
+		"oldest_kitchen_wait": oldest_kitchen_wait,
+		"cooking": cooking_rows,
+		"cook_slots": _cook_slot_descriptors(rest, hourf).size(),
+		"cooks_on_shift": rest.staff_on_shift(&"cook", hourf),
+		"waiters_on_shift": rest.staff_on_shift(&"waiter", hourf),
+		"drivers_on_shift": rest.staff_on_shift(&"driver", hourf),
+		"drivers": driver_rows,
+		"idle_drivers": idle_drivers,
+		"ready_deliveries": ready_count,
+		"oldest_ready_wait": oldest_ready_wait,
+		"active_deliveries": rest.active_deliveries,
+		"delivery_cap": rest.delivery_cap,
+		"inbound_citizens": DemandManager.restaurant_intents_for(building_id),
+	}
+	snapshot["bottleneck"] = _bottleneck_for(rest, snapshot)
+	return snapshot
+
+
+func _bottleneck_for(rest: RestaurantState, snapshot: Dictionary) -> Dictionary:
+	var queue_limit: int = int(EconomyManager.tuning_value("dinein.queue_leave_minutes", 25))
+	var food_limit: int = int(EconomyManager.tuning_value("dinein.food_wait_minutes", 60))
+	var delivery_limit: int = int(EconomyManager.tuning_value("delivery.cancel_minutes", 75))
+	if not bool(snapshot["open"]):
+		return {"severity": "info", "title": "Closed for now", "evidence": "Service resumes at %.0f:00." % rest.open_hour, "action": "Review opening hours", "screen": &"deliveries"}
+	if int(snapshot["cooks_on_shift"]) <= 0:
+		return {"severity": "critical", "title": "No cook on shift", "evidence": "Orders cannot enter the kitchen.", "action": "Schedule or hire a cook", "screen": &"staff"}
+	if rest.dine_in_enabled and int(snapshot["waiters_on_shift"]) <= 0:
+		return {"severity": "critical", "title": "No waiter on shift", "evidence": "Guests cannot be seated or served.", "action": "Schedule or hire a waiter", "screen": &"staff"}
+	if int(snapshot["oldest_queue_wait"]) >= int(float(queue_limit) * 0.75):
+		return {"severity": "critical", "title": "Guests may leave", "evidence": "Oldest table wait: %d of %d min." % [snapshot["oldest_queue_wait"], queue_limit], "action": "Add waiter coverage or another location", "screen": &"staff"}
+	if int(snapshot["oldest_kitchen_wait"]) >= int(float(food_limit) * 0.75):
+		return {"severity": "critical", "title": "Kitchen is falling behind", "evidence": "Oldest food order: %d of %d min." % [snapshot["oldest_kitchen_wait"], food_limit], "action": "Add cook coverage", "screen": &"staff"}
+	if int(snapshot["ready_deliveries"]) > 0 and int(snapshot["idle_drivers"]) <= 0:
+		var severity: String = "critical" if int(snapshot["oldest_ready_wait"]) >= int(float(delivery_limit) * 0.75) else "warning"
+		return {"severity": severity, "title": "Food is waiting for a driver", "evidence": "%d ready; oldest order is %d min." % [snapshot["ready_deliveries"], snapshot["oldest_ready_wait"]], "action": "Add driver coverage", "screen": &"staff"}
+	if int(snapshot["cook_backlog"]) > 0 and int(snapshot["cooking"].size()) >= maxi(1, int(snapshot["cook_slots"])):
+		return {"severity": "warning", "title": "Kitchen at capacity", "evidence": "%d orders queued behind %d active dishes." % [snapshot["cook_backlog"], snapshot["cooking"].size()], "action": "Schedule another cook", "screen": &"staff"}
+	if int(snapshot["dine_queue"].size()) > 0 and int(snapshot["tables_occupied"]) >= int(snapshot["table_count"]):
+		return {"severity": "warning", "title": "Every table is occupied", "evidence": "%d guests are waiting." % snapshot["dine_queue"].size(), "action": "Open another location", "screen": &"build"}
+	if rest.delivery_enabled and int(snapshot["active_deliveries"]) >= int(snapshot["delivery_cap"]):
+		return {"severity": "warning", "title": "Delivery cap reached", "evidence": "%d of %d deliveries active." % [snapshot["active_deliveries"], snapshot["delivery_cap"]], "action": "Review delivery capacity", "screen": &"deliveries"}
+	return {"severity": "good", "title": "Flow is healthy", "evidence": "No service bottleneck detected.", "action": "", "screen": &""}
 
 
 # --- Daily rollover ----------------------------------------------------------

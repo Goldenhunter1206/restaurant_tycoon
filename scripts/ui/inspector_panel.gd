@@ -15,11 +15,13 @@ const FIELD_LABELS: Dictionary = {
 	"passenger": "Passenger", "district": "District", "type": "Type",
 	"residents": "Residents", "workers": "Workers", "employer": "Employer",
 	"order": "Carrying", "capacity_residents": "Beds", "capacity_workers": "Jobs",
+	"delivery_stage": "Delivery stage", "driver": "Driver", "restaurant": "Restaurant",
+	"destination": "Destination", "order_detail": "Order", "thought": "Thinking",
 }
 ## Keys never shown to the player.
 const HIDDEN_FIELDS: Array[String] = [
 	"position", "kind", "id", "family", "wake", "work_start", "home_hour",
-	"stopped_at_light",
+	"stopped_at_light", "route_points", "destination_position", "our_delivery_car",
 ]
 
 var _title: Label
@@ -32,6 +34,7 @@ var _accum: float = 0.0
 func _ready() -> void:
 	custom_minimum_size = Vector2(300, 0)
 	visible = false
+	add_theme_stylebox_override("panel", TycoonTheme.wood_frame_sm_box())
 	var box: VBoxContainer = VBoxContainer.new()
 	box.add_theme_constant_override("separation", 6)
 	add_child(box)
@@ -42,6 +45,10 @@ func _ready() -> void:
 	header.add_child(_title)
 	var close_btn: Button = Button.new()
 	close_btn.text = "✕"
+	var assets: GDScript = load("res://scripts/ui/ui_assets.gd")
+	if assets.icon(&"close") != null:
+		close_btn.text = ""
+		assets.icon_button(close_btn, &"close", 16)
 	close_btn.pressed.connect(func() -> void: visible = false)
 	header.add_child(close_btn)
 	box.add_child(header)
@@ -93,17 +100,18 @@ func _render(info: Dictionary) -> void:
 func _title_for(kind: String, info: Dictionary) -> String:
 	match kind:
 		"citizen":
-			return "👤 %s" % info.get("name", "Citizen")
+			return String(info.get("name", "Citizen"))
 		"vehicle":
-			return "🚗 %s" % info.get("owner", "Vehicle")
+			if bool(info.get("our_delivery_car", false)):
+				return "OUR DELIVERY CAR"
+			return String(info.get("owner", "Vehicle"))
 		"delivery driver":
-			return "🛵 %s" % info.get("name", "Driver")
+			return "Driver %s" % info.get("name", "")
 		"building":
 			var b_type: String = String(info.get("type", ""))
-			var icon: String = "🏠" if b_type == "home" else "🏢"
 			if RestaurantManager.by_building.has(_current_building):
-				icon = "🍕"
-			return "%s Building #%d (%s)" % [icon, _current_building, b_type]
+				return "Restaurant · Building #%d" % _current_building
+			return "Building #%d (%s)" % [_current_building, b_type]
 	return kind.capitalize()
 
 
@@ -112,11 +120,15 @@ func _update_action(kind: String) -> void:
 	if kind != "building" or _current_building < 0:
 		return
 	if RestaurantManager.by_building.has(_current_building):
-		_action_btn.text = "🍕 Manage restaurant"
+		_action_btn.text = "Manage restaurant"
+		var assets: GDScript = load("res://scripts/ui/ui_assets.gd")
+		assets.icon_button(_action_btn, &"store", 18)
 		_action_btn.visible = true
 	elif RestaurantManager.is_purchasable(_current_building):
 		var price: float = RestaurantManager.price_for(_current_building)
-		_action_btn.text = "🏗 Buy for $%.0f" % price
+		_action_btn.text = "Buy for $%.0f" % price
+		var assets_buy: GDScript = load("res://scripts/ui/ui_assets.gd")
+		assets_buy.icon_button(_action_btn, &"hammer", 18)
 		_action_btn.disabled = not EconomyManager.can_afford(price)
 		_action_btn.visible = true
 

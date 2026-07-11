@@ -8,7 +8,11 @@ var _hire_shift: Dictionary = {}
 
 
 func screen_title() -> String:
-	return "👥  Staff"
+	return "Staff"
+
+
+func screen_icon() -> StringName:
+	return &"people"
 
 
 func _build() -> void:

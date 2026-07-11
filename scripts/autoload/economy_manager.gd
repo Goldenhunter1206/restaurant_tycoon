@@ -91,6 +91,33 @@ func post_message(kind: String, text: String) -> void:
 	message_posted.emit(kind, text)
 
 
+## Next scheduled economy beats, soonest first: [{title, kind, day, when}].
+## Purely informational for now; structured so a real event system can back it.
+func upcoming_events(count: int = 3) -> Array[Dictionary]:
+	var rules: Array[Dictionary] = [
+		{"title": "Food Festival", "kind": "festival", "every": 42, "offset": 20},
+		{"title": "Rent Review", "kind": "rent", "every": 42, "offset": 41},
+		{"title": "Health Inspection", "kind": "inspection", "every": 28, "offset": 9},
+	]
+	var events: Array[Dictionary] = []
+	var today: int = GameClock.day
+	for rule: Dictionary in rules:
+		var every: int = int(rule["every"])
+		var offset: int = int(rule["offset"])
+		var cycle_pos: int = (today - 1) % every
+		var wait_days: int = (offset - cycle_pos + every) % every
+		var event_day: int = today + wait_days
+		events.append({
+			"title": rule["title"],
+			"kind": rule["kind"],
+			"day": event_day,
+			"when": GameClock.month_name_for(event_day),
+		})
+	events.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return int(a["day"]) < int(b["day"]))
+	return events.slice(0, count)
+
+
 func income_today() -> float:
 	var total: float = 0.0
 	for amount: float in ledger_today.values():

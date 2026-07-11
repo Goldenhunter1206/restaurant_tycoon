@@ -8,15 +8,32 @@ extends Node
 ## across the 60 minutes by id — no frame spikes at 550 citizens.
 
 signal order_generated(order: FoodOrder)
+signal restaurant_intent_changed(citizen_id: int, restaurant_id: int, active: bool)
 
 const ECONOMY_TABLES_PATH: String = "res://data/economy_tables.json"
 const ECON_SEED_OFFSET: int = 3
+## Separate RNG stream so seeding demographics never shifts wealth/tastes.
+const DEMOGRAPHIC_SEED_OFFSET: int = 7
+
+## District char -> demographic weights (customer-profile buckets).
+const DEMOGRAPHIC_WEIGHTS: Dictionary = {
+	"R": {&"teens": 0.10, &"students": 0.05, &"workers": 0.20, &"families": 0.40, &"seniors": 0.25},
+	"N": {&"teens": 0.15, &"students": 0.10, &"workers": 0.30, &"families": 0.35, &"seniors": 0.10},
+	"P": {&"teens": 0.20, &"students": 0.30, &"workers": 0.30, &"families": 0.10, &"seniors": 0.10},
+	"D": {&"teens": 0.15, &"students": 0.25, &"workers": 0.40, &"families": 0.10, &"seniors": 0.10},
+	"C": {&"teens": 0.20, &"students": 0.30, &"workers": 0.35, &"families": 0.10, &"seniors": 0.05},
+	"I": {&"teens": 0.10, &"students": 0.15, &"workers": 0.55, &"families": 0.10, &"seniors": 0.10},
+}
 
 ## citizen_id -> {wealth: float, daily_wage: float, tastes: {category: 0..1}}
 var econ: Dictionary = {}
 var tables: Dictionary = {}
 ## Wealth overrides from a loaded save, applied after deterministic gen.
 var pending_wealth: Dictionary = {}
+## citizen_id -> live restaurant visit intent used by operations UI and world thoughts.
+var restaurant_intents: Dictionary = {}
+## building_id -> cached customer-profile fractions (home positions are static).
+var _profile_cache: Dictionary = {}
 
 ## Fallback meal-time weighting (index = hour, mean ~1). Overridable via
 ## tuning.json demand.hour_weights.
@@ -63,6 +80,45 @@ func charge_citizen(citizen_id: int, amount: float) -> void:
 		entry["wealth"] = maxf(0.0, float(entry["wealth"]) - amount)
 
 
+func set_restaurant_intent(citizen_id: int, restaurant_id: int, dish_id: StringName, citizen: Node) -> void:
+	restaurant_intents[citizen_id] = {
+		"citizen_id": citizen_id,
+		"restaurant_id": restaurant_id,
+		"dish_id": dish_id,
+		"citizen": citizen,
+		"started_minute": GameClock.total_minutes(),
+	}
+	restaurant_intent_changed.emit(citizen_id, restaurant_id, true)
+
+
+func clear_restaurant_intent(citizen_id: int) -> void:
+	if not restaurant_intents.has(citizen_id):
+		return
+	var restaurant_id: int = int(restaurant_intents[citizen_id].get("restaurant_id", -1))
+	restaurant_intents.erase(citizen_id)
+	restaurant_intent_changed.emit(citizen_id, restaurant_id, false)
+
+
+func restaurant_intents_for(building_id: int) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for citizen_id: int in restaurant_intents:
+		var intent: Dictionary = restaurant_intents[citizen_id]
+		if int(intent.get("restaurant_id", -1)) != building_id:
+			continue
+		var citizen: Node = intent.get("citizen")
+		if not is_instance_valid(citizen):
+			continue
+		var row: Dictionary = intent.duplicate()
+		var citizen_data: Variant = citizen.get("data")
+		row["name"] = citizen_data.get("name", "Citizen") if citizen_data is Dictionary else "Citizen"
+		row["goal"] = String(citizen.get("goal_desc"))
+		row["position"] = (citizen as Node3D).global_position if citizen is Node3D else Vector3.ZERO
+		result.append(row)
+	result.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return int(a["started_minute"]) < int(b["started_minute"]))
+	return result
+
+
 # --- Generation ---------------------------------------------------------------
 
 
@@ -91,8 +147,71 @@ func _generate_econ() -> void:
 		if econ.has(citizen_id):
 			econ[citizen_id]["wealth"] = float(pending_wealth[citizen_id])
 	pending_wealth.clear()
+	_seed_demographics()
 	_econ_ready = true
 	print("DemandManager: economy generated for %d citizens" % econ.size())
+
+
+func _seed_demographics() -> void:
+	## Deterministic age-group tag per citizen, weighted by home district.
+	var gen: RandomNumberGenerator = RandomNumberGenerator.new()
+	gen.seed = PopulationManager.POPULATION_SEED + DEMOGRAPHIC_SEED_OFFSET
+	for cd: Dictionary in PopulationManager.citizens_data:
+		var entry: Dictionary = econ.get(int(cd["id"]), {})
+		if entry.is_empty():
+			continue
+		var district: String = String(cd.get("district", "N"))
+		var weights: Dictionary = DEMOGRAPHIC_WEIGHTS.get(district, DEMOGRAPHIC_WEIGHTS["N"])
+		entry["demographic"] = _weighted_pick(weights, gen)
+
+
+func _weighted_pick(weights: Dictionary, gen: RandomNumberGenerator) -> StringName:
+	var roll: float = gen.randf()
+	var acc: float = 0.0
+	var last: StringName = &"workers"
+	for key: StringName in weights:
+		acc += float(weights[key])
+		last = key
+		if roll <= acc:
+			return key
+	return last
+
+
+## Demographic mix of potential customers around a restaurant (delivery reach):
+## {teens, students, workers, families, seniors} fractions summing to ~1.
+## Cached per building — home positions never move.
+func customer_profile(building_id: int) -> Dictionary:
+	if _profile_cache.has(building_id):
+		return _profile_cache[building_id]
+	if not _econ_ready:
+		return {}
+	var rest_building: Dictionary = CityData.get_building(building_id)
+	if rest_building.is_empty():
+		return {}
+	var door: Vector3 = rest_building.get("door_pos", rest_building.get("position", Vector3.ZERO))
+	var radius: float = float(EconomyManager.tuning_value("distance.delivery_max_m", 600.0))
+	var counts: Dictionary = {
+		&"teens": 0, &"students": 0, &"workers": 0, &"families": 0, &"seniors": 0,
+	}
+	var total: int = 0
+	for cd: Dictionary in PopulationManager.citizens_data:
+		var home: Dictionary = CityData.get_building(int(cd.get("home_id", -1)))
+		if home.is_empty():
+			continue
+		var home_pos: Vector3 = home.get("position", Vector3.ZERO)
+		if home_pos.distance_to(door) > radius:
+			continue
+		var entry: Dictionary = econ.get(int(cd["id"]), {})
+		var demo: StringName = entry.get("demographic", &"workers")
+		counts[demo] = int(counts.get(demo, 0)) + 1
+		total += 1
+	if total == 0:
+		return {}
+	var profile: Dictionary = {}
+	for key: StringName in counts:
+		profile[key] = float(counts[key]) / float(total)
+	_profile_cache[building_id] = profile
+	return profile
 
 
 func _wage_for(cd: Dictionary) -> float:

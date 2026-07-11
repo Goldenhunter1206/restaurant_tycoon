@@ -8,7 +8,11 @@ var _loan_label: Label
 
 
 func screen_title() -> String:
-	return "💰  Finances"
+	return "Finances"
+
+
+func screen_icon() -> StringName:
+	return &"coin"
 
 
 func _build() -> void:

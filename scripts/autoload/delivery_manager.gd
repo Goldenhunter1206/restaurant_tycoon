@@ -35,6 +35,23 @@ func active_count() -> int:
 	return active_orders.size()
 
 
+## Live counts for the HUD chip: busy drivers by fleet type, with drivers
+## currently walking (to a door / handing over) counted as "walker".
+func active_breakdown() -> Dictionary:
+	var result: Dictionary = {&"scooter": 0, &"car": 0, &"truck": 0, &"walker": 0}
+	for building_id: int in rosters:
+		for slot: Dictionary in rosters[building_id]:
+			var node: Node = slot["node"]
+			if not is_instance_valid(node) or not node.has_method("is_idle") or node.is_idle():
+				continue
+			if node.has_method("is_on_foot") and node.is_on_foot():
+				result[&"walker"] = int(result[&"walker"]) + 1
+				continue
+			var vehicle: StringName = node.get("vehicle_type") if node.get("vehicle_type") != null else &"scooter"
+			result[vehicle] = int(result.get(vehicle, 0)) + 1
+	return result
+
+
 ## Called by RestaurantManager when a delivery order is accepted.
 func register_order(order: FoodOrder) -> void:
 	active_orders.append(order)
@@ -71,7 +88,10 @@ func driver_became_idle(_driver: Node) -> void:
 
 func on_driver_hired(rest: RestaurantState, member: StaffMember) -> void:
 	var roster: Array = rosters.get(rest.building_id, [])
-	roster.append({"member": member, "node": _spawn_driver_agent(rest, member)})
+	# Cosmetic fleet mix: every third hire gets a car, the rest scooters.
+	var vehicle: StringName = &"car" if roster.size() % 3 == 2 else &"scooter"
+	var node: Node = _spawn_driver_agent(rest, member, vehicle)
+	roster.append({"member": member, "node": node})
 	rosters[rest.building_id] = roster
 
 
@@ -169,13 +189,14 @@ func _release_order(order: FoodOrder) -> void:
 	active_count_changed.emit(active_orders.size())
 
 
-func _spawn_driver_agent(rest: RestaurantState, member: StaffMember) -> Node:
+func _spawn_driver_agent(rest: RestaurantState, member: StaffMember, vehicle: StringName = &"scooter") -> Node:
 	if not ResourceLoader.exists(DRIVER_SCENE_PATH):
 		return null
 	var scene: PackedScene = load(DRIVER_SCENE_PATH)
 	var driver: Node = scene.instantiate()
 	driver.set("home_restaurant", rest)
 	driver.set("staff_member", member)
+	driver.set("vehicle_type", vehicle)
 	var agents: Node = get_tree().current_scene.get_node_or_null("Agents/Citizens")
 	if agents == null:
 		agents = get_tree().current_scene

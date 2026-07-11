@@ -17,6 +17,7 @@ enum DState {
 }
 
 const WALK_SPEED: float = 2.0
+const DELIVERY_MARKER_SCENE_PATH: String = "res://scenes/ui/DeliveryCarMarker.tscn"
 
 var home_restaurant: RestaurantState = null
 var staff_member: StaffMember = null
@@ -25,6 +26,9 @@ var staff_member: StaffMember = null
 var data: Dictionary = {"id": 0, "name": "Driver"}
 var company_car: Node3D = null
 var current_order: FoodOrder = null
+## Cosmetic fleet type set at hire (DeliveryManager) — drives HUD breakdown
+## counts and the world pin icon. All types still drive the company car.
+var vehicle_type: StringName = &"scooter"
 var state: DState = DState.IDLE
 var goal_desc: String = "waiting for orders"
 
@@ -51,6 +55,13 @@ func _ready() -> void:
 
 func is_idle() -> bool:
 	return state == DState.IDLE and current_order == null
+
+
+func is_on_foot() -> bool:
+	return state in [
+		DState.TO_CAR, DState.TO_CUSTOMER_DOOR, DState.HANDING_OVER,
+		DState.BACK_TO_CAR, DState.TO_RESTAURANT,
+	]
 
 
 func assign_order(order: FoodOrder) -> void:
@@ -105,8 +116,36 @@ func on_car_trip_finished(at_pos: Vector3) -> void:
 			state = DState.IDLE
 
 
+func remaining_route_points() -> PackedVector3Array:
+	if state in [DState.DRIVING_OUT, DState.DRIVING_BACK] and is_instance_valid(company_car) and company_car.has_method("remaining_route_points"):
+		return company_car.remaining_route_points()
+	var points: PackedVector3Array = PackedVector3Array()
+	points.append(global_position)
+	if not _path.is_empty():
+		var graph: RoadGraph = CityData.road_graph
+		for i: int in range(clampi(_path_idx, 0, _path.size()), _path.size()):
+			points.append(graph.side_points[_path[i]])
+	return points
+
+
+func delivery_snapshot() -> Dictionary:
+	var snapshot: Dictionary = {
+		"delivery_stage": goal_desc.capitalize(),
+		"driver": staff_member.staff_name if staff_member != null else "Driver",
+		"restaurant": home_restaurant.restaurant_name if home_restaurant != null else "Unknown restaurant",
+		"destination": "Restaurant",
+		"order_detail": "No active order",
+		"route_points": remaining_route_points(),
+	}
+	if current_order != null:
+		snapshot["order_detail"] = "#%d · %s" % [current_order.order_id, String(current_order.dish_id).replace("_", " ").capitalize()]
+		snapshot["destination"] = "Customer #%d" % current_order.citizen_id
+		snapshot["destination_position"] = current_order.target_door
+	return snapshot
+
+
 func inspect_info() -> Dictionary:
-	return {
+	var info: Dictionary = {
 		"kind": "delivery driver",
 		"name": staff_member.staff_name if staff_member != null else "Driver",
 		"employer": home_restaurant.restaurant_name if home_restaurant != null else "?",
@@ -116,6 +155,8 @@ func inspect_info() -> Dictionary:
 			if current_order != null else "none",
 		"position": global_position,
 	}
+	info.merge(delivery_snapshot(), true)
+	return info
 
 
 # --- Walking (sidewalk graph, same conventions as Citizen) --------------------
@@ -272,7 +313,24 @@ func _spawn_company_car() -> void:
 	var jitter: float = float((staff_member.uid % 5) - 2) * 2.6 if staff_member != null else 0.0
 	company_car.park_at(lane_pos, heading, jitter)
 	if home_restaurant != null:
-		company_car.set("owner_desc", "%s (delivery)" % home_restaurant.restaurant_name)
+		company_car.set("owner_desc", "%s — our delivery car" % home_restaurant.restaurant_name)
+	company_car.set("kind", "delivery")
+	company_car.set("delivery_driver", self)
+	if ResourceLoader.exists(DELIVERY_MARKER_SCENE_PATH):
+		var marker_scene: PackedScene = load(DELIVERY_MARKER_SCENE_PATH)
+		var marker: Node = marker_scene.instantiate()
+		marker.name = "OurDeliveryMarker"
+		company_car.add_child(marker)
+		# Teardrop pin matching the fleet type (car -> boxy delivery truck pin).
+		var assets: GDScript = load("res://scripts/ui/ui_assets.gd")
+		var pin_name: StringName = &"truck" if vehicle_type == &"car" else vehicle_type
+		var pin_tex: Texture2D = assets.pin(pin_name)
+		var sprite: Sprite3D = marker.get_node_or_null("PizzaBadge")
+		if pin_tex != null and sprite != null:
+			sprite.texture = pin_tex
+			sprite.pixel_size = 0.0044
+			# Overlay-marker layer, excluded from the minimap bake camera.
+			sprite.layers = 1 << 19
 
 
 func _attach_model() -> void:

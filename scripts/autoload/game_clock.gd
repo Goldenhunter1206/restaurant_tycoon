@@ -10,6 +10,13 @@ signal day_changed(day: int)
 const GAME_HOURS_PER_REAL_SECOND: float = 1.0 / 60.0
 const SPEEDS: Array[int] = [0, 1, 4, 16]
 
+## Presentation calendar: 14-day months, 12 months per year.
+const DAYS_PER_MONTH: int = 14
+const MONTH_NAMES: Array[String] = [
+	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+]
+
 var day: int = 1
 var game_hours: float = 7.0
 var speed: int = 1
@@ -52,6 +59,40 @@ func time_string() -> String:
 	var hour: int = int(game_hours)
 	var minute: int = int(fmod(game_hours, 1.0) * 60.0)
 	return "%02d:%02d" % [hour, minute]
+
+
+func time_string_ampm() -> String:
+	var hour: int = int(game_hours)
+	var minute: int = int(fmod(game_hours, 1.0) * 60.0)
+	var suffix: String = "AM" if hour < 12 else "PM"
+	var display_hour: int = hour % 12
+	if display_hour == 0:
+		display_hour = 12
+	return "%d:%02d %s" % [display_hour, minute, suffix]
+
+
+func month_index_for(a_day: int) -> int:
+	return ((a_day - 1) / DAYS_PER_MONTH) % 12
+
+
+func month_name_for(a_day: int) -> String:
+	return MONTH_NAMES[month_index_for(a_day)]
+
+
+func day_of_month() -> int:
+	return (day - 1) % DAYS_PER_MONTH + 1
+
+
+func year() -> int:
+	return (day - 1) / (DAYS_PER_MONTH * 12) + 1
+
+
+func quarter() -> int:
+	return month_index_for(day) / 3 + 1
+
+
+func date_string() -> String:
+	return "%s %d, Year %d" % [month_name_for(day), day_of_month(), year()]
 
 
 func is_between(start_hour: float, end_hour: float) -> bool:

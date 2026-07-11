@@ -46,6 +46,7 @@ func open(screen_id: StringName, building_id: int) -> void:
 	_active.set_anchors_preset(Control.PRESET_CENTER)
 	_active.reset_size.call_deferred()
 	_center_active.call_deferred()
+	_animate_open.call_deferred()
 
 
 func close() -> void:
@@ -54,6 +55,24 @@ func close() -> void:
 	_active = null
 	_dimmer.visible = false
 	_dimmer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+
+## Nav-bar "CITY MAP" behaviour: close whatever modal is open.
+func close_active() -> void:
+	close()
+
+
+func _animate_open() -> void:
+	if not is_instance_valid(_active):
+		return
+	_active.pivot_offset = _active.size * 0.5
+	_active.scale = Vector2(0.92, 0.92)
+	_active.modulate = Color(1, 1, 1, 0)
+	_dimmer.modulate = Color(1, 1, 1, 0)
+	var tween: Tween = create_tween().set_parallel(true)
+	tween.tween_property(_active, "scale", Vector2.ONE, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(_active, "modulate:a", 1.0, 0.12)
+	tween.tween_property(_dimmer, "modulate:a", 1.0, 0.12)
 
 
 func is_open() -> bool:

@@ -6,7 +6,11 @@ var _rows: Dictionary = {}
 
 
 func screen_title() -> String:
-	return "🍕  Recipes & Menu"
+	return "Recipes & Menu"
+
+
+func screen_icon() -> StringName:
+	return &"pizza"
 
 
 func _build() -> void:

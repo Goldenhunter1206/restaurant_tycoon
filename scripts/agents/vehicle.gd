@@ -20,6 +20,8 @@ var passenger: Node = null
 var goal_desc: String = "parked"
 ## Who this car belongs to, for the inspector ("Ana Silva's car", ...).
 var owner_desc: String = ""
+## Set only for player-owned delivery cars; remains linked while the driver is on foot.
+var delivery_driver: Node = null
 
 var _path: PackedInt32Array = PackedInt32Array()
 var _path_idx: int = 0
@@ -236,8 +238,27 @@ func _finish_trip() -> void:
 		set_process(false)
 
 
+func is_company_delivery() -> bool:
+	return is_instance_valid(delivery_driver)
+
+
+func remaining_route_points() -> PackedVector3Array:
+	if is_company_delivery() and delivery_driver is Driver:
+		var driver_state: int = int(delivery_driver.get("state"))
+		if driver_state not in [Driver.DState.DRIVING_OUT, Driver.DState.DRIVING_BACK]:
+			return delivery_driver.remaining_route_points()
+	var points: PackedVector3Array = PackedVector3Array()
+	points.append(global_position)
+	if _path.is_empty():
+		return points
+	var graph: RoadGraph = CityData.road_graph
+	for i: int in range(clampi(_path_idx, 0, _path.size()), _path.size()):
+		points.append(graph.lane_points[_path[i]])
+	return points
+
+
 func inspect_info() -> Dictionary:
-	return {
+	var info: Dictionary = {
 		"kind": "vehicle",
 		"vehicle_kind": kind,
 		"owner": owner_desc if not owner_desc.is_empty() else "city fleet",
@@ -246,4 +267,8 @@ func inspect_info() -> Dictionary:
 		"stopped_at_light": _stopped_at_light,
 		"passenger": passenger.data["name"] if passenger != null else "none",
 		"position": global_position,
+		"our_delivery_car": is_company_delivery(),
 	}
+	if is_company_delivery() and delivery_driver.has_method("delivery_snapshot"):
+		info.merge(delivery_driver.delivery_snapshot(), true)
+	return info

@@ -12,7 +12,11 @@ var _owned_list: VBoxContainer
 
 
 func screen_title() -> String:
-	return "🏗  Locations & Expansion"
+	return "Locations & Expansion"
+
+
+func screen_icon() -> StringName:
+	return &"hammer"
 
 
 func _build() -> void:

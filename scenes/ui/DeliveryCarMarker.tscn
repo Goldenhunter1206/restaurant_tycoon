@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://chd5njm4aifhb"]
+
+[ext_resource type="Texture2D" uid="uid://c8tw6sefbwes1" path="res://assets/ui/pizza_delivery_badge.png" id="1_gefvb"]
+
+[node name="DeliveryCarMarker" type="Node3D" unique_id=1671974345]
+
+[node name="PizzaBadge" type="Sprite3D" parent="." unique_id=155372629]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.35, 0)
+visibility_range_end = 900.0
+pixel_size = 0.0011
+billboard = 1
+fixed_size = true
+alpha_cut = 1
+texture = ExtResource("1_gefvb")

@@ -7,8 +7,8 @@ extends Node3D
 
 const PAN_SPEED: float = 60.0
 const EDGE_MARGIN: float = 8.0
-const ZOOM_MIN: float = 12.0
-const ZOOM_MAX: float = 420.0
+const ZOOM_MIN: float = 6.0
+const ZOOM_MAX: float = 520.0
 const ZOOM_STEP: float = 1.12
 const TILT_MIN: float = 25.0
 const TILT_MAX: float = 80.0
@@ -38,6 +38,7 @@ var _mouse_idle_time: float = 999.0
 
 func _ready() -> void:
 	position = Vector3(280, 0, 300)
+	_cam.near = 0.1
 	_apply()
 	SelectionManager.entity_selected.connect(_on_entity_selected)
 	SelectionManager.selection_cleared.connect(_stop_follow)
@@ -52,13 +53,13 @@ func _process(delta: float) -> void:
 			_stop_follow()
 		return
 	var move := Vector2.ZERO
-	if Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP):
+	if _pressed(&"cam_pan_up", [KEY_W, KEY_UP]):
 		move.y -= 1.0
-	if Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN):
+	if _pressed(&"cam_pan_down", [KEY_S, KEY_DOWN]):
 		move.y += 1.0
-	if Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT):
+	if _pressed(&"cam_pan_left", [KEY_A, KEY_LEFT]):
 		move.x -= 1.0
-	if Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT):
+	if _pressed(&"cam_pan_right", [KEY_D, KEY_RIGHT]):
 		move.x += 1.0
 	var vp := get_viewport()
 	var mouse := vp.get_mouse_position()
@@ -80,23 +81,40 @@ func _process(delta: float) -> void:
 			move.y -= 1.0
 		elif mouse.y > size.y - EDGE_MARGIN:
 			move.y += 1.0
-	if Input.is_physical_key_pressed(KEY_Q):
+	if _pressed(&"cam_rotate_ccw", [KEY_Q]):
 		yaw_deg += 70.0 * delta
-	if Input.is_physical_key_pressed(KEY_E):
+	if _pressed(&"cam_rotate_cw", [KEY_E]):
 		yaw_deg -= 70.0 * delta
-	if Input.is_physical_key_pressed(KEY_R):
+	if _pressed(&"cam_tilt_up", [KEY_R]):
 		tilt_deg = clampf(tilt_deg + 40.0 * delta, TILT_MIN, TILT_MAX)
-	if Input.is_physical_key_pressed(KEY_F):
+	if _pressed(&"cam_tilt_down", [KEY_F]):
 		tilt_deg = clampf(tilt_deg - 40.0 * delta, TILT_MIN, TILT_MAX)
 	if move != Vector2.ZERO:
 		var speed := PAN_SPEED * (zoom_dist / 90.0)
-		var yaw_rad := deg_to_rad(yaw_deg)
-		var fwd := Vector3(sin(yaw_rad), 0, -cos(yaw_rad))
-		var right := Vector3(cos(yaw_rad), 0, sin(yaw_rad))
-		position += (right * move.x + fwd * -move.y) * speed * delta
+		# Pan axes come from the rig's ACTUAL basis so W is always screen-up
+		# and D screen-right at any yaw (hand-rolled sin/cos here used to
+		# mirror the axes once the camera was rotated).
+		var fwd := -transform.basis.z
+		fwd.y = 0.0
+		fwd = fwd.normalized()
+		var right := transform.basis.x
+		right.y = 0.0
+		right = right.normalized()
+		position += (right * move.x - fwd * move.y) * speed * delta
 		position.x = clampf(position.x, -120.0, 820.0)
 		position.z = clampf(position.z, -120.0, 900.0)
 	_apply()
+
+
+## Action-aware key check: uses the rebindable input map when the action
+## exists, otherwise falls back to raw physical keys.
+func _pressed(action: StringName, fallback_keys: Array) -> bool:
+	if InputMap.has_action(action):
+		return Input.is_action_pressed(action)
+	for key: Key in fallback_keys:
+		if Input.is_physical_key_pressed(key):
+			return true
+	return false
 
 
 func _unhandled_input(event: InputEvent) -> void:

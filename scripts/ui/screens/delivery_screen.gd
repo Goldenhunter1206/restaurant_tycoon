@@ -11,7 +11,11 @@ var _status: Label
 
 
 func screen_title() -> String:
-	return "🛵  Service & Deliveries"
+	return "Service & Deliveries"
+
+
+func screen_icon() -> StringName:
+	return &"scooter"
 
 
 func _build() -> void:

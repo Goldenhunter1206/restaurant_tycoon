@@ -517,6 +517,7 @@ func go_dine(restaurant_id: int, door_pos: Vector3, dish_id: StringName) -> bool
 	_dine_restaurant_id = restaurant_id
 	_dine_dish = dish_id
 	_leisure_spot = {"kind": "restaurant", "pos": door_pos}
+	DemandManager.set_restaurant_intent(int(data["id"]), restaurant_id, dish_id, self)
 	_plan_trip(door_pos, "dine")
 	return true
 
@@ -554,6 +555,7 @@ func on_dine_rejected() -> void:
 
 
 func _resume_after_meal() -> void:
+	DemandManager.clear_restaurant_intent(int(data["id"]))
 	_dine_restaurant_id = -1
 	_dine_dish = &""
 	visible = true
@@ -563,6 +565,25 @@ func _resume_after_meal() -> void:
 		_start_commute_home()
 	else:
 		_start_leisure()
+
+
+func thought_text() -> String:
+	if _dine_restaurant_id >= 0:
+		var rest: RestaurantState = RestaurantManager.by_building.get(_dine_restaurant_id)
+		var rest_name: String = rest.restaurant_name if rest != null else "the restaurant"
+		if state == CState.DINE and goal_desc.contains("queue"):
+			return "I hope a table opens soon at %s." % rest_name
+		return "I'm craving %s at %s." % [String(_dine_dish).replace("_", " "), rest_name]
+	match state:
+		CState.WORK:
+			return "Busy at work — lunch would be nice."
+		CState.LEISURE:
+			return "Where should I eat next?"
+		CState.COMMUTE_OUT:
+			return "On my way to work."
+		CState.COMMUTE_HOME:
+			return "Time to head home."
+	return goal_desc.capitalize() + "."
 
 
 func inspect_info() -> Dictionary:
@@ -584,6 +605,8 @@ func inspect_info() -> Dictionary:
 		"money": "$%.0f" % float(econ.get("wealth", 0.0)) if not econ.is_empty() else "?",
 		"wage": "$%.0f/day" % float(econ.get("daily_wage", 0.0)) if not econ.is_empty() else "?",
 		"likes": _tastes_text(econ),
+		"thought": thought_text(),
+		"restaurant": RestaurantManager.by_building.get(_dine_restaurant_id).restaurant_name if RestaurantManager.by_building.has(_dine_restaurant_id) else "none",
 		"position": global_position,
 	}
 
