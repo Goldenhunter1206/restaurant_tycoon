@@ -320,7 +320,6 @@ func _spawn_company_car() -> void:
 		var marker_scene: PackedScene = load(DELIVERY_MARKER_SCENE_PATH)
 		var marker: Node = marker_scene.instantiate()
 		marker.name = "OurDeliveryMarker"
-		company_car.add_child(marker)
 		# Teardrop pin matching the fleet type (car -> boxy delivery truck pin).
 		var assets: GDScript = load("res://scripts/ui/ui_assets.gd")
 		var pin_name: StringName = &"truck" if vehicle_type == &"car" else vehicle_type
@@ -328,9 +327,13 @@ func _spawn_company_car() -> void:
 		var sprite: Sprite3D = marker.get_node_or_null("PizzaBadge")
 		if pin_tex != null and sprite != null:
 			sprite.texture = pin_tex
-			sprite.pixel_size = 0.0044
+			# Zoom-aware pin: shrinks when the camera is close so the car
+			# stays visible; script attached before entering the tree.
+			sprite.set_script(load("res://scripts/ui/zoom_scaled_pin.gd"))
+			sprite.set("base_pixel_size", 0.0008)
 			# Overlay-marker layer, excluded from the minimap bake camera.
 			sprite.layers = 1 << 19
+		company_car.add_child(marker)
 
 
 func _attach_model() -> void:

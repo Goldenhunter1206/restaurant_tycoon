@@ -7,6 +7,9 @@ extends Node3D
 const SIGN_GLB: String = "res://Cartoon City Massive Megapack/gLTF/Food Props/PizzaSign_2_A.glb"
 const BOB_HEIGHT: float = 0.6
 const BOB_SPEED: float = 2.0
+## World-scale (not fixed_size): the name shrinks naturally with distance so
+## it never covers the building; the zoom-scaled pin is the far-away marker.
+const LABEL_PIXEL_SIZE: float = 0.01
 
 var building_id: int = -1
 
@@ -23,7 +26,7 @@ func setup(rest: RestaurantState) -> void:
 	if info.has("node_path"):
 		body = get_node_or_null(info["node_path"])
 	if body != null and body.has_meta("size"):
-		top_y = (body.get_meta("size") as Vector3).y + 2.5
+		top_y = (body.get_meta("size") as Vector3).y + 3.5
 	var base: Vector3 = Vector3(info.get("position", rest.door_pos))
 	global_position = Vector3(base.x, 0.0, base.z)
 	_base_y = top_y
@@ -41,28 +44,28 @@ func setup(rest: RestaurantState) -> void:
 	var assets: GDScript = load("res://scripts/ui/ui_assets.gd")
 	var pin_tex: Texture2D = assets.pin(&"pizza")
 	if pin_tex != null:
-		var pin: Sprite3D = Sprite3D.new()
+		var pin: ZoomScaledPin = load("res://scripts/ui/zoom_scaled_pin.gd").new()
 		pin.texture = pin_tex
 		pin.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 		pin.fixed_size = true
-		pin.pixel_size = 0.0042
+		pin.base_pixel_size = 0.0008
 		pin.no_depth_test = true
 		pin.render_priority = 10
 		# Layer 20: overlay markers, excluded from the minimap bake camera
 		# (fixed_size sprites would render huge into the ortho bake).
 		pin.layers = 1 << 19
-		pin.position.y = 4.2
+		pin.position.y = 6.0
 		_bobber.add_child(pin)
 
 	var label: Label3D = Label3D.new()
 	label.text = rest.restaurant_name
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	label.font_size = 96
-	label.pixel_size = 0.01
+	label.pixel_size = LABEL_PIXEL_SIZE
 	label.modulate = Color("#fff2cf")
 	label.outline_size = 24
 	label.outline_modulate = Color("#8a5a2b")
-	label.position.y = 2.2
+	label.position.y = 3.4
 	label.no_depth_test = true
 	_bobber.add_child(label)
 
