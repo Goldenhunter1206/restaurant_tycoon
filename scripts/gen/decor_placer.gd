@@ -13,8 +13,8 @@ const TREES: Array[String] = [
 ]
 const LAMP: String = "res://Cartoon City Massive Megapack/gLTF 2/Nature and Park/StreetLamp_3_A.glb"
 
-const TREE_OFF: float = 5.6
-const LAMP_OFF: float = 4.9
+const TREE_OFF: float = 4.8
+const LAMP_OFF: float = 4.5
 const TREE_SPACING: float = 15.0
 const LAMP_SPACING: float = 30.0
 const END_CLEAR: float = 9.0

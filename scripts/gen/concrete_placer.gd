@@ -11,7 +11,7 @@ extends RefCounted
 const TILES := "res://Cartoon City Massive Megapack/gLTF 2/Tiles/"
 const PAVERS: Array[String] = [TILES + "StreetTile_1_A_1.glb", TILES + "StreetTile_1_C_1.glb"]
 const TILE_SZ: float = 2.0        # StreetTile is a 2x2 m paver
-const EDGE_INSET: float = 6.0     # clear the road (4) + sidewalk band (2) on road-facing edges
+const EDGE_INSET: float = 7.0     # clear the road (4) + sidewalk band (3) on road-facing edges
 const PAVE_Y: float = 0.0         # match the sidewalk pavers (ground plane sits at -0.02)
 const VIS_END: float = 600.0
 const PAVE_DISTRICTS: String = "DCI"

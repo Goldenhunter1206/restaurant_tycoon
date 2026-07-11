@@ -156,7 +156,9 @@ static func _build_lights(root: Node3D, cache: Dictionary) -> int:
 					continue
 				var fwd := _dir_vec(d)
 				var right := Vector3(-fwd.z, 0.0, fwd.x)
-				var pos := center + fwd * 5.5 + right * 5.5
+				# Kerb-side corner spot: clear of the corner walk node (5.6, 5.6)
+				# and the pedestrian lanes around the 5.6 walk line.
+				var pos := center + fwd * 6.3 + right * 4.6
 				xforms.append(Transform3D(Basis(Vector3.UP, atan2(-fwd.x, -fwd.z)), Vector3(pos.x, 0.42, pos.z)))
 	MeshBatch.emit(grp, "Sig", LIGHT_GLB, xforms, cache)
 	return xforms.size()

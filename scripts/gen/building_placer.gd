@@ -26,7 +26,9 @@ const POOLS := {
 	"P": ["B8", "B24", "B26", "B17", "B9", "B8", "B24", "B13"],
 }
 
-const SETBACK := {"D": 0.6, "C": 0.6, "N": 3.5, "R": 6.0, "P": 0.8, "I": 3.0}
+## Measured from the lot edge (kerb line, road center +/- 4). Fronts must
+## clear the 3 m pavement band (kerb..kerb+3) with a little air.
+const SETBACK := {"D": 3.2, "C": 3.2, "N": 3.5, "R": 6.0, "P": 3.4, "I": 3.2}
 ## Tightened after the entrance-yaw fix widened frontages (fewer fit per block).
 const GAP_MIN := {"D": 0.3, "C": 0.4, "N": 2.5, "R": 4.5, "P": 0.3, "I": 4.0}
 const GAP_MAX := {"D": 1.0, "C": 1.3, "N": 5.0, "R": 9.0, "P": 1.0, "I": 7.5}
@@ -219,7 +221,9 @@ static func _march_face(out: Array[Dictionary], catalog: Dictionary, rng: Random
 	var pool: Array = POOLS[district]
 	var setback: float = SETBACK[district] + _avenue_setback(bi, bj, face_id)
 	var is_h := face_id < 2
-	var depth_limit := ((z1 - z0) if is_h else (x1 - x0)) * 0.5 - 1.5
+	# Cap depth so two opposing faces (each starting at its own setback) keep
+	# at least a 1 m gap at the block center.
+	var depth_limit := ((z1 - z0) if is_h else (x1 - x0)) * 0.5 - setback - 0.5
 	var rot: float
 	var range_start: float
 	var range_end: float

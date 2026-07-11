@@ -1,7 +1,7 @@
 class_name SidewalkPlacer
 extends RefCounted
 ## Paves sidewalks and lines them with street furniture. For every block, a
-## 2 m pavement band (StreetTile MultiMesh) runs along each road-facing lot
+## 3 m pavement band (StreetTile MultiMesh) runs along each road-facing lot
 ## edge, and furniture (hydrants, bins, benches, post boxes, meters, bus
 ## stops, kiosks, food carts...) is placed at the curb facing the road.
 ## Deterministic; built under a "Sidewalks" group node.
@@ -13,7 +13,8 @@ const NP := "res://Cartoon City Massive Megapack/gLTF 2/Nature and Park/"
 const PAVERS: Array[String] = [TILES + "StreetTile_1_A_1.glb", TILES + "StreetTile_1_C_1.glb"]
 const KERB: Array[String] = [SP + "Kerbstone_A_1.glb", SP + "Kerbstone_A_2.glb", SP + "Kerbstone_A_3.glb"]
 const KERB_LEN: float = 2.0    # kerbstone length along its local Z
-const BAND: float = 2.0            # sidewalk depth = one tile
+const BAND: float = 3.0            # sidewalk depth (pavement 4.0..7.0 from road center)
+const TILE_LEN: float = 2.0        # StreetTile is a 2x2 m paver; depth-scaled to BAND
 const PAVE_Y: float = 0.0
 const FURN_Y: float = 0.1          # furniture rests on the pavement top
 const CURB_INSET: float = 0.75     # furniture distance from the curb into the sidewalk
@@ -28,7 +29,7 @@ const SEED: int = 51413
 ## Typical building-front setback from the kerb per district (mirrors
 ## BuildingPlacer.SETBACK); grand-avenue faces add +5 m. Used to skip bulky
 ## props that would otherwise punch through a downtown frontage.
-const SETBACK := {"D": 0.6, "C": 0.6, "N": 3.5, "R": 6.0, "P": 0.8, "I": 3.0}
+const SETBACK := {"D": 3.2, "C": 3.2, "N": 3.5, "R": 6.0, "P": 3.4, "I": 3.2}
 
 ## World-XZ footprints of bulky furniture, filled during build() and read by
 ## DecorPlacer so it never plants a tree/lamp inside a kiosk, bus stop, etc.
@@ -153,14 +154,17 @@ static func _gather(paver_xforms: Array, kerb_xforms: Array, furn_xforms: Dictio
 
 
 static func _pave_row(paver_xforms: Array, a0: float, a1: float, fixed: float, along_x: bool) -> void:
-	var count := int(round((a1 - a0) / BAND))
+	# Tiles stay TILE_LEN apart along the kerb; the depth axis is stretched
+	# world-space so one row spans the full BAND (scaled() = world-axis scale).
+	var depth_scale := Vector3(1.0, 1.0, BAND / TILE_LEN) if along_x else Vector3(BAND / TILE_LEN, 1.0, 1.0)
+	var count := int(round((a1 - a0) / TILE_LEN))
 	for k in range(count):
-		var c := a0 + BAND * (float(k) + 0.5)
+		var c := a0 + TILE_LEN * (float(k) + 0.5)
 		var pos: Vector3 = Vector3(c, PAVE_Y, fixed) if along_x else Vector3(fixed, PAVE_Y, c)
 		var key := int(c * 3.0 + fixed * 7.0)
 		var v := absi(key) % PAVERS.size()
 		var quarter := absi(key / 5) % 4
-		paver_xforms[v].append(Transform3D(Basis(Vector3.UP, float(quarter) * PI * 0.5), pos))
+		paver_xforms[v].append(Transform3D(Basis(Vector3.UP, float(quarter) * PI * 0.5).scaled(depth_scale), pos))
 
 
 static func _kerb_row(kerb_xforms: Array, a0: float, a1: float, fixed: float, along_x: bool) -> void:
