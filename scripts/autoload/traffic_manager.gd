@@ -29,6 +29,11 @@ const PED_AHEAD_RANGE: float = 12.0
 ## Unsignalized crossings: a car this close and heading at the zebra
 ## makes waiting pedestrians hold the kerb.
 const CROSSING_CAR_RANGE: float = 13.0
+## Congestion-aware routing: per-edge occupancy scales the A* weight of
+## the edge's end node every refresh, so new routes flow around jams.
+const CONGESTION_REFRESH: float = 2.0
+const CONGESTION_LOAD_FACTOR: float = 10.0
+const CONGESTION_MAX_SCALE: float = 8.0
 const SERVICE_VEHICLES: Array = [
 	["police", 2], ["taxi", 4], ["ambulance", 1], ["icecream", 2], ["post", 2],
 ]
@@ -51,6 +56,11 @@ var _grid: Dictionary = {}
 var _ped_grid: Dictionary = {}
 var _ped_grid_tick: int = 0
 
+var _edge_load: PackedInt32Array = PackedInt32Array()
+var _edge_len: PackedFloat32Array = PackedFloat32Array()
+var _weighted_nodes: PackedInt32Array = PackedInt32Array()
+var _congestion_timer: float = 0.0
+
 var _sim_time: float = 0.0
 var _vehicle_scene: PackedScene
 var _civilian_models: Array[String] = []
@@ -64,6 +74,10 @@ func _process(delta: float) -> void:
 	_ped_grid_tick += 1
 	if _ped_grid_tick % PED_GRID_INTERVAL == 0:
 		_rebuild_ped_grid()
+	_congestion_timer += delta * float(GameClock.speed)
+	if _congestion_timer >= CONGESTION_REFRESH:
+		_congestion_timer = 0.0
+		_refresh_congestion_weights()
 
 
 func _rebuild_grid() -> void:
@@ -131,8 +145,58 @@ func initialize() -> void:
 		push_warning("TrafficManager: Vehicle.tscn missing; traffic disabled")
 		return
 	_collect_civilian_models()
+	_init_congestion()
 	_spawn_service_fleet()
 	_spawn_through_traffic()
+
+
+func _init_congestion() -> void:
+	var graph: RoadGraph = CityData.road_graph
+	if graph == null:
+		return
+	var edges := graph.lane_from.size()
+	_edge_load.resize(edges)
+	_edge_load.fill(0)
+	_edge_len.resize(edges)
+	for e in range(edges):
+		_edge_len[e] = graph.lane_points[graph.lane_from[e]].distance_to(
+			graph.lane_points[graph.lane_to[e]])
+
+
+func edge_entered(edge: int) -> void:
+	if edge >= 0 and edge < _edge_load.size():
+		_edge_load[edge] += 1
+
+
+func edge_left(edge: int) -> void:
+	if edge >= 0 and edge < _edge_load.size() and _edge_load[edge] > 0:
+		_edge_load[edge] -= 1
+
+
+func _refresh_congestion_weights() -> void:
+	## Weight scale multiplies the cost of edges ENTERING a node, which
+	## matches per-edge congestion semantics. Main-thread-only mutation
+	## between queries; in-flight paths are plain arrays and unaffected.
+	if _edge_load.is_empty():
+		return
+	var graph: RoadGraph = CityData.road_graph
+	var astar := graph.lane_astar()
+	var node_scale: Dictionary = {}
+	for e in range(_edge_load.size()):
+		var load := _edge_load[e]
+		if load <= 0:
+			continue
+		var n := graph.lane_to[e]
+		node_scale[n] = float(node_scale.get(n, 0.0)) \
+			+ float(load) * CONGESTION_LOAD_FACTOR / maxf(_edge_len[e], 4.0)
+	for n in _weighted_nodes:
+		if not node_scale.has(n):
+			astar.set_point_weight_scale(n, 1.0)
+	var new_weighted := PackedInt32Array()
+	for n: int in node_scale:
+		astar.set_point_weight_scale(n, clampf(1.0 + float(node_scale[n]), 1.0, CONGESTION_MAX_SCALE))
+		new_weighted.append(n)
+	_weighted_nodes = new_weighted
 
 
 func _collect_civilian_models() -> void:

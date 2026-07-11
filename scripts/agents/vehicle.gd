@@ -46,6 +46,10 @@ var _speed: float = 0.0
 var _sub_points: PackedVector3Array = PackedVector3Array()
 var _sub_idx: int = 0
 var _curve_for_idx: int = -1
+## Congestion bookkeeping: the lane edge we currently occupy (-1 = none)
+## and a cooldown (in _advance calls) between mid-trip reroute attempts.
+var _current_edge: int = -1
+var _reroute_block: int = 0
 
 
 func setup(vehicle_kind: String) -> void:
@@ -90,6 +94,12 @@ func _ready() -> void:
 	set_meta("entity", "vehicle")
 	monitoring = false
 	set_process(false)
+	tree_exiting.connect(_release_edge)
+
+
+func _release_edge() -> void:
+	TrafficManager.edge_left(_current_edge)
+	_current_edge = -1
 
 
 func start_trip(path: PackedInt32Array, citizen: Node) -> void:
@@ -120,6 +130,7 @@ func park_at(lane_pos: Vector3, heading: Vector3, jitter: float) -> void:
 	set_process(false)
 	_speed = 0.0
 	_curve_for_idx = -1
+	_release_edge()
 	var right := Vector3(-heading.z, 0, heading.x)
 	global_position = lane_pos + right * CURB_PARK_OFFSET + heading * jitter
 	rotation.y = atan2(heading.x, heading.z)
@@ -171,6 +182,7 @@ func _next_patrol_leg() -> void:
 	# No route found; try again next evaluation.
 	state = VState.PARKED
 	set_process(false)
+	_release_edge()
 
 
 func _process(delta: float) -> void:
@@ -200,6 +212,12 @@ func _advance(scaled_delta: float, check_neighbors: bool, step_frames: int = 1) 
 	var to_id := _path[_path_idx + 1]
 	var node_target := graph.lane_points[to_id]
 	var edge := graph.lane_edge_between(from_id, to_id)
+	if edge != _current_edge:
+		TrafficManager.edge_left(_current_edge)
+		TrafficManager.edge_entered(edge)
+		_current_edge = edge
+	if _reroute_block > 0:
+		_reroute_block -= 1
 	_ensure_turn_curve(graph, edge)
 	var dist_to_node := _remaining_edge_distance(node_target)
 
@@ -239,6 +257,9 @@ func _advance(scaled_delta: float, check_neighbors: bool, step_frames: int = 1) 
 			follow = sqrt(2.0 * BRAKE_COMFORT * maxf(gap - FOLLOW_GAP, 0.0))
 		if follow < 0.3:
 			_blocked_frames += 1
+			# Blocked a while: try a congestion-aware detour before creeping.
+			if _blocked_frames == 45 and _reroute_block <= 0:
+				_try_reroute(graph)
 			if _blocked_frames >= 90:
 				follow = CREEP_SPEED
 		else:
@@ -362,6 +383,25 @@ func _ray_intersect_xz(p0: Vector3, d0: Vector3, p2: Vector3, d2: Vector3) -> Ve
 	if t <= 0.1:
 		return Vector3.INF
 	return p0 + d0 * t
+
+
+## Re-path from the next node to the destination through the congestion-
+## weighted A*; splice only when the detour actually diverges.
+func _try_reroute(graph: RoadGraph) -> void:
+	_reroute_block = 360
+	if _path_idx + 2 >= _path.size():
+		return
+	var alt := graph.find_lane_path(_path[_path_idx + 1], _path[_path.size() - 1])
+	if alt.size() < 2 or alt[1] == _path[_path_idx + 2]:
+		return
+	var new_path := PackedInt32Array()
+	new_path.append(_path[_path_idx])
+	new_path.append_array(alt)
+	_path = new_path
+	_path_idx = 0
+	_curve_for_idx = -1
+	_sub_points = PackedVector3Array()
+	_sub_idx = 0
 
 
 func _finish_trip() -> void:
