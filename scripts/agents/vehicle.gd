@@ -15,6 +15,7 @@ const TURN_SPEED: float = 4.0       # cornering speed on curved turn edges
 const FOLLOW_GAP: float = 4.0       # bumper gap kept to the car ahead
 const STOP_MARGIN: float = 1.2      # stop this short of a red-light node
 const CREEP_SPEED: float = 2.0      # deadlock-breaking crawl
+const PED_GAP: float = 2.5          # stop this short of a pedestrian ahead
 const CORNER_DOT: float = 0.94      # heading kink beyond ~20 deg = slow for corner
 const CURVE_SAMPLES: int = 8        # Bezier subdivisions per turn edge
 const LOD_NEAR: float = 90.0
@@ -243,6 +244,10 @@ func _advance(scaled_delta: float, check_neighbors: bool, step_frames: int = 1) 
 		else:
 			_blocked_frames = 0
 		target_speed = minf(target_speed, follow)
+		# Pedestrians on the roadway ahead: always yield, never creep through.
+		var ped_gap := TrafficManager.pedestrian_ahead_distance(self)
+		if ped_gap < 900.0:
+			target_speed = minf(target_speed, sqrt(2.0 * BRAKE_COMFORT * maxf(ped_gap - PED_GAP, 0.0)))
 
 	var rate := ACCEL if target_speed > _speed else BRAKE
 	_speed = move_toward(_speed, target_speed, rate * scaled_delta)

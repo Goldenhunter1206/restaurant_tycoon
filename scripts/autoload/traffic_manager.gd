@@ -17,6 +17,18 @@ const THROUGH_TRAFFIC_COUNT: int = 8
 ## Spatial hash cell for car-following lookups; > the 14 m check radius
 ## so a 3x3 cell scan always covers it.
 const GRID_CELL: float = 16.0
+## Pedestrian spatial hash: smaller cells, rebuilt every few frames.
+const PED_CELL: float = 8.0
+const PED_GRID_INTERVAL: int = 4
+## Corridor half-widths for ahead checks (car lane is 3.2 m wide; parked
+## cars sit 1.65 m off-lane and must not trigger phantom braking).
+const CAR_CORRIDOR: float = 1.5
+const PED_CORRIDOR: float = 1.9
+const CAR_AHEAD_RANGE: float = 14.0
+const PED_AHEAD_RANGE: float = 12.0
+## Unsignalized crossings: a car this close and heading at the zebra
+## makes waiting pedestrians hold the kerb.
+const CROSSING_CAR_RANGE: float = 13.0
 const SERVICE_VEHICLES: Array = [
 	["police", 2], ["taxi", 4], ["ambulance", 1], ["icecream", 2], ["post", 2],
 ]
@@ -31,8 +43,13 @@ const KIND_MODELS := {
 }
 
 var vehicles: Array[Node] = []
+## Walking agents (citizens, ambient walkers, on-foot drivers). The grid
+## build filters to visible + processing, so idle/driving states drop out.
+var pedestrians: Array[Node3D] = []
 
 var _grid: Dictionary = {}
+var _ped_grid: Dictionary = {}
+var _ped_grid_tick: int = 0
 
 var _sim_time: float = 0.0
 var _vehicle_scene: PackedScene
@@ -44,20 +61,63 @@ var _initialized: bool = false
 func _process(delta: float) -> void:
 	_sim_time += delta * float(GameClock.speed)
 	_rebuild_grid()
+	_ped_grid_tick += 1
+	if _ped_grid_tick % PED_GRID_INTERVAL == 0:
+		_rebuild_ped_grid()
 
 
 func _rebuild_grid() -> void:
-	## Car-following only cares about cars ON the road: parked cars sit
-	## at the curb, off-lane, and must not trigger phantom braking.
+	## Includes parked cars: the corridor test in vehicle_ahead_distance
+	## keeps curb-parked cars (1.65 m off-lane) from causing phantom
+	## braking, while a car pulling out still sees one dead ahead.
 	_grid.clear()
 	for car: Vehicle in vehicles:
-		if not car.visible or car.state != Vehicle.VState.DRIVING:
+		if not car.visible:
 			continue
 		var pos := car.global_position
 		var cell := Vector2i(floori(pos.x / GRID_CELL), floori(pos.z / GRID_CELL))
 		if not _grid.has(cell):
 			_grid[cell] = []
 		(_grid[cell] as Array).append(car)
+
+
+func register_pedestrian(p: Node3D) -> void:
+	if not pedestrians.has(p):
+		pedestrians.append(p)
+
+
+func unregister_pedestrian(p: Node3D) -> void:
+	pedestrians.erase(p)
+
+
+func _rebuild_ped_grid() -> void:
+	_ped_grid.clear()
+	var stale: Array = []
+	for p: Node3D in pedestrians:
+		if not is_instance_valid(p):
+			stale.append(p)
+			continue
+		if not p.visible or not p.is_processing():
+			continue
+		var pos := p.global_position
+		var cell := Vector2i(floori(pos.x / PED_CELL), floori(pos.z / PED_CELL))
+		if not _ped_grid.has(cell):
+			_ped_grid[cell] = []
+		(_ped_grid[cell] as Array).append(p)
+	for p: Node3D in stale:
+		pedestrians.erase(p)
+
+
+func peds_near(pos: Vector3, radius: float) -> Array:
+	var out: Array = []
+	var span := int(ceilf(radius / PED_CELL))
+	var center := Vector2i(floori(pos.x / PED_CELL), floori(pos.z / PED_CELL))
+	for cx in range(center.x - span, center.x + span + 1):
+		for cz in range(center.y - span, center.y + span + 1):
+			for p: Node3D in _ped_grid.get(Vector2i(cx, cz), []):
+				if p.global_position.distance_to(pos) <= radius:
+					out.append(p)
+	return out
 
 
 func initialize() -> void:
@@ -235,12 +295,14 @@ func _spawn_vehicle(kind: String, pos: Vector3) -> Node3D:
 
 
 func vehicle_ahead_distance(vehicle: Node3D) -> float:
-	## Distance to the nearest other vehicle roughly ahead of us.
-	## Scans only the 3x3 spatial-hash cells around the caller.
+	## Forward distance to the nearest vehicle inside our lane corridor.
+	## The corridor test (vs the old forward cone) ignores oncoming cars
+	## in the opposite lane (3.2 m lateral) and curb-parked cars (1.65 m).
 	var best := 1e9
 	# Vehicles steer with rotation.y = atan2(dir.x, dir.z), so their
 	# travel direction is +basis.z (NOT the usual -Z convention).
 	var fwd: Vector3 = vehicle.global_transform.basis.z
+	var right := Vector3(-fwd.z, 0.0, fwd.x)
 	var pos := vehicle.global_position
 	var center := Vector2i(floori(pos.x / GRID_CELL), floori(pos.z / GRID_CELL))
 	for cx in range(center.x - 1, center.x + 2):
@@ -250,9 +312,65 @@ func vehicle_ahead_distance(vehicle: Node3D) -> float:
 				if other == vehicle:
 					continue
 				var rel: Vector3 = other.global_position - pos
-				var dist := rel.length()
-				if dist > 14.0 or dist < 0.01:
+				rel.y = 0.0
+				var s := rel.dot(fwd)
+				if s <= 0.3 or s >= CAR_AHEAD_RANGE:
 					continue
-				if rel.normalized().dot(fwd) > 0.75:
-					best = minf(best, dist)
+				if absf(rel.dot(right)) > CAR_CORRIDOR:
+					continue
+				best = minf(best, s)
 	return best
+
+
+func pedestrian_ahead_distance(vehicle: Node3D) -> float:
+	## Forward distance to the nearest pedestrian inside the vehicle's
+	## corridor. Sidewalk walkers (>= 4 m lateral) never register; anyone
+	## on a crossing or jaywalking in the lane does.
+	var best := 1e9
+	var fwd: Vector3 = vehicle.global_transform.basis.z
+	var right := Vector3(-fwd.z, 0.0, fwd.x)
+	var pos := vehicle.global_position
+	var span := int(ceilf(PED_AHEAD_RANGE / PED_CELL))
+	var center := Vector2i(floori(pos.x / PED_CELL), floori(pos.z / PED_CELL))
+	for cx in range(center.x - span, center.x + span + 1):
+		for cz in range(center.y - span, center.y + span + 1):
+			for p: Node3D in _ped_grid.get(Vector2i(cx, cz), []):
+				var rel: Vector3 = p.global_position - pos
+				rel.y = 0.0
+				var s := rel.dot(fwd)
+				if s <= 0.0 or s >= PED_AHEAD_RANGE:
+					continue
+				if absf(rel.dot(right)) > PED_CORRIDOR:
+					continue
+				best = minf(best, s)
+	return best
+
+
+func is_crossing_safe(side_edge: int) -> bool:
+	## Unsignalized crossings only: pedestrians hold the kerb while a
+	## moving car is close and heading at the zebra. Signalized crossings
+	## are already gated by the walk phase.
+	var graph: RoadGraph = CityData.road_graph
+	var inter_id := graph.side_crossing[side_edge]
+	if inter_id < 0:
+		return true
+	var rec := graph.get_intersection(inter_id)
+	if not rec.is_empty() and rec["signalized"]:
+		return true
+	var mid := (graph.side_points[graph.side_from[side_edge]]
+		+ graph.side_points[graph.side_to[side_edge]]) * 0.5
+	mid.y = 0.0
+	var center := Vector2i(floori(mid.x / GRID_CELL), floori(mid.z / GRID_CELL))
+	for cx in range(center.x - 1, center.x + 2):
+		for cz in range(center.y - 1, center.y + 2):
+			for car: Vehicle in _grid.get(Vector2i(cx, cz), []):
+				if car.state != Vehicle.VState.DRIVING:
+					continue
+				var rel := mid - car.global_position
+				rel.y = 0.0
+				var d := rel.length()
+				if d > CROSSING_CAR_RANGE or d < 0.01:
+					continue
+				if car.global_transform.basis.z.dot(rel / d) > 0.7 and float(car.get("_speed")) > 0.5:
+					return false
+	return true

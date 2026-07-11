@@ -7,6 +7,7 @@ extends Area3D
 enum CState { SLEEP, COMMUTE_OUT, WORK, LEISURE_GO, LEISURE, COMMUTE_HOME, DRIVING, DINE }
 
 const WALK_SPEED: float = 1.7
+const WALK_SPEED_SPREAD: float = 0.4   # per-citizen speed in [1.5, 1.9]
 const LOD_NEAR: float = 70.0
 const LOD_MID: float = 180.0
 const LUNCH_HOURS: float = 0.7
@@ -29,6 +30,8 @@ var _idle_anim: String = "Idle_A"
 var _path: PackedInt32Array = PackedInt32Array()
 var _path_idx: int = 0
 var _edge_progress: float = 0.0
+var _walk_speed: float = WALK_SPEED
+var _lane_off: float = 0.0
 var _target_pos: Vector3
 var _leisure_spot: Dictionary = {}
 var _vehicle: Node3D = null
@@ -82,6 +85,10 @@ func set_model(model_path: String, anim_lib: AnimationLibrary) -> void:
 func _ready() -> void:
 	set_meta("entity", "citizen")
 	monitoring = false
+	var id_v: int = int(data.get("id", 0))
+	_walk_speed = 1.5 + float(posmod(id_v * 7919, 100)) / 100.0 * WALK_SPEED_SPREAD
+	_lane_off = PedSteering.lane_offset_for(id_v)
+	TrafficManager.register_pedestrian(self)
 	GameClock.hour_changed.connect(_on_hour)
 	GameClock.minute_ticked.connect(_on_minute)
 	_model = get_node_or_null("Model")
@@ -126,26 +133,34 @@ func _process(delta: float) -> void:
 		step_frames = 3
 	if _lod_tick % step_frames != 0:
 		return
-	_advance_walk(delta * float(step_frames) * float(GameClock.speed))
+	_advance_walk(delta * float(step_frames) * float(GameClock.speed), dist < LOD_NEAR)
 
 
-func _advance_walk(scaled_delta: float) -> void:
+func _advance_walk(scaled_delta: float, near_cam: bool = false) -> void:
 	if _path_idx >= _path.size():
 		_arrive()
 		return
 	var graph: RoadGraph = CityData.road_graph
-	var target := graph.side_points[_path[_path_idx]]
-	# Crossing gate: wait for walk phase at signalized crossings.
+	var target := PedSteering.offset_target(
+		graph.side_points[_path[_path_idx]], global_position, _lane_off)
+	# Crossing gate: signalized crossings wait for the walk phase, plain
+	# ones wait until no car is bearing down on the zebra.
 	if _path_idx > 0:
 		var edge := _crossing_edge(_path[_path_idx - 1], _path[_path_idx])
-		if edge >= 0 and not TrafficManager.can_pedestrian_cross(edge):
+		if edge >= 0 and (not TrafficManager.can_pedestrian_cross(edge)
+				or not TrafficManager.is_crossing_safe(edge)):
 			_set_anim("idle")
 			return
 	_set_anim("walk")
+	# Light separation from nearby walkers (near camera, every 2nd step).
+	if near_cam and (_lod_tick & 1) == 0:
+		var push := PedSteering.lateral_avoid(self)
+		if push != Vector3.ZERO:
+			global_position += push * minf(scaled_delta * 2.0, 1.0)
 	var to_target := target - global_position
 	to_target.y = 0
 	var dist := to_target.length()
-	var step := WALK_SPEED * scaled_delta
+	var step := _walk_speed * scaled_delta
 	if step >= dist:
 		global_position = Vector3(target.x, target.y, target.z)
 		_path_idx += 1

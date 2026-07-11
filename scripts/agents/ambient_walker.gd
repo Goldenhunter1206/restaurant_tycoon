@@ -21,6 +21,7 @@ var _node_id: int = -1
 var _lod_tick: int = 0
 var _anim_lod_paused: bool = false
 var _rng := RandomNumberGenerator.new()
+var _lane_off: float = 0.0
 var _anim: AnimationPlayer
 var _model: Node3D
 
@@ -35,6 +36,8 @@ func setup(model_path: String, anim_lib: AnimationLibrary, seed_value: int) -> v
 	## and visibility-range overrides (skinned extras must stay cheap).
 	_rng.seed = seed_value
 	_speed = _rng.randf_range(WALK_SPEED_MIN, WALK_SPEED_MAX)
+	_lane_off = PedSteering.lane_offset_for(seed_value)
+	TrafficManager.register_pedestrian(self)
 	_walk_anim = ["Walk_A", "Walk_B", "Walk_C"][absi(seed_value) % 3]
 	_idle_anim = ["Idle_A", "Idle_B", "LookingAround"][absi(seed_value) % 3]
 	_anim = get_node_or_null("AnimationPlayer")
@@ -106,24 +109,32 @@ func _process(delta: float) -> void:
 		step_frames = 3
 	if _lod_tick % step_frames != 0:
 		return
-	_advance_walk(delta * float(step_frames) * float(GameClock.speed))
+	_advance_walk(delta * float(step_frames) * float(GameClock.speed), dist < LOD_NEAR)
 
 
-func _advance_walk(scaled_delta: float) -> void:
+func _advance_walk(scaled_delta: float, near_cam: bool = false) -> void:
 	if _path_idx >= _path.size():
 		_extend_path()
 		if _path.is_empty():
 			return
 	var graph: RoadGraph = CityData.road_graph
-	var target := graph.side_points[_path[_path_idx]]
-	# Crossing gate: wait for the walk phase at signalized crossings.
+	var target := PedSteering.offset_target(
+		graph.side_points[_path[_path_idx]], global_position, _lane_off)
+	# Crossing gate: signalized crossings wait for the walk phase, plain
+	# ones wait until no car is bearing down on the zebra.
 	var from_node := _path[_path_idx - 1] if _path_idx > 0 else _node_id
 	if from_node >= 0:
 		var edge := _crossing_edge(from_node, _path[_path_idx])
-		if edge >= 0 and not TrafficManager.can_pedestrian_cross(edge):
+		if edge >= 0 and (not TrafficManager.can_pedestrian_cross(edge)
+				or not TrafficManager.is_crossing_safe(edge)):
 			_set_anim("idle")
 			return
 	_set_anim("walk")
+	# Light separation from nearby walkers (near camera, every 2nd step).
+	if near_cam and (_lod_tick & 1) == 0:
+		var push := PedSteering.lateral_avoid(self)
+		if push != Vector3.ZERO:
+			global_position += push * minf(scaled_delta * 2.0, 1.0)
 	var to_target := target - global_position
 	to_target.y = 0
 	var dist := to_target.length()

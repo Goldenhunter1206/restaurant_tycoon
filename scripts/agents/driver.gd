@@ -43,6 +43,8 @@ var _anim: AnimationPlayer
 func _ready() -> void:
 	set_meta("entity", "driver")
 	monitoring = false
+	TrafficManager.register_pedestrian(self)
+	tree_exiting.connect(func() -> void: TrafficManager.unregister_pedestrian(self))
 	if staff_member != null:
 		data = {"id": staff_member.uid, "name": staff_member.staff_name}
 		name = "Driver_%d" % staff_member.uid
@@ -173,7 +175,8 @@ func _process(delta: float) -> void:
 	var target: Vector3 = graph.side_points[_path[_path_idx]]
 	if _path_idx > 0:
 		var edge: int = _crossing_edge(_path[_path_idx - 1], _path[_path_idx])
-		if edge >= 0 and not TrafficManager.can_pedestrian_cross(edge):
+		if edge >= 0 and (not TrafficManager.can_pedestrian_cross(edge)
+				or not TrafficManager.is_crossing_safe(edge)):
 			_set_anim("idle")
 			return
 	_set_anim("walk")
