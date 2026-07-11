@@ -7,6 +7,11 @@ func _ready() -> void:
 	_register_buildings()
 	PopulationManager.initialize.call_deferred()
 	TrafficManager.initialize.call_deferred()
+	# Tycoon layer — after buildings and citizens are registered.
+	EconomyManager.initialize.call_deferred()
+	RestaurantManager.initialize.call_deferred()
+	DemandManager.initialize.call_deferred()
+	DeliveryManager.initialize.call_deferred()
 
 
 func _register_buildings() -> void:

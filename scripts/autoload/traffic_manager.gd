@@ -172,6 +172,7 @@ func spawn_citizen_car(citizen: Node) -> Node3D:
 		heading = (graph.lane_points[graph.lane_to[e]] - lane_pos).normalized()
 	var car := _spawn_vehicle("private", lane_pos)
 	car.park_at(lane_pos, heading, _park_jitter(citizen))
+	car.owner_desc = "%s's car" % String(citizen.get("data")["name"])
 	citizen.set("owned_vehicle", car)
 	return car
 

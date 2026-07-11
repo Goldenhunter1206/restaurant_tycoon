@@ -1,0 +1,64 @@
+{
+	"company": {
+		"name": "Bella Vista Pizza Co.",
+		"starting_cash": 20000.0
+	},
+	"purchase": {
+		"base_price": 14000.0,
+		"affluence_mult": { "D": 2.2, "C": 1.8, "R": 2.0, "N": 1.0, "P": 0.6, "I": 0.7, "K": 1.0, "G": 1.0, "X": 0.8 },
+		"size_factor": 0.004,
+		"table_area_per_table": 14.0,
+		"min_tables": 4,
+		"max_tables": 24
+	},
+	"rent": {
+		"daily_by_district": { "D": 220.0, "C": 140.0, "R": 180.0, "N": 100.0, "P": 60.0, "I": 70.0, "K": 100.0, "G": 100.0, "X": 80.0 }
+	},
+	"demand": {
+		"meal_occasions_per_citizen_per_day": 2.2,
+		"dinein_share": 0.5,
+		"meal_budget_wealth_fraction": 0.02,
+		"min_meal_budget": 6.0,
+		"taste_weight": 1.6,
+		"price_weight": 1.0,
+		"distance_weight": 0.8,
+		"rating_weight": 0.6,
+		"min_utility": 0.25
+	},
+	"distance": {
+		"walk_max_m": 150.0,
+		"drive_max_m": 900.0,
+		"delivery_max_m": 450.0
+	},
+	"delivery": {
+		"cancel_minutes": 210,
+		"deliver_dwell_minutes": 2
+	},
+	"dinein": {
+		"queue_leave_minutes": 25,
+		"eat_minutes": 45
+	},
+	"reputation": {
+		"start": 3.0,
+		"per_served": 0.02,
+		"per_cancelled": -0.05,
+		"per_queue_leave": -0.02,
+		"quality_bonus_scale": 0.02,
+		"min": 1.0,
+		"max": 5.0
+	},
+	"loan": {
+		"max": 50000.0,
+		"daily_interest": 0.002,
+		"increment": 5000.0
+	},
+	"staff": {
+		"max_shift_hours": 8.0
+	},
+	"objectives": [
+		{ "id": "cash_30k", "text": "Grow the treasury to $30,000", "type": "cash", "target": 30000 },
+		{ "id": "second_restaurant", "text": "Open a 2nd restaurant", "type": "restaurants", "target": 2 },
+		{ "id": "rating_4", "text": "Reach a 4.0 star rating", "type": "reputation", "target": 4.0 },
+		{ "id": "deliveries_20", "text": "Complete 20 deliveries", "type": "deliveries", "target": 20 }
+	]
+}

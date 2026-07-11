@@ -5,6 +5,7 @@ extends Node
 signal minute_ticked(day: int, hour: int, minute: int)
 signal hour_changed(day: int, hour: int)
 signal speed_changed(new_speed: int)
+signal day_changed(day: int)
 
 const GAME_HOURS_PER_REAL_SECOND: float = 1.0 / 60.0
 const SPEEDS: Array[int] = [0, 1, 4, 16]
@@ -24,6 +25,7 @@ func _process(delta: float) -> void:
 	if game_hours >= 24.0:
 		game_hours -= 24.0
 		day += 1
+		day_changed.emit(day)
 	var hour: int = int(game_hours)
 	var minute: int = int(fmod(game_hours, 1.0) * 60.0)
 	if hour != _last_emitted_hour:
@@ -32,6 +34,12 @@ func _process(delta: float) -> void:
 	if minute != _last_emitted_minute:
 		_last_emitted_minute = minute
 		minute_ticked.emit(day, hour, minute)
+
+
+func total_minutes() -> int:
+	## Absolute game minute since day 1, 00:00. Sim timers diff this value so
+	## they stay correct when minute_ticked skips minutes at high speed.
+	return (day - 1) * 1440 + int(game_hours * 60.0)
 
 
 func set_speed(new_speed: int) -> void:

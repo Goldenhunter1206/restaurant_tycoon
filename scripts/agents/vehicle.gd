@@ -18,6 +18,8 @@ var kind: String = "civilian"
 var state: VState = VState.PARKED
 var passenger: Node = null
 var goal_desc: String = "parked"
+## Who this car belongs to, for the inspector ("Ana Silva's car", ...).
+var owner_desc: String = ""
 
 var _path: PackedInt32Array = PackedInt32Array()
 var _path_idx: int = 0
@@ -238,6 +240,7 @@ func inspect_info() -> Dictionary:
 	return {
 		"kind": "vehicle",
 		"vehicle_kind": kind,
+		"owner": owner_desc if not owner_desc.is_empty() else "city fleet",
 		"state": VState.keys()[state],
 		"goal": goal_desc,
 		"stopped_at_light": _stopped_at_light,

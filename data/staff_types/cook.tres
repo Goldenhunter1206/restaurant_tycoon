@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="StaffTypeDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/staff_type_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"cook"
+display_name = "Cook"
+base_daily_wage = 85.0
+cook_slots = 1
+waiter_customers_per_hour = 0.0
+is_driver = false

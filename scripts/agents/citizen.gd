@@ -4,7 +4,7 @@ extends Area3D
 ## kinematic waypoint-following on the sidewalk graph (walking) or
 ## delegated to a Vehicle (driving). LOD: far agents move analytically.
 
-enum CState { SLEEP, COMMUTE_OUT, WORK, LEISURE_GO, LEISURE, COMMUTE_HOME, DRIVING }
+enum CState { SLEEP, COMMUTE_OUT, WORK, LEISURE_GO, LEISURE, COMMUTE_HOME, DRIVING, DINE }
 
 const WALK_SPEED: float = 1.7
 const LOD_NEAR: float = 70.0
@@ -42,7 +42,10 @@ var _stroll_wait: float = 0.0
 var _leisure_rng: RandomNumberGenerator = null
 ## Multi-leg trip: a queue of {kind: "walk"|"drive", target: Vector3}.
 var _trip_plan: Array[Dictionary] = []
-var _trip_purpose: String = ""   # "work" | "home" | "leisure"
+var _trip_purpose: String = ""   # "work" | "home" | "leisure" | "dine"
+## Dine-in visit (tycoon layer): where we are headed and what we ordered.
+var _dine_restaurant_id: int = -1
+var _dine_dish: StringName = &""
 
 
 func setup(record: Dictionary) -> void:
@@ -372,6 +375,8 @@ func _finish_trip_purpose() -> void:
 			_enter_work()
 		"home":
 			_enter_sleep()
+		"dine":
+			_arrive_at_restaurant()
 		_:
 			state = CState.LEISURE
 			goal_desc = "on lunch break" if _lunching else "enjoying %s" % String(_leisure_spot.get("kind", "a spot"))
@@ -500,9 +505,70 @@ func _set_anim(kind: String) -> void:
 		_anim.play(target)
 
 
+# --- Dining out (tycoon layer) -----------------------------------------
+
+func go_dine(restaurant_id: int, door_pos: Vector3, dish_id: StringName) -> bool:
+	## Ask this citizen to visit a player restaurant. Only accepted during
+	## free leisure time so commute/lunch flows are never interrupted.
+	if state != CState.LEISURE or _lunching:
+		return false
+	if not _trip_plan.is_empty():
+		return false
+	_dine_restaurant_id = restaurant_id
+	_dine_dish = dish_id
+	_leisure_spot = {"kind": "restaurant", "pos": door_pos}
+	_plan_trip(door_pos, "dine")
+	return true
+
+
+func _arrive_at_restaurant() -> void:
+	var verdict: String = RestaurantManager.request_seat(self, _dine_restaurant_id, _dine_dish)
+	match verdict:
+		"seated":
+			# on_seated() has already run via the seat callback.
+			pass
+		"queued":
+			state = CState.DINE
+			goal_desc = "queueing at the restaurant"
+			visible = true
+			_set_anim("idle")
+			_set_sim_active(false)
+		_:
+			_resume_after_meal()
+
+
+func on_seated() -> void:
+	state = CState.DINE
+	goal_desc = "dining out"
+	visible = false
+	_set_sim_active(false)
+
+
+func on_meal_done() -> void:
+	_resume_after_meal()
+
+
+func on_dine_rejected() -> void:
+	goal_desc = "left the restaurant hungry"
+	_resume_after_meal()
+
+
+func _resume_after_meal() -> void:
+	_dine_restaurant_id = -1
+	_dine_dish = &""
+	visible = true
+	_set_sim_active(true)
+	state = CState.LEISURE
+	if GameClock.is_between(float(data["home_hour"]), float(data["wake_hour"])):
+		_start_commute_home()
+	else:
+		_start_leisure()
+
+
 func inspect_info() -> Dictionary:
 	var home := CityData.get_building(int(data["home_id"]))
 	var work := CityData.get_building(int(data["work_id"]))
+	var econ := DemandManager.citizen_econ(int(data["id"]))
 	return {
 		"kind": "citizen",
 		"name": data["name"],
@@ -515,5 +581,22 @@ func inspect_info() -> Dictionary:
 		"wake": "%.1f" % data["wake_hour"],
 		"work_start": "%.1f" % data["work_start"],
 		"home_hour": "%.1f" % data["home_hour"],
+		"money": "$%.0f" % float(econ.get("wealth", 0.0)) if not econ.is_empty() else "?",
+		"wage": "$%.0f/day" % float(econ.get("daily_wage", 0.0)) if not econ.is_empty() else "?",
+		"likes": _tastes_text(econ),
 		"position": global_position,
 	}
+
+
+func _tastes_text(econ: Dictionary) -> String:
+	var tastes: Dictionary = econ.get("tastes", {})
+	if tastes.is_empty():
+		return "?"
+	var pairs: Array = []
+	for category: StringName in tastes:
+		pairs.append([String(category), float(tastes[category])])
+	pairs.sort_custom(func(a: Array, b: Array) -> bool: return a[1] > b[1])
+	var parts: PackedStringArray = PackedStringArray()
+	for pair: Array in pairs:
+		parts.append("%s %d%%" % [pair[0], int(pair[1] * 100.0)])
+	return ", ".join(parts)

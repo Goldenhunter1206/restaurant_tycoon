@@ -23,9 +23,15 @@ CityData="*res://scripts/autoload/city_data.gd"
 PopulationManager="*res://scripts/autoload/population_manager.gd"
 TrafficManager="*res://scripts/autoload/traffic_manager.gd"
 SelectionManager="*res://scripts/autoload/selection_manager.gd"
+EconomyManager="*res://scripts/autoload/economy_manager.gd"
+RestaurantManager="*res://scripts/autoload/restaurant_manager.gd"
+DemandManager="*res://scripts/autoload/demand_manager.gd"
+DeliveryManager="*res://scripts/autoload/delivery_manager.gd"
 
 [display]
 
+window/size/viewport_width=1920
+window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
