@@ -8,6 +8,15 @@ enum VState { PARKED, DRIVING }
 
 const CITY_SPEED: float = 9.0
 const MOTORWAY_SPEED: float = 17.0
+const ACCEL: float = 5.0            # m/s^2 pull-away
+const BRAKE: float = 9.0            # m/s^2 max braking rate
+const BRAKE_COMFORT: float = 5.5    # m/s^2 anticipated slowdowns (v = sqrt(2*a*d))
+const TURN_SPEED: float = 4.0       # cornering speed on curved turn edges
+const FOLLOW_GAP: float = 4.0       # bumper gap kept to the car ahead
+const STOP_MARGIN: float = 1.2      # stop this short of a red-light node
+const CREEP_SPEED: float = 2.0      # deadlock-breaking crawl
+const CORNER_DOT: float = 0.94      # heading kink beyond ~20 deg = slow for corner
+const CURVE_SAMPLES: int = 8        # Bezier subdivisions per turn edge
 const LOD_NEAR: float = 90.0
 const LOD_MID: float = 220.0
 const ROAD_SURFACE_Y: float = 0.319   # asphalt top in world space
@@ -31,6 +40,11 @@ var _center_getter: Callable = Callable()
 var _lod_tick: int = 0
 var _stopped_at_light: bool = false
 var _blocked_frames: int = 0
+var _speed: float = 0.0
+## Bezier sub-waypoints smoothing the current KIND_TURN edge (empty = straight).
+var _sub_points: PackedVector3Array = PackedVector3Array()
+var _sub_idx: int = 0
+var _curve_for_idx: int = -1
 
 
 func setup(vehicle_kind: String) -> void:
@@ -80,6 +94,11 @@ func _ready() -> void:
 func start_trip(path: PackedInt32Array, citizen: Node) -> void:
 	_path = path
 	_path_idx = 0
+	_speed = 0.0
+	_blocked_frames = 0
+	_curve_for_idx = -1
+	_sub_points = PackedVector3Array()
+	_sub_idx = 0
 	passenger = citizen
 	state = VState.DRIVING
 	set_process(true)
@@ -98,6 +117,8 @@ func park_at(lane_pos: Vector3, heading: Vector3, jitter: float) -> void:
 	state = VState.PARKED
 	goal_desc = "parked"
 	set_process(false)
+	_speed = 0.0
+	_curve_for_idx = -1
 	var right := Vector3(-heading.z, 0, heading.x)
 	global_position = lane_pos + right * CURB_PARK_OFFSET + heading * jitter
 	rotation.y = atan2(heading.x, heading.z)
@@ -139,6 +160,9 @@ func _next_patrol_leg() -> void:
 		if path.size() >= 4:
 			_path = path
 			_path_idx = 0
+			_curve_for_idx = -1
+			_sub_points = PackedVector3Array()
+			_sub_idx = 0
 			state = VState.DRIVING
 			set_process(true)
 			goal_desc = "%s patrol" % kind
@@ -163,52 +187,176 @@ func _process(delta: float) -> void:
 		step_frames = 3
 	if _lod_tick % step_frames != 0:
 		return
-	_advance(delta * float(step_frames) * float(GameClock.speed), dist < LOD_MID)
+	_advance(delta * float(step_frames) * float(GameClock.speed), dist < LOD_MID, step_frames)
 
 
-func _advance(scaled_delta: float, check_neighbors: bool) -> void:
+func _advance(scaled_delta: float, check_neighbors: bool, step_frames: int = 1) -> void:
 	if _path_idx >= _path.size() - 1:
 		_finish_trip()
 		return
 	var graph: RoadGraph = CityData.road_graph
 	var from_id := _path[_path_idx]
 	var to_id := _path[_path_idx + 1]
-	var target := graph.lane_points[to_id]
-	var to_target := target - global_position
-	to_target.y = 0
-	var dist := to_target.length()
-
-	# Red-light check: the current edge may end on a stop line.
+	var node_target := graph.lane_points[to_id]
 	var edge := graph.lane_edge_between(from_id, to_id)
-	if edge >= 0 and graph.lane_enters[edge] >= 0 and dist < 3.0:
-		if not TrafficManager.can_vehicle_pass(graph.lane_enters[edge], graph.lane_enter_heading[edge]):
-			_stopped_at_light = true
-			return
-	_stopped_at_light = false
+	_ensure_turn_curve(graph, edge)
+	var dist_to_node := _remaining_edge_distance(node_target)
 
-	# Car-following: brake if someone is close ahead (only near camera).
-	# A car blocked too long creeps through to break a deadlock (two cars
-	# in each other's cone at a junction) — normal queues drain from the
-	# front and never reach the timeout.
-	if check_neighbors and TrafficManager.vehicle_ahead_distance(self) < 5.0:
-		_blocked_frames += 1
-		if _blocked_frames < 90:
-			return
-	else:
-		_blocked_frames = 0
-
-	var speed := CITY_SPEED
+	# --- target speed: cruise capped by corners, lights, cars ahead --------
+	var cruise := CITY_SPEED
 	if edge >= 0 and graph.lane_kind[edge] == RoadGraph.KIND_MOTORWAY:
-		speed = MOTORWAY_SPEED
-	var step := speed * scaled_delta
-	if step >= dist:
-		global_position = target
-		_path_idx += 1
-	else:
-		global_position += to_target.normalized() * step
-	if to_target.length_squared() > 0.04:
-		var yaw := atan2(to_target.x, to_target.z)
-		rotation.y = lerp_angle(rotation.y, yaw, 0.35)
+		cruise = MOTORWAY_SPEED
+	if _curve_for_idx == _path_idx and not _sub_points.is_empty():
+		cruise = minf(cruise, TURN_SPEED)
+	elif _path_idx + 2 < _path.size():
+		# Approaching a heading kink at the next node: arrive at TURN_SPEED.
+		var cur_dir := node_target - graph.lane_points[from_id]
+		cur_dir.y = 0.0
+		var nxt_dir := graph.lane_points[_path[_path_idx + 2]] - node_target
+		nxt_dir.y = 0.0
+		if cur_dir.length_squared() > 0.01 and nxt_dir.length_squared() > 0.01 \
+				and cur_dir.normalized().dot(nxt_dir.normalized()) < CORNER_DOT:
+			cruise = minf(cruise, sqrt(TURN_SPEED * TURN_SPEED + 2.0 * BRAKE_COMFORT * dist_to_node))
+
+	var target_speed := cruise
+	# Red light: come to rest STOP_MARGIN short of the stop-line node.
+	_stopped_at_light = false
+	if edge >= 0 and graph.lane_enters[edge] >= 0 \
+			and not TrafficManager.can_vehicle_pass(graph.lane_enters[edge], graph.lane_enter_heading[edge]):
+		var stop_d := maxf(dist_to_node - STOP_MARGIN, 0.0)
+		target_speed = minf(target_speed, sqrt(2.0 * BRAKE_COMFORT * stop_d))
+		_stopped_at_light = stop_d < 0.5
+	# Path end: roll gently to the final node.
+	if _path_idx + 2 >= _path.size():
+		target_speed = minf(target_speed, sqrt(2.0 * BRAKE_COMFORT * dist_to_node) + 0.8)
+	# Car ahead: keep FOLLOW_GAP; blocked too long -> creep through to break
+	# junction deadlocks (normal queues drain from the front before that).
+	if check_neighbors:
+		var gap := TrafficManager.vehicle_ahead_distance(self)
+		var follow := INF
+		if gap < 900.0:
+			follow = sqrt(2.0 * BRAKE_COMFORT * maxf(gap - FOLLOW_GAP, 0.0))
+		if follow < 0.3:
+			_blocked_frames += 1
+			if _blocked_frames >= 90:
+				follow = CREEP_SPEED
+		else:
+			_blocked_frames = 0
+		target_speed = minf(target_speed, follow)
+
+	var rate := ACCEL if target_speed > _speed else BRAKE
+	_speed = move_toward(_speed, target_speed, rate * scaled_delta)
+	if _speed <= 0.001:
+		return
+
+	# --- move, carrying the step remainder across waypoints ----------------
+	var step := _speed * scaled_delta
+	var move_dir := global_transform.basis.z
+	var guard := 0
+	while step > 0.0 and guard < 32:
+		guard += 1
+		var wp := _next_waypoint(graph)
+		var seg := wp - global_position
+		seg.y = 0.0
+		var d := seg.length()
+		if d <= 0.001:
+			if not _consume_waypoint(graph):
+				return
+			continue
+		if step < d:
+			move_dir = seg / d
+			global_position += move_dir * step
+			break
+		move_dir = seg / d
+		global_position = wp
+		step -= d
+		if not _consume_waypoint(graph):
+			return
+	if move_dir.length_squared() > 0.01:
+		var yaw := atan2(move_dir.x, move_dir.z)
+		# Stride-invariant smoothing: same convergence whatever the LOD stride.
+		rotation.y = lerp_angle(rotation.y, yaw, 1.0 - pow(0.65, float(step_frames)))
+
+
+func _next_waypoint(graph: RoadGraph) -> Vector3:
+	if _curve_for_idx == _path_idx and _sub_idx < _sub_points.size():
+		return _sub_points[_sub_idx]
+	return graph.lane_points[_path[_path_idx + 1]]
+
+
+## Advance past the current waypoint. Returns false when the trip ended.
+func _consume_waypoint(graph: RoadGraph) -> bool:
+	if _curve_for_idx == _path_idx and _sub_idx < _sub_points.size():
+		_sub_idx += 1
+		return true
+	_path_idx += 1
+	if _path_idx >= _path.size() - 1:
+		_finish_trip()
+		return false
+	var e := graph.lane_edge_between(_path[_path_idx], _path[_path_idx + 1])
+	_ensure_turn_curve(graph, e)
+	return true
+
+
+## Distance left on the current edge (along the curve when one is active).
+func _remaining_edge_distance(node_target: Vector3) -> float:
+	if _curve_for_idx == _path_idx and _sub_idx < _sub_points.size():
+		var d := 0.0
+		var prev := global_position
+		for k in range(_sub_idx, _sub_points.size()):
+			d += Vector2(prev.x - _sub_points[k].x, prev.z - _sub_points[k].z).length()
+			prev = _sub_points[k]
+		d += Vector2(prev.x - node_target.x, prev.z - node_target.z).length()
+		return d
+	var seg := node_target - global_position
+	seg.y = 0.0
+	return seg.length()
+
+
+## Lazily build a quadratic-Bezier sub-path for the turn edge at _path_idx.
+## Control point = XZ intersection of the entry and (reversed) exit rays;
+## straight-through intersections (parallel rays) keep the straight edge.
+func _ensure_turn_curve(graph: RoadGraph, edge: int) -> void:
+	if _curve_for_idx == _path_idx:
+		return
+	_curve_for_idx = _path_idx
+	_sub_points = PackedVector3Array()
+	_sub_idx = 0
+	if edge < 0 or graph.lane_kind[edge] != RoadGraph.KIND_TURN:
+		return
+	var p0 := graph.lane_points[_path[_path_idx]]
+	var p2 := graph.lane_points[_path[_path_idx + 1]]
+	var dir_in := p2 - p0
+	if _path_idx > 0:
+		dir_in = p0 - graph.lane_points[_path[_path_idx - 1]]
+	dir_in.y = 0.0
+	var dir_out := p2 - p0
+	if _path_idx + 2 < _path.size():
+		dir_out = graph.lane_points[_path[_path_idx + 2]] - p2
+	dir_out.y = 0.0
+	if dir_in.length_squared() < 0.01 or dir_out.length_squared() < 0.01:
+		return
+	var c := _ray_intersect_xz(p0, dir_in.normalized(), p2, dir_out.normalized())
+	if not c.is_finite():
+		return
+	# Degenerate near-parallel rays put the apex absurdly far out; keep straight.
+	if c.distance_to(p0) > 12.0 or c.distance_to(p2) > 12.0:
+		return
+	for k in range(1, CURVE_SAMPLES):
+		var t := float(k) / float(CURVE_SAMPLES)
+		_sub_points.append(p0.lerp(c, t).lerp(c.lerp(p2, t), t))
+
+
+## Intersection of ray (p0, d0) with the line through p2 along d2, in XZ.
+## Returns Vector3.INF when parallel or behind the entry point.
+func _ray_intersect_xz(p0: Vector3, d0: Vector3, p2: Vector3, d2: Vector3) -> Vector3:
+	var denom := d0.x * d2.z - d0.z * d2.x
+	if absf(denom) < 0.05:
+		return Vector3.INF
+	var t := ((p2.x - p0.x) * d2.z - (p2.z - p0.z) * d2.x) / denom
+	if t <= 0.1:
+		return Vector3.INF
+	return p0 + d0 * t
 
 
 func _finish_trip() -> void:
