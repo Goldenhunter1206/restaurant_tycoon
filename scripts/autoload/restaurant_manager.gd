@@ -229,11 +229,16 @@ func set_menu_entry(building_id: int, dish_id: StringName, price: float, tier: S
 		return
 	for entry: MenuEntry in rest.menu:
 		if entry.dish_id == dish_id:
+			if enabled and not entry.enabled and not _can_enable_dish(rest):
+				restaurant_updated.emit(building_id)
+				return
 			entry.price = maxf(0.5, price)
 			entry.tier = tier
 			entry.enabled = enabled
 			restaurant_updated.emit(building_id)
 			return
+	if enabled and not _can_enable_dish(rest):
+		enabled = false
 	var entry: MenuEntry = MenuEntry.new()
 	entry.dish_id = dish_id
 	entry.price = maxf(0.5, price)
@@ -241,6 +246,63 @@ func set_menu_entry(building_id: int, dish_id: StringName, price: float, tier: S
 	entry.enabled = enabled
 	rest.menu.append(entry)
 	restaurant_updated.emit(building_id)
+
+
+func _can_enable_dish(rest: RestaurantState) -> bool:
+	if rest.enabled_dish_count() < rest.menu_slots:
+		return true
+	EconomyManager.post_message("alert",
+		"All %d kitchen stations at %s are in use — buy a station or take a dish off the menu."
+		% [rest.menu_slots, rest.restaurant_name])
+	return false
+
+
+## Price of the next kitchen station: escalates per station already added.
+func menu_slot_price(rest: RestaurantState) -> float:
+	var base: float = float(EconomyManager.tuning_value("menu.slot_base_price", 2500.0))
+	var growth: float = float(EconomyManager.tuning_value("menu.slot_price_growth", 1.6))
+	var base_slots: int = int(EconomyManager.tuning_value("menu.base_slots", 4))
+	return base * pow(growth, float(maxi(0, rest.menu_slots - base_slots)))
+
+
+func buy_menu_slot(building_id: int) -> bool:
+	var rest: RestaurantState = by_building.get(building_id)
+	if rest == null:
+		return false
+	var max_slots: int = int(EconomyManager.tuning_value("menu.max_slots", 8))
+	if rest.menu_slots >= max_slots:
+		EconomyManager.post_message("info", "The kitchen at %s has no room for more stations." % rest.restaurant_name)
+		return false
+	var price: float = menu_slot_price(rest)
+	if not EconomyManager.can_afford(price):
+		EconomyManager.post_message("alert", "Not enough cash for a new kitchen station ($%.0f)." % price)
+		return false
+	EconomyManager.transact(&"kitchen_stations", -price)
+	rest.menu_slots += 1
+	rest.today["expenses"] = float(rest.today.get("expenses", 0.0)) + price
+	EconomyManager.post_message("good", "%s installed a kitchen station — %d dish slots now." % [rest.restaurant_name, rest.menu_slots])
+	restaurant_updated.emit(building_id)
+	return true
+
+
+## Daily mise-en-place cost of one enabled dish at a given quality tier.
+func dish_upkeep(def: DishDef, tier_id: StringName) -> float:
+	var base: float = float(EconomyManager.tuning_value("menu.daily_upkeep_per_dish", 8.0))
+	var factor: float = float(EconomyManager.tuning_value("menu.upkeep_ingredient_factor", 1.5))
+	var cost: float = 2.0
+	if def != null:
+		var tier: QualityTier = def.tier_by_id(tier_id)
+		if tier != null:
+			cost = tier.ingredient_cost
+	return base + cost * factor
+
+
+func menu_upkeep_for(rest: RestaurantState) -> float:
+	var total: float = 0.0
+	for entry: MenuEntry in rest.menu:
+		if entry.enabled:
+			total += dish_upkeep(dishes.get(entry.dish_id), entry.tier)
+	return total
 
 
 func set_hours(building_id: int, open_hour: float, close_hour: float) -> void:
@@ -600,7 +662,12 @@ func _charge_daily_costs(_day: int) -> void:
 			EconomyManager.transact(&"wages", -wages)
 		var rent: float = float(rents.get(rest.district, 120.0))
 		EconomyManager.transact(&"rent", -rent)
-		rest.today["expenses"] = float(rest.today.get("expenses", 0.0)) + wages + rent
+		# Mise en place: every enabled dish costs daily prep + stocked
+		# ingredients, so an unsold dish is a real loss on the ledger.
+		var upkeep: float = menu_upkeep_for(rest)
+		if upkeep > 0.0:
+			EconomyManager.transact(&"menu_upkeep", -upkeep)
+		rest.today["expenses"] = float(rest.today.get("expenses", 0.0)) + wages + rent + upkeep
 
 
 # --- Setup -------------------------------------------------------------------
@@ -697,14 +764,18 @@ func _add_restaurant(building_id: int, restaurant_name: String, price: float) ->
 	rest.curb_pos = info.get("position", Vector3.ZERO)
 	rest.table_count = _table_count_for(info)
 	rest.star_rating = EconomyManager.reputation
+	rest.menu_slots = int(EconomyManager.tuning_value("menu.base_slots", 4))
 	rest.reset_today()
+	var enabled_count: int = 0
 	for dish_id: StringName in dishes:
 		var def: DishDef = dishes[dish_id]
 		var entry: MenuEntry = MenuEntry.new()
 		entry.dish_id = dish_id
 		entry.tier = &"med"
 		entry.price = def.suggested_price
-		entry.enabled = def.category == &"pizza"
+		entry.enabled = def.category == &"pizza" and enabled_count < rest.menu_slots
+		if entry.enabled:
+			enabled_count += 1
 		rest.menu.append(entry)
 	owned.append(rest)
 	by_building[building_id] = rest

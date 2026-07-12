@@ -38,6 +38,14 @@
 		"queue_leave_minutes": 25,
 		"eat_minutes": 45
 	},
+	"menu": {
+		"base_slots": 4,
+		"max_slots": 8,
+		"slot_base_price": 2500.0,
+		"slot_price_growth": 1.6,
+		"daily_upkeep_per_dish": 8.0,
+		"upkeep_ingredient_factor": 1.5
+	},
 	"reputation": {
 		"start": 3.0,
 		"per_served": 0.02,

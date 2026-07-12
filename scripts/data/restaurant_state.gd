@@ -12,6 +12,8 @@ extends Resource
 @export var dine_in_enabled: bool = true
 @export var delivery_enabled: bool = false
 @export var delivery_cap: int = 4
+## Kitchen stations: hard cap on simultaneously enabled menu dishes.
+@export var menu_slots: int = 4
 @export var purchase_price: float = 0.0
 @export var menu: Array[MenuEntry] = []
 @export var staff: Array[StaffMember] = []
@@ -60,6 +62,14 @@ func menu_entry_for(dish: StringName) -> MenuEntry:
 		if entry.dish_id == dish and entry.enabled:
 			return entry
 	return null
+
+
+func enabled_dish_count() -> int:
+	var count: int = 0
+	for entry: MenuEntry in menu:
+		if entry.enabled:
+			count += 1
+	return count
 
 
 func enabled_menu() -> Array[MenuEntry]:

@@ -180,6 +180,10 @@ func _process(delta: float) -> void:
 			_set_anim("idle")
 			return
 	_set_anim("walk")
+	# Same separation as citizens: never walk through cars or walkers.
+	var push: Vector3 = PedSteering.lateral_avoid(self)
+	if push != Vector3.ZERO:
+		global_position += push * minf(delta * float(GameClock.speed) * 2.0, 1.0)
 	var to_target: Vector3 = target - global_position
 	to_target.y = 0.0
 	var dist: float = to_target.length()
@@ -313,8 +317,9 @@ func _spawn_company_car() -> void:
 	if not out_edges.is_empty():
 		var e: int = out_edges[0]
 		heading = (graph.lane_points[graph.lane_to[e]] - lane_pos).normalized()
-	var jitter: float = float((staff_member.uid % 5) - 2) * 2.6 if staff_member != null else 0.0
-	company_car.park_at(lane_pos, heading, jitter)
+	if not TrafficManager.park_vehicle_near(company_car, home_restaurant.curb_pos):
+		var jitter: float = float((staff_member.uid % 5) - 2) * 2.6 if staff_member != null else 0.0
+		company_car.park_at(lane_pos, heading, jitter)
 	if home_restaurant != null:
 		company_car.set("owner_desc", "%s — our delivery car" % home_restaurant.restaurant_name)
 	company_car.set("kind", "delivery")

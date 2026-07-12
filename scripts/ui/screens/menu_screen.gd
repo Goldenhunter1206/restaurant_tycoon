@@ -3,6 +3,8 @@ extends TycoonScreen
 ## cost + margin readout.
 
 var _rows: Dictionary = {}
+var _slots_label: Label
+var _buy_button: Button
 
 
 func screen_title() -> String:
@@ -15,6 +17,19 @@ func screen_icon() -> StringName:
 
 func _build() -> void:
 	add_section("Tick a dish to sell it. Quality changes ingredient cost and reputation.")
+	add_section("Each dish needs a kitchen station and costs daily prep — pick what this district actually eats.")
+	var slots_row: HBoxContainer = HBoxContainer.new()
+	slots_row.add_theme_constant_override("separation", 10)
+	_slots_label = Label.new()
+	_slots_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_slots_label.add_theme_color_override("font_color", Color("#8a5a2b"))
+	slots_row.add_child(_slots_label)
+	_buy_button = Button.new()
+	_buy_button.pressed.connect(func() -> void:
+		RestaurantManager.buy_menu_slot(building_id)
+		refresh())
+	slots_row.add_child(_buy_button)
+	_content.add_child(slots_row)
 	var list: VBoxContainer = add_scroll_list()
 	var rest: RestaurantState = restaurant()
 	if rest == null:
@@ -30,6 +45,7 @@ func refresh() -> void:
 	var rest: RestaurantState = restaurant()
 	if rest == null:
 		return
+	_refresh_slots(rest)
 	for dish_id: StringName in _rows:
 		var entry: MenuEntry = null
 		for candidate: MenuEntry in rest.menu:
@@ -39,10 +55,29 @@ func refresh() -> void:
 		if entry == null:
 			continue
 		var row: Dictionary = _rows[dish_id]
-		(row["enabled"] as CheckBox).set_pressed_no_signal(entry.enabled)
+		var checkbox: CheckBox = row["enabled"]
+		checkbox.set_pressed_no_signal(entry.enabled)
+		# Kitchen full: the remaining dishes need a free station first.
+		var full: bool = rest.enabled_dish_count() >= rest.menu_slots
+		checkbox.disabled = full and not entry.enabled
+		checkbox.tooltip_text = "All kitchen stations are in use." if checkbox.disabled else ""
 		(row["price"] as SpinBox).set_value_no_signal(entry.price)
 		_select_tier(row["tier"] as OptionButton, entry.tier)
 		_update_margin(dish_id)
+
+
+func _refresh_slots(rest: RestaurantState) -> void:
+	if _slots_label == null:
+		return
+	_slots_label.text = "Kitchen stations: %d/%d used · menu upkeep $%.0f/day" % [
+		rest.enabled_dish_count(), rest.menu_slots, RestaurantManager.menu_upkeep_for(rest)]
+	var max_slots: int = int(EconomyManager.tuning_value("menu.max_slots", 8))
+	if rest.menu_slots >= max_slots:
+		_buy_button.text = "Kitchen full"
+		_buy_button.disabled = true
+	else:
+		_buy_button.text = "Add station ($%.0f)" % RestaurantManager.menu_slot_price(rest)
+		_buy_button.disabled = false
 
 
 func _make_dish_row(entry: MenuEntry, def: DishDef) -> Control:
@@ -89,6 +124,7 @@ func _make_dish_row(entry: MenuEntry, def: DishDef) -> Control:
 	}
 	var apply: Callable = func(_arg: Variant = null) -> void:
 		_apply_row(entry.dish_id)
+		refresh()   # re-sync checkboxes: the manager may reject over-cap enables
 	enabled.toggled.connect(apply)
 	price.value_changed.connect(apply)
 	tier_select.item_selected.connect(apply)
@@ -119,7 +155,7 @@ func _update_margin(dish_id: StringName) -> void:
 	var price: float = (row["price"] as SpinBox).value
 	var margin: float = price - tier.ingredient_cost
 	var label: Label = row["margin"]
-	label.text = "profit $%.2f" % margin
+	label.text = "profit $%.2f · $%.0f/day" % [margin, RestaurantManager.dish_upkeep(def, tier.tier)]
 	label.add_theme_color_override(
 		"font_color", Color("#2e7d32") if margin > 0.0 else Color("#c0392b"))
 

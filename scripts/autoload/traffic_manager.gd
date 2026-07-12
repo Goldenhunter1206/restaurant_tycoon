@@ -34,6 +34,14 @@ const CROSSING_CAR_RANGE: float = 13.0
 const CONGESTION_REFRESH: float = 2.0
 const CONGESTION_LOAD_FACTOR: float = 10.0
 const CONGESTION_MAX_SCALE: float = 8.0
+## Turn-yield rules: how far out approaching conflict traffic matters.
+const YIELD_ONCOMING_RANGE: float = 17.0
+const YIELD_CROSS_RANGE: float = 13.0
+const YIELD_BOX_RADIUS: float = 6.0
+## Opposite / right-hand-priority heading lookups (N=1 S=2 E=4 W=8).
+const OPPOSITE_HEADING := {1: 2, 2: 1, 4: 8, 8: 4}
+const RIGHT_OF_HEADING := {1: 8, 2: 4, 4: 1, 8: 2}
+
 const SERVICE_VEHICLES: Array = [
 	["police", 2], ["taxi", 4], ["ambulance", 1], ["icecream", 2], ["post", 2],
 ]
@@ -60,6 +68,9 @@ var _edge_load: PackedInt32Array = PackedInt32Array()
 var _edge_len: PackedFloat32Array = PackedFloat32Array()
 var _weighted_nodes: PackedInt32Array = PackedInt32Array()
 var _congestion_timer: float = 0.0
+
+## Curb parking slots (built from the lane graph at initialize()).
+var parking: ParkingRegistry = null
 
 var _sim_time: float = 0.0
 var _vehicle_scene: PackedScene
@@ -146,6 +157,7 @@ func initialize() -> void:
 		return
 	_collect_civilian_models()
 	_init_congestion()
+	_init_parking()
 	_spawn_service_fleet()
 	_spawn_through_traffic()
 
@@ -161,6 +173,29 @@ func _init_congestion() -> void:
 	for e in range(edges):
 		_edge_len[e] = graph.lane_points[graph.lane_from[e]].distance_to(
 			graph.lane_points[graph.lane_to[e]])
+
+
+func _init_parking() -> void:
+	var graph: RoadGraph = CityData.road_graph
+	if graph == null:
+		return
+	parking = ParkingRegistry.new()
+	parking.build(graph)
+	# The decorative ParkedCarPlacer fleet occupies real curb space:
+	# mark those slots taken so dynamic cars never park inside them.
+	var scene := get_tree().current_scene
+	if scene == null:
+		return
+	var grp := scene.find_child("ParkedCars", true, false)
+	if grp == null:
+		return
+	for child in grp.get_children():
+		var mmi := child as MultiMeshInstance3D
+		if mmi == null or mmi.multimesh == null:
+			continue
+		for i in range(mmi.multimesh.instance_count):
+			var xf := mmi.global_transform * mmi.multimesh.get_instance_transform(i)
+			parking.block_static_at(xf.origin)
 
 
 func edge_entered(edge: int) -> void:
@@ -267,11 +302,24 @@ func request_car_trip(citizen: Node, car: Node3D, target: Vector3) -> bool:
 		return false
 	var graph: RoadGraph = CityData.road_graph
 	var from_node := graph.nearest_lane_node(car.global_position)
+	# Preferred: route to a reserved legal curb slot near the target and
+	# stop there mid-edge (the passenger walks the final leg anyway).
+	if parking != null:
+		var slot := parking.reserve_near(target, 60.0, car.get_instance_id())
+		if slot >= 0:
+			var e := parking.slot_edge[slot]
+			var path := graph.find_lane_path(from_node, graph.lane_from[e])
+			if path.size() >= 1:
+				path.append(graph.lane_to[e])
+				car.start_trip(path, citizen, slot)
+				return true
+			parking.release(slot, car.get_instance_id())
+	# Fallback: legacy nearest-node trip (no free slot in range).
 	var to_node := graph.nearest_lane_node(target)
-	var path := graph.find_lane_path(from_node, to_node)
-	if path.size() < 2:
+	var legacy_path := graph.find_lane_path(from_node, to_node)
+	if legacy_path.size() < 2:
 		return false
-	car.start_trip(path, citizen)
+	car.start_trip(legacy_path, citizen)
 	return true
 
 
@@ -295,7 +343,8 @@ func spawn_citizen_car(citizen: Node) -> Node3D:
 		var e: int = out_edges[0]
 		heading = (graph.lane_points[graph.lane_to[e]] - lane_pos).normalized()
 	var car := _spawn_vehicle("private", lane_pos)
-	car.park_at(lane_pos, heading, _park_jitter(citizen))
+	if not park_vehicle_near(car, door):
+		car.park_at(lane_pos, heading, _park_jitter(citizen))
 	car.owner_desc = "%s's car" % String(citizen.get("data")["name"])
 	citizen.set("owned_vehicle", car)
 	return car
@@ -305,6 +354,18 @@ func _park_jitter(citizen: Node) -> float:
 	## 5 deterministic longitudinal parking slots (~a car length apart)
 	## so several cars at one lane node don't stack.
 	return float((int(citizen.get("data")["id"]) % 5) - 2) * 2.6
+
+
+func park_vehicle_near(car: Node3D, target: Vector3) -> bool:
+	## Park an idle car in the nearest free legal curb slot around target.
+	## Returns false when no slot is free in range (caller falls back).
+	if parking == null or car == null or not is_instance_valid(car):
+		return false
+	var slot := parking.reserve_near(target, 45.0, car.get_instance_id())
+	if slot < 0:
+		return false
+	car.park_in_slot(slot)
+	return true
 
 
 func request_route(vehicle: Node3D, from_pos: Vector3, to_pos: Vector3) -> PackedInt32Array:
@@ -356,6 +417,68 @@ func _spawn_vehicle(kind: String, pos: Vector3) -> Node3D:
 	car.global_position = pos
 	vehicles.append(car)
 	return car
+
+
+func cars_near(pos: Vector3, radius: float) -> Array:
+	## Vehicles within radius of pos (spatial-hash scan, includes parked).
+	var out: Array = []
+	var span := int(ceilf(radius / GRID_CELL))
+	var center := Vector2i(floori(pos.x / GRID_CELL), floori(pos.z / GRID_CELL))
+	for cx in range(center.x - span, center.x + span + 1):
+		for cz in range(center.y - span, center.y + span + 1):
+			for car: Node3D in _grid.get(Vector2i(cx, cz), []):
+				var rel := car.global_position - pos
+				rel.y = 0.0
+				if rel.length() <= radius:
+					out.append(car)
+	return out
+
+
+func heading_bit_of(dir: Vector3) -> int:
+	## Dominant world axis of a travel direction -> heading bit.
+	if absf(dir.z) >= absf(dir.x):
+		return N if dir.z < 0.0 else S
+	return E if dir.x > 0.0 else W
+
+
+func must_yield(vehicle: Node3D, inter_id: int, entry_heading: int, turn_sign: float) -> bool:
+	## Right-of-way at the stop line. turn_sign > 0.5 means a left turn
+	## (crosses the oncoming lane). Signalized: left turns yield to
+	## oncoming green traffic. Unsignalized: priority-to-the-right plus
+	## the same left-turn rule. Everyone waits while a conflicting car is
+	## still inside the intersection box.
+	var graph: RoadGraph = CityData.road_graph
+	var rec := graph.get_intersection(inter_id)
+	if rec.is_empty():
+		return false
+	var center: Vector3 = rec["pos"]
+	var signalized: bool = rec["signalized"]
+	var opposite: int = OPPOSITE_HEADING.get(entry_heading, 0)
+	var right_priority: int = RIGHT_OF_HEADING.get(entry_heading, 0)
+	for other: Node3D in cars_near(center, YIELD_ONCOMING_RANGE):
+		if other == vehicle or int(other.get("state")) != Vehicle.VState.DRIVING:
+			continue
+		var fwd: Vector3 = other.global_transform.basis.z
+		var hb := heading_bit_of(fwd)
+		if hb == entry_heading:
+			continue   # same approach: queue handled by car-following
+		var rel := center - other.global_position
+		rel.y = 0.0
+		var d := rel.length()
+		var moving: bool = float(other.get("_speed")) > 0.6
+		# Conflicting car still inside the box: hold the stop line. A car
+		# merely waiting at its own stop line (stopped, near the box rim)
+		# does not count — only movers or cars dead-centre.
+		if d < YIELD_BOX_RADIUS and (moving or d < 3.5):
+			return true
+		var approaching: bool = d > 0.01 and fwd.dot(rel / d) > 0.6
+		if not (moving and approaching):
+			continue
+		if turn_sign > 0.5 and hb == opposite and d < YIELD_ONCOMING_RANGE:
+			return true   # left turn across an approaching oncoming car
+		if not signalized and hb == right_priority and d < YIELD_CROSS_RANGE:
+			return true   # unsignalized: yield to the right
+	return false
 
 
 func vehicle_ahead_distance(vehicle: Node3D) -> float:

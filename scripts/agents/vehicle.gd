@@ -23,6 +23,8 @@ const LOD_MID: float = 220.0
 const ROAD_SURFACE_Y: float = 0.319   # asphalt top in world space
 const LANE_NODE_Y: float = 0.2        # y the road-graph lane nodes sit at
 const CURB_PARK_OFFSET: float = 1.65  # lane-centre -> parked-car centre, toward the kerb
+const YIELD_CHECK_RANGE: float = 10.0 # start right-of-way checks this close to the stop line
+const YIELD_TIMEOUT_FRAMES: int = 180 # stalemate-breaker: go anyway after ~3 s of yielding
 
 var kind: String = "civilian"
 var state: VState = VState.PARKED
@@ -50,6 +52,11 @@ var _curve_for_idx: int = -1
 ## and a cooldown (in _advance calls) between mid-trip reroute attempts.
 var _current_edge: int = -1
 var _reroute_block: int = 0
+## Curb parking: the registry slot we occupy while PARKED, and the slot
+## reserved for the end of the current trip (-1 = none, legacy parking).
+var _park_slot: int = -1
+var _slot_pending: int = -1
+var _yield_frames: int = 0
 
 
 func setup(vehicle_kind: String) -> void:
@@ -95,6 +102,7 @@ func _ready() -> void:
 	monitoring = false
 	set_process(false)
 	tree_exiting.connect(_release_edge)
+	tree_exiting.connect(_release_park_slots)
 
 
 func _release_edge() -> void:
@@ -102,7 +110,9 @@ func _release_edge() -> void:
 	_current_edge = -1
 
 
-func start_trip(path: PackedInt32Array, citizen: Node) -> void:
+func start_trip(path: PackedInt32Array, citizen: Node, slot: int = -1) -> void:
+	_release_park_slots()   # we leave the curb; free the old slot first
+	_slot_pending = slot
 	_path = path
 	_path_idx = 0
 	_speed = 0.0
@@ -120,6 +130,25 @@ func start_trip(path: PackedInt32Array, citizen: Node) -> void:
 	var spawn: Vector3 = CityData.road_graph.lane_points[path[0]]
 	if global_position.distance_to(spawn) > 10.0:
 		global_position = spawn
+
+
+func park_in_slot(slot: int) -> void:
+	## Park in a ParkingRegistry slot already reserved for this car.
+	var reg: ParkingRegistry = TrafficManager.parking
+	park_at(reg.slot_lane_point[slot], reg.slot_heading[slot], 0.0)
+	_park_slot = slot
+
+
+func _release_park_slots() -> void:
+	var reg: ParkingRegistry = TrafficManager.parking
+	if reg == null:
+		return
+	if _park_slot >= 0:
+		reg.release(_park_slot, get_instance_id())
+		_park_slot = -1
+	if _slot_pending >= 0:
+		reg.release(_slot_pending, get_instance_id())
+		_slot_pending = -1
 
 
 func park_at(lane_pos: Vector3, heading: Vector3, jitter: float) -> void:
@@ -216,6 +245,7 @@ func _advance(scaled_delta: float, check_neighbors: bool, step_frames: int = 1) 
 		TrafficManager.edge_left(_current_edge)
 		TrafficManager.edge_entered(edge)
 		_current_edge = edge
+		_yield_frames = 0
 	if _reroute_block > 0:
 		_reroute_block -= 1
 	_ensure_turn_curve(graph, edge)
@@ -238,16 +268,37 @@ func _advance(scaled_delta: float, check_neighbors: bool, step_frames: int = 1) 
 			cruise = minf(cruise, sqrt(TURN_SPEED * TURN_SPEED + 2.0 * BRAKE_COMFORT * dist_to_node))
 
 	var target_speed := cruise
-	# Red light: come to rest STOP_MARGIN short of the stop-line node.
+	# Red light / right-of-way: come to rest STOP_MARGIN short of the
+	# stop-line node.
 	_stopped_at_light = false
-	if edge >= 0 and graph.lane_enters[edge] >= 0 \
-			and not TrafficManager.can_vehicle_pass(graph.lane_enters[edge], graph.lane_enter_heading[edge]):
-		var stop_d := maxf(dist_to_node - STOP_MARGIN, 0.0)
-		target_speed = minf(target_speed, sqrt(2.0 * BRAKE_COMFORT * stop_d))
-		_stopped_at_light = stop_d < 0.5
+	if edge >= 0 and graph.lane_enters[edge] >= 0:
+		var inter := graph.lane_enters[edge]
+		var entry_heading := graph.lane_enter_heading[edge]
+		var hold := not TrafficManager.can_vehicle_pass(inter, entry_heading)
+		if not hold and dist_to_node < YIELD_CHECK_RANGE:
+			# Green (or unsignalized): still yield to conflicting traffic
+			# before committing to the intersection.
+			if TrafficManager.must_yield(self, inter, entry_heading, _turn_sign_ahead(graph)):
+				_yield_frames += 1
+				hold = _yield_frames < YIELD_TIMEOUT_FRAMES
+			else:
+				_yield_frames = 0
+		if hold:
+			var stop_d := maxf(dist_to_node - STOP_MARGIN, 0.0)
+			target_speed = minf(target_speed, sqrt(2.0 * BRAKE_COMFORT * stop_d))
+			_stopped_at_light = stop_d < 0.5
 	# Path end: roll gently to the final node.
 	if _path_idx + 2 >= _path.size():
 		target_speed = minf(target_speed, sqrt(2.0 * BRAKE_COMFORT * dist_to_node) + 0.8)
+	# Reserved curb slot on the final edge: roll to a stop abreast of it,
+	# then swing into the slot (never park mid-intersection again).
+	if _slot_pending >= 0 and _path_idx + 2 >= _path.size():
+		var reg: ParkingRegistry = TrafficManager.parking
+		var rem := (reg.slot_lane_point[_slot_pending] - global_position).dot(reg.slot_heading[_slot_pending])
+		if rem <= 0.2:
+			_finish_trip()
+			return
+		target_speed = minf(target_speed, sqrt(2.0 * BRAKE_COMFORT * maxf(rem - 0.2, 0.0)) + 0.5)
 	# Car ahead: keep FOLLOW_GAP; blocked too long -> creep through to break
 	# junction deadlocks (normal queues drain from the front before that).
 	if check_neighbors:
@@ -385,15 +436,44 @@ func _ray_intersect_xz(p0: Vector3, d0: Vector3, p2: Vector3, d2: Vector3) -> Ve
 	return p0 + d0 * t
 
 
+## Signed turn direction at the node we are approaching: > 0.5 = left
+## turn (crosses the oncoming lane), < -0.5 = right, ~0 = straight.
+func _turn_sign_ahead(graph: RoadGraph) -> float:
+	if _path_idx + 2 >= _path.size():
+		return 0.0
+	var here := graph.lane_points[_path[_path_idx]]
+	var node := graph.lane_points[_path[_path_idx + 1]]
+	var next := graph.lane_points[_path[_path_idx + 2]]
+	var in_dir := node - here
+	in_dir.y = 0.0
+	var out_dir := next - node
+	out_dir.y = 0.0
+	if in_dir.length_squared() < 0.01 or out_dir.length_squared() < 0.01:
+		return 0.0
+	in_dir = in_dir.normalized()
+	out_dir = out_dir.normalized()
+	return in_dir.z * out_dir.x - in_dir.x * out_dir.z
+
+
 ## Re-path from the next node to the destination through the congestion-
-## weighted A*; splice only when the detour actually diverges.
+## weighted A*; splice only when the detour actually diverges. A trip
+## with a reserved curb slot must still finish on the slot's edge, so
+## the detour targets that edge's start and re-appends its end.
 func _try_reroute(graph: RoadGraph) -> void:
 	_reroute_block = 360
 	if _path_idx + 2 >= _path.size():
 		return
-	var alt := graph.find_lane_path(_path[_path_idx + 1], _path[_path.size() - 1])
+	var goal := _path[_path.size() - 1]
+	var slot_tail := -1
+	if _slot_pending >= 0:
+		var slot_e: int = TrafficManager.parking.slot_edge[_slot_pending]
+		goal = graph.lane_from[slot_e]
+		slot_tail = graph.lane_to[slot_e]
+	var alt := graph.find_lane_path(_path[_path_idx + 1], goal)
 	if alt.size() < 2 or alt[1] == _path[_path_idx + 2]:
 		return
+	if slot_tail >= 0:
+		alt.append(slot_tail)
 	var new_path := PackedInt32Array()
 	new_path.append(_path[_path_idx])
 	new_path.append_array(alt)
@@ -405,18 +485,25 @@ func _try_reroute(graph: RoadGraph) -> void:
 
 
 func _finish_trip() -> void:
+	var parked_in_slot := false
+	if _slot_pending >= 0 and TrafficManager.parking != null:
+		var slot := _slot_pending
+		_slot_pending = -1
+		park_in_slot(slot)
+		parked_in_slot = true
 	if passenger != null:
-		var graph: RoadGraph = CityData.road_graph
-		var end_pos := graph.lane_points[_path[_path.size() - 1]] if _path.size() > 0 else global_position
-		var jitter := float((int(passenger.get("data")["id"]) % 5) - 2) * 2.6
-		if _path.size() >= 2:
-			var prev := graph.lane_points[_path[_path.size() - 2]]
-			var heading := (end_pos - prev).normalized()
-			park_at(end_pos, heading, jitter)
-		else:
-			state = VState.PARKED
-			goal_desc = "parked"
-			set_process(false)
+		if not parked_in_slot:
+			var graph: RoadGraph = CityData.road_graph
+			var end_pos := graph.lane_points[_path[_path.size() - 1]] if _path.size() > 0 else global_position
+			var jitter := float((int(passenger.get("data")["id"]) % 5) - 2) * 2.6
+			if _path.size() >= 2:
+				var prev := graph.lane_points[_path[_path.size() - 2]]
+				var heading := (end_pos - prev).normalized()
+				park_at(end_pos, heading, jitter)
+			else:
+				state = VState.PARKED
+				goal_desc = "parked"
+				set_process(false)
 		var rider := passenger
 		passenger = null
 		# Hand the rider the car's actual parked spot (curb + slot), not
@@ -425,7 +512,8 @@ func _finish_trip() -> void:
 		return
 	if _is_patrol:
 		_next_patrol_leg()
-	else:
+		return
+	if not parked_in_slot:
 		state = VState.PARKED
 		goal_desc = "parked"
 		set_process(false)
