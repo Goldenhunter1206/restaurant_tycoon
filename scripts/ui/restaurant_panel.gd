@@ -15,6 +15,7 @@ const ACTIONS: Array[Array] = [
 	[&"truck", "Suppliers", &"suppliers"],
 	[&"chart_bars", "Reports", &"reports"],
 	[&"coin", "Finances", &"finances"],
+	[&"store", "Visit", &"interior"],
 ]
 
 const PROFILE_COLS: Array[Array] = [

@@ -364,7 +364,25 @@ func _chip_label(chip_row: HBoxContainer, text: String, font_size: int = 15) -> 
 
 
 func _on_action(screen_id: StringName, building_id: int) -> void:
+	if screen_id == &"interior":
+		_open_interior(building_id)
+		return
 	screens.open(screen_id, building_id)
+
+
+func _open_interior(building_id: int) -> void:
+	if not RestaurantManager.by_building.has(building_id):
+		return
+	var parent: Node = get_parent()
+	if parent.get_node_or_null("InteriorViewer") != null:
+		return
+	screens.close()
+	var viewer_script: GDScript = load("res://scripts/ui/interior_viewer.gd")
+	var viewer: Control = viewer_script.new()
+	viewer.name = "InteriorViewer"
+	viewer.hud = self
+	parent.add_child(viewer)
+	viewer.setup(building_id)
 
 
 func _selected_building() -> int:
