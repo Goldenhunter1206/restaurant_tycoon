@@ -5,8 +5,8 @@ extends RefCounted
 ## benches, bushes, flowers and lamps. Individual instances (park counts are
 ## small). Deterministic per lot. Merged park superblocks fill as one lot.
 
-const D := "res://Cartoon City Massive Megapack/gLTF 2/Nature and Park/"
-const B := "res://Cartoon City Massive Megapack/gLTF 2/Basketball/"
+const D := "res://Cartoon City Massive Megapack/gLTF/Nature and Park/"
+const B := "res://Cartoon City Massive Megapack/gLTF/Basketball/"
 
 const TREES: Array[String] = [
 	D + "Tree_A_3.glb", D + "Tree_A_7.glb", D + "Tree_B_3.glb",

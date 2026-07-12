@@ -30,7 +30,7 @@ const AVENUE_ROWS: Array[int] = [3, 11]   # horizontal lines extended west to th
 ## a leafy boulevard while keeping traffic and the graph unchanged.
 const GRAND_AVENUE_V: Array[int] = [6, 11]   # vertical arterial line indices
 const GRAND_AVENUE_H: Array[int] = [10]      # horizontal arterial line indices
-const ROADS_DIR: String = "res://Cartoon City Massive Megapack/gLTF 2/Roads/"
+const ROADS_DIR: String = "res://Cartoon City Massive Megapack/gLTF/Roads/"
 
 # Direction bitmask (world): N = -Z, S = +Z, E = +X, W = -X.
 const N: int = 1

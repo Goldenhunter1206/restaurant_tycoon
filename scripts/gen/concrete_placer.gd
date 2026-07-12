@@ -8,7 +8,7 @@ extends RefCounted
 ## super-lots pave continuously. Deterministic; built under a "ConcreteLots"
 ## group. Run inside CityRebuilder.rebuild_all after SidewalkPlacer.
 
-const TILES := "res://Cartoon City Massive Megapack/gLTF 2/Tiles/"
+const TILES := "res://Cartoon City Massive Megapack/gLTF/Tiles/"
 const PAVERS: Array[String] = [TILES + "StreetTile_1_A_1.glb", TILES + "StreetTile_1_C_1.glb"]
 const TILE_SZ: float = 2.0        # StreetTile is a 2x2 m paver
 const EDGE_INSET: float = 7.0     # clear the road (4) + sidewalk band (3) on road-facing edges

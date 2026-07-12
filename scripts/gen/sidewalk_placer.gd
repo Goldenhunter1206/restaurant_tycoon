@@ -6,9 +6,9 @@ extends RefCounted
 ## stops, kiosks, food carts...) is placed at the curb facing the road.
 ## Deterministic; built under a "Sidewalks" group node.
 
-const TILES := "res://Cartoon City Massive Megapack/gLTF 2/Tiles/"
-const SP := "res://Cartoon City Massive Megapack/gLTF 2/Street Props/"
-const NP := "res://Cartoon City Massive Megapack/gLTF 2/Nature and Park/"
+const TILES := "res://Cartoon City Massive Megapack/gLTF/Tiles/"
+const SP := "res://Cartoon City Massive Megapack/gLTF/Street Props/"
+const NP := "res://Cartoon City Massive Megapack/gLTF/Nature and Park/"
 
 const PAVERS: Array[String] = [TILES + "StreetTile_1_A_1.glb", TILES + "StreetTile_1_C_1.glb"]
 const KERB: Array[String] = [SP + "Kerbstone_A_1.glb", SP + "Kerbstone_A_2.glb", SP + "Kerbstone_A_3.glb"]

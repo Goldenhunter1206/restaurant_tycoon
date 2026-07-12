@@ -14,8 +14,8 @@ extends RefCounted
 ## for grounding, fence pitch and fence long-axis. All MultiMesh via MeshBatch
 ## under an "IndustrialDressing" group. Deterministic per lot.
 
-const CO := "res://Cartoon City Massive Megapack/gLTF 2/Construction Site/Other/"
-const OT := "res://Cartoon City Massive Megapack/gLTF 2/Other/"
+const CO := "res://Cartoon City Massive Megapack/gLTF/Construction Site/Other/"
+const OT := "res://Cartoon City Massive Megapack/gLTF/Other/"
 
 const SEED: int = 271828182
 const PROP_Y: float = 0.1        # concrete pavement top (matches sidewalk furniture)
@@ -110,9 +110,9 @@ const TEMPLATES: Array[Dictionary] = [
 			{"p": CO + "TrailerC_1_C.glb", "o": Vector3(0.0, 0.0, 0.0), "yaw": 2.0},
 			{"p": CO + "TrailerC_1_D.glb", "o": Vector3(4.0, 0.0, 0.1), "yaw": 355.0},
 			{"p": CO + "TrailerC_1_E.glb", "o": Vector3(8.0, 0.0, -0.1), "yaw": 3.0},
-			{"p": "res://Cartoon City Massive Megapack/gLTF 2/Street Props/Cone_1.glb", "o": Vector3(-9.6, 0.0, 3.4)},
-			{"p": "res://Cartoon City Massive Megapack/gLTF 2/Street Props/Cone_2.glb", "o": Vector3(0.2, 0.0, 3.8)},
-			{"p": "res://Cartoon City Massive Megapack/gLTF 2/Street Props/Cone_1.glb", "o": Vector3(9.5, 0.0, 3.2)},
+			{"p": "res://Cartoon City Massive Megapack/gLTF/Street Props/Cone_1.glb", "o": Vector3(-9.6, 0.0, 3.4)},
+			{"p": "res://Cartoon City Massive Megapack/gLTF/Street Props/Cone_2.glb", "o": Vector3(0.2, 0.0, 3.8)},
+			{"p": "res://Cartoon City Massive Megapack/gLTF/Street Props/Cone_1.glb", "o": Vector3(9.5, 0.0, 3.2)},
 		],
 	},
 	{

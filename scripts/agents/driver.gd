@@ -34,6 +34,8 @@ var goal_desc: String = "waiting for orders"
 
 var _path: PackedInt32Array = PackedInt32Array()
 var _path_idx: int = 0
+## Walk-speed factor from the navigation attribute, cached in _ready.
+var _walk_mult: float = 1.0
 var _walk_done: Callable = Callable()
 var _dwell_until: int = -1
 var _model: Node3D
@@ -48,6 +50,8 @@ func _ready() -> void:
 	if staff_member != null:
 		data = {"id": staff_member.uid, "name": staff_member.staff_name}
 		name = "Driver_%d" % staff_member.uid
+		var walk_span: float = float(EconomyManager.tuning_value("staff.effects.walk_span", 0.3))
+		_walk_mult = 1.0 + (staff_member.attr(&"navigation") - 0.5) * walk_span
 	_anim = get_node_or_null("AnimationPlayer")
 	_attach_model()
 	_spawn_company_car()
@@ -187,7 +191,7 @@ func _process(delta: float) -> void:
 	var to_target: Vector3 = target - global_position
 	to_target.y = 0.0
 	var dist: float = to_target.length()
-	var step: float = WALK_SPEED * delta * float(GameClock.speed)
+	var step: float = WALK_SPEED * _walk_mult * delta * float(GameClock.speed)
 	if step >= dist:
 		global_position = target
 		_path_idx += 1
@@ -251,8 +255,11 @@ func _on_reached_car_out() -> void:
 func _on_reached_customer() -> void:
 	state = DState.HANDING_OVER
 	goal_desc = "handing over the food"
-	_dwell_until = GameClock.total_minutes() \
-		+ int(EconomyManager.tuning_value("delivery.deliver_dwell_minutes", 2))
+	var dwell: float = float(EconomyManager.tuning_value("delivery.deliver_dwell_minutes", 2))
+	if staff_member != null:
+		var dwell_span: float = float(EconomyManager.tuning_value("staff.effects.dwell_span", 0.5))
+		dwell *= 1.0 - (staff_member.attr(&"navigation") - 0.5) * dwell_span
+	_dwell_until = GameClock.total_minutes() + int(maxf(1.0, dwell))
 
 
 func _finish_handover() -> void:
@@ -324,6 +331,9 @@ func _spawn_company_car() -> void:
 		company_car.set("owner_desc", "%s — our delivery car" % home_restaurant.restaurant_name)
 	company_car.set("kind", "delivery")
 	company_car.set("delivery_driver", self)
+	if staff_member != null:
+		var drive_span: float = float(EconomyManager.tuning_value("staff.effects.drive_span", 0.3))
+		company_car.set("speed_multiplier", 1.0 + (staff_member.attr(&"driving") - 0.5) * drive_span)
 	if ResourceLoader.exists(DELIVERY_MARKER_SCENE_PATH):
 		var marker_scene: PackedScene = load(DELIVERY_MARKER_SCENE_PATH)
 		var marker: Node = marker_scene.instantiate()

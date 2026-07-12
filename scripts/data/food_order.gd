@@ -24,6 +24,8 @@ var tier: StringName = &"med"
 var price: float = 0.0
 var ingredient_cost: float = 0.0
 var prep_minutes: float = 10.0
+## Consistency attr of the cook who prepared it; feeds service reputation.
+var cook_consistency: float = 0.5
 var placed_minute: int = 0
 var state: int = State.PLACED
 var is_delivery: bool = false

@@ -8,6 +8,7 @@ signal restaurant_purchased(rest: RestaurantState)
 signal restaurant_updated(building_id: int)
 signal order_state_changed(order: FoodOrder)
 signal order_ready_for_delivery(order: FoodOrder)
+signal job_market_changed
 
 const DISH_DIR: String = "res://data/dishes"
 const STAFF_TYPE_DIR: String = "res://data/staff_types"
@@ -16,9 +17,12 @@ var dishes: Dictionary = {}
 var staff_types: Dictionary = {}
 var owned: Array[RestaurantState] = []
 var by_building: Dictionary = {}
+## Rolling pool of hireable applicants shared by all restaurants.
+var job_market: Array[JobCandidate] = []
 
 var _next_order_id: int = 1
 var _next_staff_uid: int = 1
+var _next_candidate_uid: int = 1
 var _last_tick_minute: int = -1
 var _initialized: bool = false
 
@@ -36,6 +40,8 @@ func initialize() -> void:
 		_restore_from_save(save)
 	else:
 		_found_starting_restaurant()
+	if job_market.is_empty():
+		_refresh_job_market(GameClock.day)
 
 
 func dish(dish_id: StringName) -> DishDef:
@@ -94,17 +100,43 @@ func purchasable_buildings() -> Array[Dictionary]:
 	return result
 
 
+func signing_fee_for(building_id: int) -> float:
+	var frac: float = float(EconomyManager.tuning_value("purchase.signing_fee_fraction", 0.15))
+	return price_for(building_id) * frac
+
+
 func purchase(building_id: int, restaurant_name: String = "") -> bool:
 	if not is_purchasable(building_id):
 		return false
-	var price: float = price_for(building_id)
+	var value: float = price_for(building_id)
+	var fee: float = value * float(EconomyManager.tuning_value("purchase.signing_fee_fraction", 0.15))
+	if not EconomyManager.can_afford(fee):
+		EconomyManager.post_message("alert", "Not enough cash to sign this lease ($%.0f)." % fee)
+		return false
+	EconomyManager.transact(&"signing_fee", -fee)
+	var rest: RestaurantState = _add_restaurant(building_id, restaurant_name, fee, value)
+	var rents: Dictionary = EconomyManager.tuning_value("rent.daily_by_district", {})
+	var rent: float = float(rents.get(rest.district, 120.0))
+	EconomyManager.post_message("good", "Signed the lease on %s for $%.0f — rent is $%.0f/day." % [rest.restaurant_name, fee, rent])
+	EconomyManager.post_message("info", "Hire cooks and waiters so %s can serve customers." % rest.restaurant_name)
+	return true
+
+
+## Pays the full property value; the location stops paying rent permanently.
+func buyout(building_id: int) -> bool:
+	var rest: RestaurantState = by_building.get(building_id)
+	if rest == null or rest.owned_outright:
+		return false
+	if rest.property_value <= 0.0:
+		rest.property_value = price_for(building_id)
+	var price: float = rest.property_value
 	if not EconomyManager.can_afford(price):
-		EconomyManager.post_message("alert", "Not enough cash to buy this location ($%.0f)." % price)
+		EconomyManager.post_message("alert", "Not enough cash to buy %s outright ($%.0f)." % [rest.restaurant_name, price])
 		return false
 	EconomyManager.transact(&"property_purchase", -price)
-	var rest: RestaurantState = _add_restaurant(building_id, restaurant_name, price)
-	EconomyManager.post_message("good", "Opened %s for $%.0f!" % [rest.restaurant_name, price])
-	EconomyManager.post_message("info", "Hire cooks and waiters so %s can serve customers." % rest.restaurant_name)
+	rest.owned_outright = true
+	EconomyManager.post_message("good", "%s is now yours — no more rent!" % rest.restaurant_name)
+	restaurant_updated.emit(building_id)
 	return true
 
 
@@ -184,24 +216,55 @@ func request_seat(citizen: Node, building_id: int, dish_id: StringName) -> Strin
 # --- Staff -----------------------------------------------------------------
 
 
-func hire(building_id: int, type_id: StringName, shift_start: float = -1.0) -> StaffMember:
-	var rest: RestaurantState = by_building.get(building_id)
+## Fabricates an average-ish employee outside the job market (starting staff).
+func _hire_generated(rest: RestaurantState, type_id: StringName, shift_start: float, shift_hours: float = 8.0) -> StaffMember:
 	var def: StaffTypeDef = staff_types.get(type_id)
 	if rest == null or def == null:
 		return null
+	var member: StaffMember = _make_member(type_id, _random_person_name(), _roll_attributes(def), def.base_hourly_wage, shift_start, shift_hours)
+	rest.staff.append(member)
+	if def.is_driver:
+		DeliveryManager.on_driver_hired(rest, member)
+	restaurant_updated.emit(rest.building_id)
+	return member
+
+
+func _make_member(type_id: StringName, member_name: String, attrs: Dictionary, wage: float, shift_start: float, shift_hours: float) -> StaffMember:
+	var lo: float = float(EconomyManager.tuning_value("staff.min_shift_hours", 2.0))
+	var hi: float = float(EconomyManager.tuning_value("staff.max_shift_hours", 10.0))
 	var member: StaffMember = StaffMember.new()
 	member.uid = _next_staff_uid
 	_next_staff_uid += 1
 	member.type_id = type_id
-	member.staff_name = _random_person_name()
-	member.daily_wage = def.base_daily_wage
-	member.shift_hours = float(EconomyManager.tuning_value("staff.max_shift_hours", 8.0))
-	member.shift_start = shift_start if shift_start >= 0.0 else rest.open_hour
-	rest.staff.append(member)
-	if def.is_driver:
-		DeliveryManager.on_driver_hired(rest, member)
-	restaurant_updated.emit(building_id)
+	member.staff_name = member_name
+	member.attributes = attrs.duplicate()
+	member.hourly_wage = wage
+	member.shift_start = wrapf(shift_start, 0.0, 24.0)
+	member.shift_hours = clampf(shift_hours, lo, hi)
 	return member
+
+
+func _roll_attributes(def: StaffTypeDef) -> Dictionary:
+	var attrs: Dictionary = {}
+	if def == null:
+		return attrs
+	for key: StringName in def.attribute_keys:
+		attrs[key] = clampf(randfn(0.5, 0.2), 0.05, 0.95)
+	return attrs
+
+
+func set_shift(building_id: int, uid: int, start: float, hours: float) -> void:
+	var rest: RestaurantState = by_building.get(building_id)
+	if rest == null:
+		return
+	var lo: float = float(EconomyManager.tuning_value("staff.min_shift_hours", 2.0))
+	var hi: float = float(EconomyManager.tuning_value("staff.max_shift_hours", 10.0))
+	for member: StaffMember in rest.staff:
+		if member.uid == uid:
+			member.shift_start = wrapf(start, 0.0, 24.0)
+			member.shift_hours = clampf(hours, lo, hi)
+			restaurant_updated.emit(building_id)
+			return
 
 
 func fire(building_id: int, uid: int) -> bool:
@@ -218,6 +281,87 @@ func fire(building_id: int, uid: int) -> bool:
 			restaurant_updated.emit(building_id)
 			return true
 	return false
+
+
+# --- Job market --------------------------------------------------------------
+
+
+func candidates_for(type_id: StringName) -> Array[JobCandidate]:
+	var result: Array[JobCandidate] = []
+	for cand: JobCandidate in job_market:
+		if cand.type_id == type_id:
+			result.append(cand)
+	return result
+
+
+func hire_candidate(building_id: int, candidate_uid: int, shift_start: float, shift_hours: float = 8.0) -> StaffMember:
+	var rest: RestaurantState = by_building.get(building_id)
+	if rest == null:
+		return null
+	for i: int in job_market.size():
+		var cand: JobCandidate = job_market[i]
+		if cand.uid != candidate_uid:
+			continue
+		var def: StaffTypeDef = staff_types.get(cand.type_id)
+		if def == null:
+			return null
+		job_market.remove_at(i)
+		var member: StaffMember = _make_member(cand.type_id, cand.candidate_name, cand.attributes, cand.hourly_wage, shift_start, shift_hours)
+		rest.staff.append(member)
+		if def.is_driver:
+			DeliveryManager.on_driver_hired(rest, member)
+		restaurant_updated.emit(building_id)
+		job_market_changed.emit()
+		return member
+	return null
+
+
+## Ages the pool each day: stale/leaving candidates drop out, fresh ones apply.
+func _refresh_job_market(day: int) -> void:
+	var lifetime: int = int(EconomyManager.tuning_value("hiring.candidate_lifetime_days", 4))
+	var leave_chance: float = float(EconomyManager.tuning_value("hiring.daily_leave_chance", 0.2))
+	for i: int in range(job_market.size() - 1, -1, -1):
+		var cand: JobCandidate = job_market[i]
+		if day - cand.posted_day >= lifetime or randf() < leave_chance:
+			job_market.remove_at(i)
+	var lo: int = int(EconomyManager.tuning_value("hiring.market_min", 3))
+	var hi: int = int(EconomyManager.tuning_value("hiring.market_max", 5))
+	for type_id: StringName in staff_types:
+		var have: int = candidates_for(type_id).size()
+		var target: int = randi_range(lo, hi)
+		while have < target:
+			job_market.append(_generate_candidate(type_id))
+			have += 1
+	job_market_changed.emit()
+
+
+func _generate_candidate(type_id: StringName) -> JobCandidate:
+	var def: StaffTypeDef = staff_types.get(type_id)
+	var cand: JobCandidate = JobCandidate.new()
+	cand.uid = _next_candidate_uid
+	_next_candidate_uid += 1
+	cand.type_id = type_id
+	cand.candidate_name = _random_person_name()
+	cand.attributes = _roll_attributes(def)
+	cand.hourly_wage = _asking_wage(def, cand.attributes)
+	cand.posted_day = GameClock.day
+	return cand
+
+
+## Better attributes -> higher asking wage (~0.6x to ~1.4x of the role base).
+func _asking_wage(def: StaffTypeDef, attrs: Dictionary) -> float:
+	var base_frac: float = float(EconomyManager.tuning_value("hiring.wage_base_frac", 0.6))
+	var span: float = float(EconomyManager.tuning_value("hiring.wage_attr_span", 0.8))
+	var noise: float = float(EconomyManager.tuning_value("hiring.wage_noise", 0.06))
+	var avg: float = 0.5
+	if not attrs.is_empty():
+		var total: float = 0.0
+		for value: Variant in attrs.values():
+			total += float(value)
+		avg = total / float(attrs.size())
+	var base: float = def.base_hourly_wage if def != null else 8.0
+	var wage: float = base * (base_frac + span * avg) * randf_range(1.0 - noise, 1.0 + noise)
+	return snappedf(wage, 0.25)
 
 
 # --- Settings mutators (UI entry points) ------------------------------------
@@ -350,15 +494,22 @@ func _on_minute(_day: int, hour: int, _minute: int) -> void:
 
 func _tick_restaurant(rest: RestaurantState, now: int, dm: int, _hour: int) -> void:
 	var hourf: float = GameClock.game_hours
-	# Waiters accumulate fractional serving capacity while on shift.
-	var waiters: int = rest.staff_on_shift(&"waiter", hourf)
+	# Waiters accumulate fractional serving capacity while on shift; a better
+	# service attribute means more guests seated per hour.
+	var waiter_span: float = float(EconomyManager.tuning_value("staff.effects.waiter_span", 0.6))
+	var waiters: int = 0
+	var serve_per_hour: float = 0.0
+	for member: StaffMember in rest.staff:
+		if not member.on_shift(hourf):
+			continue
+		var wdef: StaffTypeDef = staff_types.get(member.type_id)
+		if wdef == null or wdef.waiter_customers_per_hour <= 0.0:
+			continue
+		waiters += 1
+		serve_per_hour += wdef.waiter_customers_per_hour * (1.0 + (member.attr(&"service") - 0.5) * waiter_span)
 	if waiters > 0:
-		var per_hour: float = 10.0
-		var def: StaffTypeDef = staff_types.get(&"waiter")
-		if def != null:
-			per_hour = def.waiter_customers_per_hour
 		var cap: float = maxf(2.0, float(waiters) * 2.0)
-		rest.waiter_credits = minf(rest.waiter_credits + float(waiters) * per_hour / 60.0 * float(dm), cap)
+		rest.waiter_credits = minf(rest.waiter_credits + serve_per_hour / 60.0 * float(dm), cap)
 	# Kitchen: assign each live cook slot so the UI can show who owns every dish.
 	var cook_slots: Array[Dictionary] = _cook_slot_descriptors(rest, hourf)
 	while rest.cooking.size() < cook_slots.size() and not rest.cook_backlog.is_empty():
@@ -367,6 +518,7 @@ func _tick_restaurant(rest: RestaurantState, now: int, dm: int, _hour: int) -> v
 			continue
 		var slot: Dictionary = cook_slots[rest.cooking.size()]
 		order.state = FoodOrder.State.COOKING
+		order.cook_consistency = float(slot.get("consistency", 0.5))
 		EconomyManager.transact(&"ingredients", -order.ingredient_cost)
 		rest.today["expenses"] = float(rest.today.get("expenses", 0.0)) + order.ingredient_cost
 		rest.cooking.append({
@@ -393,7 +545,8 @@ func _tick_restaurant(rest: RestaurantState, now: int, dm: int, _hour: int) -> v
 		job["cook_uid"] = active_slot["cook_uid"]
 		job["cook_name"] = active_slot["cook_name"]
 		job["slot_index"] = active_slot["slot_index"]
-		job["minutes_left"] = float(job["minutes_left"]) - float(dm)
+		order.cook_consistency = float(active_slot.get("consistency", 0.5))
+		job["minutes_left"] = float(job["minutes_left"]) - float(dm) * float(active_slot.get("speed_mult", 1.0))
 		if float(job["minutes_left"]) <= 0.0:
 			rest.cooking.remove_at(i)
 			_on_cooked(rest, order)
@@ -486,6 +639,7 @@ func _complete_dine_in(rest: RestaurantState, citizen: Node, order: FoodOrder) -
 	record_category_sale(rest, order.dish_id)
 	DemandManager.charge_citizen(order.citizen_id, order.price)
 	award_service_reputation(order)
+	_award_charm_reputation(rest)
 	order.state = FoodOrder.State.SERVED
 	_notify_citizen(citizen, "on_meal_done")
 
@@ -500,7 +654,27 @@ func award_service_reputation(order: FoodOrder) -> void:
 		if tier != null:
 			quality = tier.quality_score
 	var bonus: float = (quality - 0.5) * float(EconomyManager.tuning_value("reputation.quality_bonus_scale", 0.02))
+	bonus += (order.cook_consistency - 0.5) * float(EconomyManager.tuning_value("staff.effects.consistency_rep_scale", 0.02))
 	EconomyManager.add_reputation(base + bonus)
+
+
+## Charming waiters on shift leave a small extra impression on dine-in guests.
+func _award_charm_reputation(rest: RestaurantState) -> void:
+	var hourf: float = GameClock.game_hours
+	var total: float = 0.0
+	var count: int = 0
+	for member: StaffMember in rest.staff:
+		if not member.on_shift(hourf):
+			continue
+		var def: StaffTypeDef = staff_types.get(member.type_id)
+		if def == null or def.waiter_customers_per_hour <= 0.0:
+			continue
+		total += member.attr(&"charm")
+		count += 1
+	if count == 0:
+		return
+	var scale: float = float(EconomyManager.tuning_value("staff.effects.charm_rep_scale", 0.015))
+	EconomyManager.add_reputation((total / float(count) - 0.5) * scale)
 
 
 ## Track which cuisine categories sell (customer-profile UI).
@@ -514,6 +688,7 @@ func record_category_sale(rest: RestaurantState, dish_id: StringName) -> void:
 
 
 func _cook_slot_descriptors(rest: RestaurantState, hourf: float) -> Array[Dictionary]:
+	var prep_span: float = float(EconomyManager.tuning_value("staff.effects.prep_span", 0.5))
 	var slots: Array[Dictionary] = []
 	for member: StaffMember in rest.staff:
 		if not member.on_shift(hourf):
@@ -526,6 +701,8 @@ func _cook_slot_descriptors(rest: RestaurantState, hourf: float) -> Array[Dictio
 				"cook_uid": member.uid,
 				"cook_name": member.staff_name,
 				"slot_index": slot_index,
+				"speed_mult": 1.0 + (member.attr(&"speed") - 0.5) * prep_span,
+				"consistency": member.attr(&"consistency"),
 			})
 	return slots
 
@@ -642,13 +819,17 @@ func _bottleneck_for(rest: RestaurantState, snapshot: Dictionary) -> Dictionary:
 # --- Daily rollover ----------------------------------------------------------
 
 
-func _on_day_changed(_day: int) -> void:
+func _on_day_changed(day: int) -> void:
 	for rest: RestaurantState in owned:
 		rest.sales_history.append(float(rest.today.get("sales", 0.0)))
 		if rest.sales_history.size() > 14:
 			rest.sales_history.remove_at(0)
+		rest.expense_history.append(float(rest.today.get("expenses", 0.0)))
+		if rest.expense_history.size() > 14:
+			rest.expense_history.remove_at(0)
 		rest.reset_today()
 		restaurant_updated.emit(rest.building_id)
+	_refresh_job_market(day)
 
 
 ## Registered with EconomyManager.daily_cost_providers.
@@ -657,11 +838,13 @@ func _charge_daily_costs(_day: int) -> void:
 	for rest: RestaurantState in owned:
 		var wages: float = 0.0
 		for member: StaffMember in rest.staff:
-			wages += member.daily_wage
+			wages += member.daily_pay()
 		if wages > 0.0:
 			EconomyManager.transact(&"wages", -wages)
-		var rent: float = float(rents.get(rest.district, 120.0))
-		EconomyManager.transact(&"rent", -rent)
+		var rent: float = 0.0
+		if not rest.owned_outright:
+			rent = float(rents.get(rest.district, 120.0))
+			EconomyManager.transact(&"rent", -rent)
 		# Mise en place: every enabled dish costs daily prep + stocked
 		# ingredients, so an unsold dish is a real loss on the ledger.
 		var upkeep: float = menu_upkeep_for(rest)
@@ -713,6 +896,7 @@ func _restore_from_save(save: SaveGame) -> void:
 		rest.door_pos = info.get("door_pos", Vector3.ZERO)
 		rest.curb_pos = info.get("position", Vector3.ZERO)
 		rest.reset_today()
+		_migrate_restaurant(rest, save.save_version)
 		owned.append(rest)
 		by_building[rest.building_id] = rest
 		_spawn_marker(rest)
@@ -722,8 +906,31 @@ func _restore_from_save(save: SaveGame) -> void:
 			if def != null and def.is_driver:
 				DeliveryManager.on_driver_hired(rest, member)
 		restaurant_purchased.emit(rest)
+	job_market = save.job_market.duplicate()
+	for cand: JobCandidate in job_market:
+		_next_candidate_uid = maxi(_next_candidate_uid, cand.uid + 1)
+	_next_candidate_uid = maxi(_next_candidate_uid, save.next_candidate_uid)
 	DemandManager.pending_wealth = save.citizen_wealth.duplicate()
 	EconomyManager.post_message("good", "Save loaded — welcome back, boss!")
+
+
+## Fills in fields introduced after the save was written (save_version < 2).
+func _migrate_restaurant(rest: RestaurantState, version: int) -> void:
+	var lo: float = float(EconomyManager.tuning_value("staff.min_shift_hours", 2.0))
+	var hi: float = float(EconomyManager.tuning_value("staff.max_shift_hours", 8.0))
+	for member: StaffMember in rest.staff:
+		if member.hourly_wage <= 0.0:
+			member.hourly_wage = maxf(1.0, member.daily_wage / 8.0)
+		if member.attributes.is_empty():
+			member.attributes = _roll_attributes(staff_types.get(member.type_id))
+		member.shift_hours = clampf(member.shift_hours, lo, hi)
+	if rest.property_value <= 0.0:
+		rest.property_value = price_for(rest.building_id)
+	if version < 2 and rest.purchase_price > 0.0:
+		# Pre-v2 saves paid the full purchase price, so they keep ownership.
+		rest.owned_outright = true
+	while rest.expense_history.size() < rest.sales_history.size():
+		rest.expense_history.append(0.0)
 
 
 func _found_starting_restaurant() -> void:
@@ -743,23 +950,24 @@ func _found_starting_restaurant() -> void:
 	if best_id < 0:
 		push_warning("RestaurantManager: no shop building found for the starting restaurant")
 		return
-	var rest: RestaurantState = _add_restaurant(best_id, "%s — Home Base" % EconomyManager.company_name, 0.0)
+	var rest: RestaurantState = _add_restaurant(best_id, "%s — Home Base" % EconomyManager.company_name, 0.0, price_for(best_id))
 	# The first location opens staffed for lunch AND the dinner rush
 	# (evening leisure is when most citizens dine out).
-	hire(rest.building_id, &"cook", 10.0)
-	hire(rest.building_id, &"waiter", 10.0)
-	hire(rest.building_id, &"cook", 14.0)
-	hire(rest.building_id, &"waiter", 14.0)
+	_hire_generated(rest, &"cook", 10.0)
+	_hire_generated(rest, &"waiter", 10.0)
+	_hire_generated(rest, &"cook", 14.0)
+	_hire_generated(rest, &"waiter", 14.0)
 	EconomyManager.post_message("good", "Welcome! %s opened its first restaurant." % EconomyManager.company_name)
 
 
-func _add_restaurant(building_id: int, restaurant_name: String, price: float) -> RestaurantState:
+func _add_restaurant(building_id: int, restaurant_name: String, fee: float, value: float) -> RestaurantState:
 	var info: Dictionary = CityData.get_building(building_id)
 	var rest: RestaurantState = RestaurantState.new()
 	rest.building_id = building_id
 	rest.district = String(info.get("district", "N"))
 	rest.restaurant_name = restaurant_name if restaurant_name != "" else "Restaurant %d" % building_id
-	rest.purchase_price = price
+	rest.purchase_price = fee
+	rest.property_value = value
 	rest.door_pos = info.get("door_pos", Vector3.ZERO)
 	rest.curb_pos = info.get("position", Vector3.ZERO)
 	rest.table_count = _table_count_for(info)

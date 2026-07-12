@@ -46,7 +46,7 @@ const SERVICE_VEHICLES: Array = [
 	["police", 2], ["taxi", 4], ["ambulance", 1], ["icecream", 2], ["post", 2],
 ]
 
-const VEHICLE_DIR: String = "res://Cartoon City Massive Megapack/gLTF 2/Vehicles/"
+const VEHICLE_DIR: String = "res://Cartoon City Massive Megapack/gLTF/Vehicles/"
 const KIND_MODELS := {
 	"police": ["Police Car/Car_Police_1_A_1.gltf", "Police Car/Car_Police_2_A_1.gltf"],
 	"taxi": ["Taxi/Taxi_1.gltf", "Taxi/Taxi_2.gltf", "Taxi/Taxi_3.gltf"],

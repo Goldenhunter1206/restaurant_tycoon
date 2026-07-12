@@ -1,7 +1,7 @@
 {
  "families": {
   "B1": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 1/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 1/",
    "variants": [
     "Building_1_1_A.glb",
     "Building_1_1_B.glb",
@@ -728,7 +728,7 @@
    }
   },
   "B2": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building_2/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building_2/",
    "variants": [
     "Building_2_1_A.glb",
     "Building_2_1_B.glb",
@@ -1375,7 +1375,7 @@
    }
   },
   "B3": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 3/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 3/",
    "variants": [
     "Building_3_1_A.glb",
     "Building_3_1_B.glb",
@@ -1678,7 +1678,7 @@
    }
   },
   "B4": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 4/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 4/",
    "variants": [
     "Building_4_A.glb",
     "Building_4_B.glb",
@@ -1781,7 +1781,7 @@
    }
   },
   "B5": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 5/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 5/",
    "variants": [
     "Building_5_1_B.glb",
     "Building_5_1_C.glb",
@@ -2268,7 +2268,7 @@
    }
   },
   "B6": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 6/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 6/",
    "variants": [
     "Building_6_A.glb",
     "Building_6_B.glb",
@@ -2363,7 +2363,7 @@
    }
   },
   "B7": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 7/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 7/",
    "variants": [
     "Building_7_1_A.glb",
     "Building_7_1_B.glb",
@@ -2514,7 +2514,7 @@
    }
   },
   "B8": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 8'/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 8'/",
    "variants": [
     "Building_8_1_A.glb",
     "Building_8_1_B.glb",
@@ -2857,7 +2857,7 @@
    }
   },
   "B9": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 9/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 9/",
    "variants": [
     "Building_9_1_A.glb",
     "Building_9_1_AA.glb",
@@ -3376,7 +3376,7 @@
    }
   },
   "B10": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 10/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 10/",
    "variants": [
     "Building_10_A.glb",
     "Building_10_B.glb",
@@ -3503,7 +3503,7 @@
    }
   },
   "B11": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 11/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 11/",
    "variants": [
     "Building_11_1_A.glb",
     "Building_11_1_B.glb",
@@ -3870,7 +3870,7 @@
    }
   },
   "B12": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 12/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 12/",
    "variants": [
     "Building_12_A.glb",
     "Building_12_B.glb",
@@ -3949,7 +3949,7 @@
    }
   },
   "B13": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 13/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 13/",
    "variants": [
     "Building_13_A.glb",
     "Building_13_B.glb",
@@ -4012,7 +4012,7 @@
    }
   },
   "B14": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 14/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 14/",
    "variants": [
     "Building_14_A.glb",
     "Building_14_B.glb",
@@ -4091,7 +4091,7 @@
    }
   },
   "B15": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 15/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 15/",
    "variants": [
     "Building_15_A.glb",
     "Building_15_B.glb",
@@ -4178,7 +4178,7 @@
    }
   },
   "B16": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 16/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 16/",
    "variants": [
     "Building_16_1_A.glb",
     "Building_16_1_B.glb",
@@ -4393,7 +4393,7 @@
    }
   },
   "B17": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 17/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 17/",
    "variants": [
     "Building_17_1_A.glb",
     "Building_17_1_AA.glb",
@@ -4928,7 +4928,7 @@
    }
   },
   "B18": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 18/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 18/",
    "variants": [
     "Building_18_1_A.glb",
     "Building_18_1_B.glb",
@@ -5367,7 +5367,7 @@
    }
   },
   "B19": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 19/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 19/",
    "variants": [
     "Building_19_1_A.glb",
     "Building_19_1_B.glb",
@@ -5614,7 +5614,7 @@
    }
   },
   "B20": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 20/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 20/",
    "variants": [
     "Building_20_1_A.glb",
     "Building_20_1_B.glb",
@@ -5861,7 +5861,7 @@
    }
   },
   "B21": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 21/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 21/",
    "variants": [
     "Building_21_1_A.glb",
     "Building_21_1_B.glb",
@@ -6308,7 +6308,7 @@
    }
   },
   "B22": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 22/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 22/",
    "variants": [
     "Building_22_1_A.glb",
     "Building_22_1_B.glb",
@@ -6507,7 +6507,7 @@
    }
   },
   "B23": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 23/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 23/",
    "variants": [
     "Building_23_A.glb",
     "Building_23_B.glb",
@@ -6570,7 +6570,7 @@
    }
   },
   "B24": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 24/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 24/",
    "variants": [
     "Building_24_A.glb",
     "Building_24_B.glb",
@@ -6689,7 +6689,7 @@
    }
   },
   "B25": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 25/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 25/",
    "variants": [
     "Building_25_10_A.glb",
     "Building_25_10_B.glb",
@@ -7400,7 +7400,7 @@
    }
   },
   "B26": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 26/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 26/",
    "variants": [
     "Building_26_A.glb",
     "Building_26_B.glb",
@@ -7535,7 +7535,7 @@
    }
   },
   "B27": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Buildings/Building 27/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Buildings/Building 27/",
    "variants": [
     "Building_27_A.glb",
     "Building_27_B.glb",
@@ -7694,7 +7694,7 @@
    }
   },
   "FACTORY": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Factory/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Factory/",
    "variants": [
     "Building_Fabric_3_A.glb",
     "Building_Fabric_3_B.glb",
@@ -7861,7 +7861,7 @@
    }
   },
   "GASTANK": {
-   "dir": "res://Cartoon City Massive Megapack/gLTF 2/Factory/",
+   "dir": "res://Cartoon City Massive Megapack/gLTF/Factory/",
    "variants": [
     "GasTank_1_A.glb",
     "GasTank_1_B.glb",

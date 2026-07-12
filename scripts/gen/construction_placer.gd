@@ -7,9 +7,9 @@ extends RefCounted
 ## MultiMesh; the bulky props are individual instances (small counts).
 ## Deterministic; built under a "Construction" group. Skips merged super-lots.
 
-const CO := "res://Cartoon City Massive Megapack/gLTF 2/Construction Site/Other/"
-const CB := "res://Cartoon City Massive Megapack/gLTF 2/Construction Site/Buildings/"
-const SP := "res://Cartoon City Massive Megapack/gLTF 2/Street Props/"
+const CO := "res://Cartoon City Massive Megapack/gLTF/Construction Site/Other/"
+const CB := "res://Cartoon City Massive Megapack/gLTF/Construction Site/Buildings/"
+const SP := "res://Cartoon City Massive Megapack/gLTF/Street Props/"
 
 const DIRT: Array[String] = [
 	CB + "cGround_A_1.glb", CB + "cGround_A_2.glb", CB + "cGround_A_3.glb",

@@ -11,13 +11,13 @@ extends RefCounted
 ## MeshBatch), grouped by asset, with a far-field fade. Deterministic; built
 ## under a "SuburbanYards" group. Run inside CityRebuilder.rebuild_all.
 
-const NP := "res://Cartoon City Massive Megapack/gLTF 2/Nature and Park/"
-const SP := "res://Cartoon City Massive Megapack/gLTF 2/Street Props/"
-const OT := "res://Cartoon City Massive Megapack/gLTF 2/Other/"
-const FP := "res://Cartoon City Massive Megapack/gLTF 2/Food Props/"
-const TILES := "res://Cartoon City Massive Megapack/gLTF 2/Tiles/"
-const V := "res://Cartoon City Massive Megapack/gLTF 2/Vehicles/"
-const B := "res://Cartoon City Massive Megapack/gLTF 2/Basketball/"
+const NP := "res://Cartoon City Massive Megapack/gLTF/Nature and Park/"
+const SP := "res://Cartoon City Massive Megapack/gLTF/Street Props/"
+const OT := "res://Cartoon City Massive Megapack/gLTF/Other/"
+const FP := "res://Cartoon City Massive Megapack/gLTF/Food Props/"
+const TILES := "res://Cartoon City Massive Megapack/gLTF/Tiles/"
+const V := "res://Cartoon City Massive Megapack/gLTF/Vehicles/"
+const B := "res://Cartoon City Massive Megapack/gLTF/Basketball/"
 
 const PICKET: Array[String] = [SP + "Fence_1_A_1.glb", SP + "Fence_1_C_1.glb"]   # length ~1.97 m along local Z
 const PICKET_LEN: float = 1.97

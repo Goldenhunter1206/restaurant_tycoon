@@ -5,7 +5,7 @@ extends RefCounted
 ## gives colour variety across the fleet. Cars are .gltf and face +X at rest.
 ## Deterministic; built under a "ParkedCars" group.
 
-const V := "res://Cartoon City Massive Megapack/gLTF 2/Vehicles/"
+const V := "res://Cartoon City Massive Megapack/gLTF/Vehicles/"
 
 const CARS: Array[String] = [
 	V + "Car 5/Car_5_A.gltf", V + "Car 5/Car_5_B.gltf", V + "Car 5/Car_5_C.gltf", V + "Car 5/Car_5_D.gltf",

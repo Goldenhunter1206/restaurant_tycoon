@@ -357,7 +357,10 @@ func _render_overview(rest: RestaurantState) -> void:
 		traffic = "Medium"
 	var sales: float = float(rest.today.get("sales", 0.0))
 	var expenses: float = float(rest.today.get("expenses", 0.0))
-	_biz_row(&"rent", "Rent", "$%s/day" % TycoonHud._fmt(float(rents.get(rest.district, 120.0))), TycoonTheme.PALETTE["text"])
+	if rest.owned_outright:
+		_biz_row(&"rent", "Rent", "Owned — none", TycoonTheme.PALETTE["good"])
+	else:
+		_biz_row(&"rent", "Rent", "$%s/day" % TycoonHud._fmt(float(rents.get(rest.district, 120.0))), TycoonTheme.PALETTE["text"])
 	_biz_row(&"traffic", "Traffic", traffic, TycoonTheme.PALETTE["good"] if traffic == "High" else TycoonTheme.PALETTE["text"])
 	_biz_row(&"banknotes", "Sales Today", "$%s" % TycoonHud._fmt(sales), TycoonTheme.PALETTE["text"])
 	_biz_row(&"chart_up", "Profit Today", "$%s" % TycoonHud._fmt(sales - expenses),

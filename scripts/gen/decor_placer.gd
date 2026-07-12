@@ -5,13 +5,13 @@ extends RefCounted
 ## Trees skip tight downtown / industrial frontages; lamps line every street.
 
 const TREES: Array[String] = [
-	"res://Cartoon City Massive Megapack/gLTF 2/Nature and Park/Tree_A_2.glb",
-	"res://Cartoon City Massive Megapack/gLTF 2/Nature and Park/Tree_A_5.glb",
-	"res://Cartoon City Massive Megapack/gLTF 2/Nature and Park/Tree_B_2.glb",
-	"res://Cartoon City Massive Megapack/gLTF 2/Nature and Park/Tree_B_8.glb",
-	"res://Cartoon City Massive Megapack/gLTF 2/Nature and Park/Tree_C_8.glb",
+	"res://Cartoon City Massive Megapack/gLTF/Nature and Park/Tree_A_2.glb",
+	"res://Cartoon City Massive Megapack/gLTF/Nature and Park/Tree_A_5.glb",
+	"res://Cartoon City Massive Megapack/gLTF/Nature and Park/Tree_B_2.glb",
+	"res://Cartoon City Massive Megapack/gLTF/Nature and Park/Tree_B_8.glb",
+	"res://Cartoon City Massive Megapack/gLTF/Nature and Park/Tree_C_8.glb",
 ]
-const LAMP: String = "res://Cartoon City Massive Megapack/gLTF 2/Nature and Park/StreetLamp_3_A.glb"
+const LAMP: String = "res://Cartoon City Massive Megapack/gLTF/Nature and Park/StreetLamp_3_A.glb"
 
 const TREE_OFF: float = 4.8
 const LAMP_OFF: float = 4.5

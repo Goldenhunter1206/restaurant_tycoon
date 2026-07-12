@@ -13,8 +13,8 @@ extends RefCounted
 ## both the height (true roof top) and the horizontal centring in one shot.
 ## All MultiMesh (via MeshBatch) under a "BuildingDressing" group. Deterministic.
 
-const RP := "res://Cartoon City Massive Megapack/gLTF 2/Roof Props/"
-const SP := "res://Cartoon City Massive Megapack/gLTF 2/Street Props/"
+const RP := "res://Cartoon City Massive Megapack/gLTF/Roof Props/"
+const SP := "res://Cartoon City Massive Megapack/gLTF/Street Props/"
 
 const ROOF_PROPS: Array[String] = [
 	RP + "WaterTank_1_A.glb", RP + "WaterTank_1_C.glb", RP + "WaterTank_2_A.glb",

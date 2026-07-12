@@ -1,14 +1,27 @@
 class_name StaffMember
 extends Resource
-## One hired employee at a restaurant. Works at most 8 hours per day
-## (shift_hours is clamped by RestaurantManager on hire).
+## One hired employee at a restaurant. Shift length is clamped to
+## staff.min/max_shift_hours tuning by RestaurantManager; pay is hourly and
+## charged only for scheduled hours.
 
 @export var uid: int = 0
 @export var type_id: StringName = &""
 @export var staff_name: String = ""
 @export var shift_start: float = 10.0
 @export var shift_hours: float = 8.0
+## Legacy pre-v2 field, only read during save migration.
 @export var daily_wage: float = 60.0
+@export var hourly_wage: float = 0.0
+## StringName -> float 0..1, keys defined per role in StaffTypeDef.attribute_keys.
+@export var attributes: Dictionary = {}
+
+
+func attr(key: StringName) -> float:
+	return clampf(float(attributes.get(key, 0.5)), 0.0, 1.0)
+
+
+func daily_pay() -> float:
+	return hourly_wage * shift_hours
 
 
 func on_shift(hour: float) -> bool:

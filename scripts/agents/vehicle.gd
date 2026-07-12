@@ -34,6 +34,8 @@ var goal_desc: String = "parked"
 var owner_desc: String = ""
 ## Set only for player-owned delivery cars; remains linked while the driver is on foot.
 var delivery_driver: Node = null
+## Cruise-speed factor; delivery cars get it from the driver's driving attribute.
+var speed_multiplier: float = 1.0
 
 var _path: PackedInt32Array = PackedInt32Array()
 var _path_idx: int = 0
@@ -255,6 +257,7 @@ func _advance(scaled_delta: float, check_neighbors: bool, step_frames: int = 1) 
 	var cruise := CITY_SPEED
 	if edge >= 0 and graph.lane_kind[edge] == RoadGraph.KIND_MOTORWAY:
 		cruise = MOTORWAY_SPEED
+	cruise *= speed_multiplier
 	if _curve_for_idx == _path_idx and not _sub_points.is_empty():
 		cruise = minf(cruise, TURN_SPEED)
 	elif _path_idx + 2 < _path.size():

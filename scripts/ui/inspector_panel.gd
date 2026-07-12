@@ -125,11 +125,11 @@ func _update_action(kind: String) -> void:
 		assets.icon_button(_action_btn, &"store", 18)
 		_action_btn.visible = true
 	elif RestaurantManager.is_purchasable(_current_building):
-		var price: float = RestaurantManager.price_for(_current_building)
-		_action_btn.text = "Buy for $%.0f" % price
+		var fee: float = RestaurantManager.signing_fee_for(_current_building)
+		_action_btn.text = "Sign lease for $%.0f" % fee
 		var assets_buy: GDScript = load("res://scripts/ui/ui_assets.gd")
 		assets_buy.icon_button(_action_btn, &"hammer", 18)
-		_action_btn.disabled = not EconomyManager.can_afford(price)
+		_action_btn.disabled = not EconomyManager.can_afford(fee)
 		_action_btn.visible = true
 
 

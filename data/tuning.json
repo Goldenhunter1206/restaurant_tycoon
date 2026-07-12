@@ -5,6 +5,7 @@
 	},
 	"purchase": {
 		"base_price": 14000.0,
+		"signing_fee_fraction": 0.15,
 		"affluence_mult": { "D": 2.2, "C": 1.8, "R": 2.0, "N": 1.0, "P": 0.6, "I": 0.7, "K": 1.0, "G": 1.0, "X": 0.8 },
 		"size_factor": 0.004,
 		"table_area_per_table": 14.0,
@@ -61,7 +62,26 @@
 		"increment": 5000.0
 	},
 	"staff": {
-		"max_shift_hours": 8.0
+		"max_shift_hours": 10.0,
+		"min_shift_hours": 2.0,
+		"effects": {
+			"prep_span": 0.5,
+			"waiter_span": 0.6,
+			"drive_span": 0.3,
+			"walk_span": 0.3,
+			"dwell_span": 0.5,
+			"consistency_rep_scale": 0.02,
+			"charm_rep_scale": 0.015
+		}
+	},
+	"hiring": {
+		"market_min": 3,
+		"market_max": 5,
+		"candidate_lifetime_days": 4,
+		"daily_leave_chance": 0.2,
+		"wage_base_frac": 0.6,
+		"wage_attr_span": 0.8,
+		"wage_noise": 0.06
 	},
 	"objectives": [
 		{ "id": "cash_30k", "text": "Grow the treasury to $30,000", "type": "cash", "target": 30000 },

@@ -20,6 +20,9 @@ static func save_game() -> bool:
 	save.history = EconomyManager.history.duplicate(true)
 	for rest: RestaurantState in RestaurantManager.owned:
 		save.restaurants.append(rest)
+	for cand: JobCandidate in RestaurantManager.job_market:
+		save.job_market.append(cand)
+	save.next_candidate_uid = RestaurantManager._next_candidate_uid
 	for citizen_id: int in DemandManager.econ:
 		save.citizen_wealth[citizen_id] = float(DemandManager.econ[citizen_id]["wealth"])
 	var err: Error = ResourceSaver.save(save, SAVE_PATH)

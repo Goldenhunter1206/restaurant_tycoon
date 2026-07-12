@@ -138,6 +138,28 @@ func profit_today() -> float:
 	return income_today() + expenses_today()
 
 
+## Per-category totals over the last `days` days; today counts as one day.
+func category_totals(days: int) -> Dictionary:
+	var totals: Dictionary = {}
+	for category: StringName in ledger_today:
+		totals[category] = float(totals.get(category, 0.0)) + float(ledger_today[category])
+	var extra: int = maxi(0, days - 1)
+	for i: int in range(history.size() - 1, maxi(-1, history.size() - 1 - extra), -1):
+		var ledger: Dictionary = history[i].get("ledger", {})
+		for category: StringName in ledger:
+			totals[category] = float(totals.get(category, 0.0)) + float(ledger[category])
+	return totals
+
+
+## Daily series of a summary key ("profit", "income", "expenses", "cash"),
+## oldest first, over the last `days` closed days.
+func series(key: String, days: int) -> Array[float]:
+	var result: Array[float] = []
+	for i: int in range(maxi(0, history.size() - days), history.size()):
+		result.append(float(history[i].get(key, 0.0)))
+	return result
+
+
 func _on_day_changed(day: int) -> void:
 	for provider: Callable in daily_cost_providers:
 		if provider.is_valid():

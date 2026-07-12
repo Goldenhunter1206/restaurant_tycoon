@@ -5,7 +5,7 @@ extends RefCounted
 ## facing the avenue. All MultiMesh (via MeshBatch) under a "Signage" group.
 ## Deterministic per block. Uses the assets' baked textures.
 
-const SG := "res://Cartoon City Massive Megapack/gLTF 2/Signs/"
+const SG := "res://Cartoon City Massive Megapack/gLTF/Signs/"
 
 const HOLDERS: Array[String] = [
 	SG + "SignHolder_1_A.glb", SG + "SignHolder_1_B.glb",

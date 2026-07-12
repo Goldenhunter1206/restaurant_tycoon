@@ -14,11 +14,17 @@ extends Resource
 @export var delivery_cap: int = 4
 ## Kitchen stations: hard cap on simultaneously enabled menu dishes.
 @export var menu_slots: int = 4
+## Cash paid at acquisition (signing fee since save v2).
 @export var purchase_price: float = 0.0
+## Full buyout price captured at signing; paying it stops rent permanently.
+@export var property_value: float = 0.0
+@export var owned_outright: bool = false
 @export var menu: Array[MenuEntry] = []
 @export var staff: Array[StaffMember] = []
 @export var star_rating: float = 3.0
 @export var sales_history: Array[float] = []
+## Daily expense totals, parallel to sales_history.
+@export var expense_history: Array[float] = []
 
 # --- Runtime-only (rebuilt each session) ---
 var door_pos: Vector3 = Vector3.ZERO

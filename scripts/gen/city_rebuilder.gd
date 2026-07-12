@@ -13,7 +13,7 @@ extends RefCounted
 const CITY_SCENE: String = "res://scenes/world/City.tscn"
 const GRAPH_PATH: String = "res://data/road_graph.tres"
 const CATALOG_PATH: String = "res://data/building_catalog.json"
-const LIGHT_GLB: String = "res://Cartoon City Massive Megapack/gLTF 2/Signs/Lights_6_A.glb"
+const LIGHT_GLB: String = "res://Cartoon City Massive Megapack/gLTF/Signs/Lights_6_A.glb"
 const CITY_SCRIPT: String = "res://scripts/world/city.gd"
 const DECOR_SCRIPT: String = "res://scripts/gen/decor_placer.gd"
 const PARK_SCRIPT: String = "res://scripts/gen/park_placer.gd"
@@ -23,7 +23,7 @@ const YARD_SCRIPT: String = "res://scripts/gen/suburban_yard_placer.gd"
 const INDUSTRIAL_SCRIPT: String = "res://scripts/gen/industrial_dressing_placer.gd"
 const GRAFFITI_SCRIPT: String = "res://scripts/gen/graffiti_placer.gd"
 const GROUND_ALBEDO: Color = Color(0.45, 0.76, 0.32)
-const GROUND_GRASS_TEX: String = "res://Cartoon City Massive Megapack/gLTF 2/Tiles/GrassTile_D_1_Grass.png"
+const GROUND_GRASS_TEX: String = "res://Cartoon City Massive Megapack/gLTF/Tiles/GrassTile_D_1_Grass.png"
 const GROUND_UV_TILES: float = 120.0   # texture repeats across the 1500 m plane (~12.5 m per tile)
 const VIS_RANGE_END: float = 900.0
 const VIS_RANGE_MARGIN: float = 80.0

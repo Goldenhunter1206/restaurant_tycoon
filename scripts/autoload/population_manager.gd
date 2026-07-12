@@ -33,8 +33,8 @@ const SERVICE_JOBS: Array = [
 	["post", 2, "day"],
 ]
 
-const CHARACTERS_DIR: String = "res://Cartoon City Massive Megapack/gLTF 2/Characters/"
-const ANIMATIONS_GLB: String = "res://Cartoon City Massive Megapack/gLTF 2/Animations/Animations.glb"
+const CHARACTERS_DIR: String = "res://Cartoon City Massive Megapack/gLTF/Characters/"
+const ANIMATIONS_GLB: String = "res://Cartoon City Massive Megapack/gLTF/Animations/Animations.glb"
 
 var citizens_data: Array[Dictionary] = []
 var citizens: Array[Node] = []
