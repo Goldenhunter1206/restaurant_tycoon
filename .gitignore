@@ -1,3 +1,26 @@
-# Godot 4+ specific ignores
+# Godot-generated files
 .godot/
-/android/
+
+# Godot export output
+/build/
+/dist/
+exports/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# IDE/editor settings
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+Cartoon City Massive Megapack/
+RestaurantAssets/
