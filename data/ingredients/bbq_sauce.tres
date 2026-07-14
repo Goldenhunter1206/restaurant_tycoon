@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://d16ycaua1c44v"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_wiqpb"]
+
+[resource]
+script = ExtResource("1_wiqpb")
+id = &"bbq_sauce"
+display_name = "BBQ Sauce"
+category = &"sauce"
+unit_cost = 0.4
+prep_mod = 0.1
+nutrition = 0.2
+spice = 0.3
+oil = 0.3
+novelty = 0.5
+roles = Array[StringName]([&"sauce", &"spread"])
+swatch_color = Color(0.47843137, 0.1882353, 0.0627451, 1)
+affinity = {
+&"families": 0.2,
+&"seniors": -0.1,
+&"students": 0.5,
+&"teens": 0.5,
+&"workers": 0.3
+}

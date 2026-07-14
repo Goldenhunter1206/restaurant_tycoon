@@ -68,8 +68,9 @@ func complete_delivery(order: FoodOrder) -> void:
 	if rest != null:
 		rest.record_sale(order.price)
 		RestaurantManager.record_category_sale(rest, order.dish_id)
+		RestaurantManager.record_recipe_sale(rest, order)
 		rest.active_deliveries = maxi(0, rest.active_deliveries - 1)
-	EconomyManager.transact(&"delivery_sales", order.price)
+		rest.company().transact(&"delivery_sales", order.price)
 	DemandManager.charge_citizen(order.citizen_id, order.price)
 	RestaurantManager.award_service_reputation(order)
 	total_delivered += 1
@@ -176,10 +177,11 @@ func _cancel(order: FoodOrder) -> void:
 		rest.today["cancelled"] = int(rest.today.get("cancelled", 0)) + 1
 	if is_instance_valid(order.driver) and order.driver.has_method("abort_delivery"):
 		order.driver.abort_delivery()
-	EconomyManager.add_reputation(
+	RestaurantManager.add_company_reputation(rest,
 		float(EconomyManager.tuning_value("reputation.per_cancelled", -0.06)))
 	total_cancelled += 1
-	EconomyManager.post_message("alert", "A delivery took too long — the customer cancelled.")
+	if rest == null or rest.company().is_player:
+		EconomyManager.post_message("alert", "A delivery took too long — the customer cancelled.")
 	delivery_state_changed.emit(order)
 	delivery_completed.emit(order, false)
 
@@ -192,6 +194,8 @@ func _release_order(order: FoodOrder) -> void:
 func _spawn_driver_agent(rest: RestaurantState, member: StaffMember, vehicle: StringName = &"scooter") -> Node:
 	if not ResourceLoader.exists(DRIVER_SCENE_PATH):
 		return null
+	if not is_inside_tree() or get_tree().current_scene == null:
+		return null  # Headless harness — no world to walk in.
 	var scene: PackedScene = load(DRIVER_SCENE_PATH)
 	var driver: Node = scene.instantiate()
 	driver.set("home_restaurant", rest)

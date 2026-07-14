@@ -74,6 +74,10 @@ func citizen_econ(citizen_id: int) -> Dictionary:
 	return econ.get(citizen_id, {})
 
 
+func demographic_of(citizen_id: int) -> StringName:
+	return econ.get(citizen_id, {}).get("demographic", &"")
+
+
 func charge_citizen(citizen_id: int, amount: float) -> void:
 	if econ.has(citizen_id):
 		var entry: Dictionary = econ[citizen_id]
@@ -237,7 +241,7 @@ func _pay_wages(_day: int) -> void:
 
 
 func _on_minute(_day: int, _hour: int, _minute: int) -> void:
-	if not _econ_ready or RestaurantManager.owned.is_empty():
+	if not _econ_ready or RestaurantManager.by_building.is_empty():
 		return
 	var now: int = GameClock.total_minutes()
 	if _last_demand_minute < 0:
@@ -328,7 +332,7 @@ func _best_offer(entry: Dictionary, budget: float, origin: Vector3,
 	var hourf: float = GameClock.game_hours
 	var best: Dictionary = {}
 	var best_utility: float = min_utility
-	for rest: RestaurantState in RestaurantManager.owned:
+	for rest: RestaurantState in RestaurantManager.all_restaurants():
 		if not rest.is_open(hourf):
 			continue
 		if dine_in and not rest.dine_in_enabled:
@@ -349,14 +353,22 @@ func _best_offer(entry: Dictionary, budget: float, origin: Vector3,
 		for menu_entry: MenuEntry in rest.enabled_menu():
 			if menu_entry.price > budget:
 				continue
-			var def: DishDef = RestaurantManager.dish(menu_entry.dish_id)
-			if def == null:
-				continue
-			var taste: float = float(tastes.get(def.category, 0.3)) * def.popularity
+			var taste: float
+			if RecipeManager.is_recipe(menu_entry.dish_id):
+				# Custom/starter recipes: per-segment appeal replaces the
+				# category-taste * popularity term.
+				taste = RecipeManager.segment_appeal(menu_entry.dish_id,
+					menu_entry.tier, entry.get("demographic", &"workers"))
+			else:
+				var def: DishDef = RestaurantManager.dish(menu_entry.dish_id)
+				if def == null:
+					continue
+				taste = float(tastes.get(def.category, 0.3)) * def.popularity
 			var utility: float = taste * tw \
 				+ rest.star_rating / 5.0 * rw \
 				- menu_entry.price / budget * pw * 0.5 \
-				- dist / max_dist * dw * 0.5
+				- dist / max_dist * dw * 0.5 \
+				+ MarketingManager.bonus_for(rest, entry.get("demographic", &"workers"), origin)
 			if utility > best_utility:
 				best_utility = utility
 				best = {"rest": rest, "dish_id": menu_entry.dish_id, "utility": utility}

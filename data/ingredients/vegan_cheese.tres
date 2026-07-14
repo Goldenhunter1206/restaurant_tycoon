@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://lgrsc4pgtfk1"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_s3fu5"]
+
+[resource]
+script = ExtResource("1_s3fu5")
+id = &"vegan_cheese"
+display_name = "Vegan Cheese"
+category = &"cheese"
+unit_cost = 0.95
+quality = 0.55
+nutrition = 0.4
+oil = 0.3
+novelty = 0.9
+roles = Array[StringName]([&"cheese"])
+swatch_color = Color(0.93333334, 0.8509804, 0.627451, 1)
+marker_shape = &"square"
+affinity = {
+&"families": 0.2,
+&"seniors": 0.0,
+&"students": 0.6,
+&"teens": 0.2,
+&"workers": 0.3
+}

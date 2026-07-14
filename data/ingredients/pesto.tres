@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://obvyo6yg12ec"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_m515r"]
+
+[resource]
+script = ExtResource("1_m515r")
+id = &"pesto"
+display_name = "Pesto"
+category = &"sauce"
+unit_cost = 0.6
+prep_mod = 0.15
+quality = 0.7
+spice = 0.1
+oil = 0.6
+novelty = 0.7
+products = Array[StringName]([&"pizza"])
+roles = Array[StringName]([&"sauce"])
+swatch_color = Color(0.30588236, 0.56078434, 0.15294118, 1)
+marker_shape = &"ring"
+affinity = {
+&"families": 0.2,
+&"seniors": 0.3,
+&"students": 0.3,
+&"teens": -0.1,
+&"workers": 0.4
+}

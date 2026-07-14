@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CompetitorProfile" format=3 uid="uid://bxr3b5bjssw6g"]
+
+[ext_resource type="Script" uid="uid://c73xvfofpkoyb" path="res://scripts/data/competitor_profile.gd" id="1_4lnvh"]
+
+[resource]
+script = ExtResource("1_4lnvh")
+id = &"swift"
+display_name = "Swift Slice Co."
+brand_color = Color(0.95686275, 0.48235294, 0.0627451, 1)
+tagline = "Strength: strikes while you blink"
+risk_tolerance = 0.6
+expansion_appetite = 0.65
+marketing_style = 0.45
+aggression = 0.6
+forecast_accuracy = 0.65
+reaction_delay_min = 210
+planning_noise = 0.3

@@ -77,6 +77,7 @@ func _ready() -> void:
 	EconomyManager.cash_changed.connect(_on_cash_changed)
 	EconomyManager.reputation_changed.connect(func(_r: float) -> void: _refresh_static())
 	EconomyManager.message_posted.connect(_on_message)
+	EconomyManager.company_message_posted.connect(_on_company_message)
 	EconomyManager.bankrupt.connect(_on_bankrupt)
 	DeliveryManager.active_count_changed.connect(_on_deliveries_changed)
 	_refresh_static.call_deferred()
@@ -385,6 +386,21 @@ func _open_interior(building_id: int) -> void:
 	viewer.setup(building_id)
 
 
+## Full-screen recipe workshop takeover, mirroring _open_interior. recipe may
+## be null (new draft) or an unsaved converted draft from the workshop itself.
+func _open_workshop(building_id: int, recipe: RecipeDef, product_type: StringName) -> void:
+	var parent: Node = get_parent()
+	if parent.get_node_or_null("RecipeWorkshop") != null:
+		return
+	screens.close()
+	var workshop_script: GDScript = load("res://scripts/ui/recipe_workshop.gd")
+	var workshop: Control = workshop_script.new()
+	workshop.name = "RecipeWorkshop"
+	workshop.hud = self
+	parent.add_child(workshop)
+	workshop.setup(building_id, recipe, product_type)
+
+
 func _selected_building() -> int:
 	return restaurant_panel.selected_building_id
 
@@ -434,6 +450,17 @@ func _on_message(kind: String, text: String) -> void:
 	_render_feed()
 
 
+## Rival news: same feed, but the bead takes the company's brand color.
+func _on_company_message(brand: Color, kind: String, text: String) -> void:
+	_feed_entries.append({
+		"kind": kind, "text": text, "dot": "#" + brand.to_html(false),
+		"day": GameClock.day, "time": GameClock.time_string(),
+	})
+	if _feed_entries.size() > MAX_MESSAGES:
+		_feed_entries.pop_front()
+	_render_feed()
+
+
 func _render_feed() -> void:
 	_messages.clear()
 	for entry: Dictionary in _feed_entries:
@@ -449,6 +476,7 @@ func _render_feed() -> void:
 			"alert":
 				color = "#c0392b"
 				dot_color = "#d8452e"
+		dot_color = String(entry.get("dot", dot_color))
 		_messages.append_text("[color=%s]●[/color] [color=%s]Day %d %s: %s[/color]\n" % [
 			dot_color, color, int(entry["day"]), String(entry["time"]), String(entry["text"])])
 

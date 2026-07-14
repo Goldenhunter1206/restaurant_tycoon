@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CompetitorProfile" format=3 uid="uid://de3naab0lq5fj"]
+
+[ext_resource type="Script" uid="uid://c73xvfofpkoyb" path="res://scripts/data/competitor_profile.gd" id="1_6ibc2"]
+
+[resource]
+script = ExtResource("1_6ibc2")
+id = &"slice"
+display_name = "Slice Machine"
+brand_color = Color(0.9607843, 0.77254903, 0.09411765, 1)
+tagline = "Strength: unbeatable prices"
+risk_tolerance = 0.6
+expansion_appetite = 0.6
+price_bias = 0.15
+quality_bias = 0.3
+marketing_style = 0.5
+operational_skill = 0.55
+aggression = 0.7
+target_demographics = Array[StringName]([&"students", &"teens"])
+forecast_accuracy = 0.6
+planning_noise = 0.25

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CompetitorProfile" format=3 uid="uid://blvjd1hrd37aq"]
+
+[ext_resource type="Script" uid="uid://c73xvfofpkoyb" path="res://scripts/data/competitor_profile.gd" id="1_2re64"]
+
+[resource]
+script = ExtResource("1_2re64")
+id = &"bella2"
+display_name = "Bella Express"
+brand_color = Color(0.9490196, 0.40784314, 0.32156864, 1)
+tagline = "Strength: friendly all-rounder"
+difficulty = &"easy"
+operational_skill = 0.5
+aggression = 0.45
+target_demographics = Array[StringName]([&"families"])
+forecast_accuracy = 0.55
+reaction_delay_min = 480
+planning_noise = 0.3

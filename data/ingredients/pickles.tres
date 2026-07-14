@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://bs6lodxvcj2vv"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_rni7f"]
+
+[resource]
+script = ExtResource("1_rni7f")
+id = &"pickles"
+display_name = "Pickles"
+unit_cost = 0.2
+prep_mod = 0.1
+nutrition = 0.3
+spice = 0.2
+oil = 0.1
+novelty = 0.4
+products = Array[StringName]([&"burger"])
+roles = Array[StringName]([&"layer"])
+swatch_color = Color(0.43529412, 0.627451, 0.1882353, 1)
+marker_shape = &"triangle"
+affinity = {
+&"families": 0.2,
+&"seniors": 0.2,
+&"students": 0.4,
+&"teens": 0.4,
+&"workers": 0.3
+}

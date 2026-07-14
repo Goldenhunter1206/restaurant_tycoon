@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://cihyeltx6mock"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_l5amv"]
+
+[resource]
+script = ExtResource("1_l5amv")
+id = &"jalapeno"
+display_name = "Jalapeño"
+unit_cost = 0.3
+prep_mod = 0.1
+nutrition = 0.2
+spice = 0.9
+oil = 0.1
+novelty = 0.6
+roles = Array[StringName]([&"topping", &"layer"])
+swatch_color = Color(0.30588236, 0.56078434, 0.15294118, 1)
+marker_shape = &"triangle"
+affinity = {
+&"families": -0.2,
+&"seniors": -0.3,
+&"students": 0.5,
+&"teens": 0.6,
+&"workers": 0.2
+}

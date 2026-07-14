@@ -1,11 +1,14 @@
 extends Node
-## Owns the dish/staff catalogs and every player restaurant, and advances the
-## per-restaurant kitchen + dining-room simulation each game minute.
+## Owns the dish/staff catalogs and every company's restaurants, and advances
+## the per-restaurant kitchen + dining-room simulation each game minute.
+## Restaurant storage lives per company on CompanyState; by_building indexes
+## every branch regardless of owner.
 ## Catalogs are directory-loaded: drop a .tres into data/dishes or
 ## data/staff_types and it is available without code changes.
 
 signal restaurant_purchased(rest: RestaurantState)
 signal restaurant_updated(building_id: int)
+signal restaurant_closed(building_id: int)
 signal order_state_changed(order: FoodOrder)
 signal order_ready_for_delivery(order: FoodOrder)
 signal job_market_changed
@@ -15,7 +18,12 @@ const STAFF_TYPE_DIR: String = "res://data/staff_types"
 
 var dishes: Dictionary = {}
 var staff_types: Dictionary = {}
-var owned: Array[RestaurantState] = []
+## The player's branches. Legacy alias kept for the many UI call sites; the
+## actual storage is CompanyManager.player.restaurants.
+var owned: Array[RestaurantState]:
+	get:
+		return CompanyManager.player.restaurants
+## building_id -> RestaurantState for EVERY company's branches.
 var by_building: Dictionary = {}
 ## Rolling pool of hireable applicants shared by all restaurants.
 var job_market: Array[JobCandidate] = []
@@ -32,10 +40,13 @@ func initialize() -> void:
 		return
 	_initialized = true
 	_load_catalogs()
+	RecipeManager.book_changed.connect(_sync_recipe_menu_entries)
 	GameClock.minute_ticked.connect(_on_minute)
 	GameClock.day_changed.connect(_on_day_changed)
 	EconomyManager.daily_cost_providers.append(_charge_daily_costs)
-	var save: SaveGame = SaveSystem.load_game()
+	# CompanyManager (initialized just before us) already restored companies
+	# from the save; we rebuild runtime restaurant state from them.
+	var save: SaveGame = CompanyManager.loaded_save
 	if save != null:
 		_restore_from_save(save)
 	else:
@@ -46,6 +57,69 @@ func initialize() -> void:
 
 func dish(dish_id: StringName) -> DishDef:
 	return dishes.get(dish_id)
+
+
+## Every company's branches — the sim and demand loops iterate this.
+func all_restaurants() -> Array[RestaurantState]:
+	var result: Array[RestaurantState] = []
+	for rest: RestaurantState in by_building.values():
+		result.append(rest)
+	return result
+
+
+## Reputation delta for the company that owns `rest`, tuning-clamped.
+func add_company_reputation(rest: RestaurantState, delta: float) -> void:
+	if rest == null:
+		return
+	var lo: float = float(EconomyManager.tuning_value("reputation.min", 1.0))
+	var hi: float = float(EconomyManager.tuning_value("reputation.max", 5.0))
+	rest.company().add_reputation(delta, lo, hi)
+
+
+## Menu ids resolve to either a RecipeDef (custom/starter recipes) or a
+## DishDef (fixed catalog items). One namespace, two backing types.
+func resolve_item(dish_id: StringName) -> Dictionary:
+	if RecipeManager.is_recipe(dish_id):
+		var rec: RecipeDef = RecipeManager.recipe(dish_id)
+		return {
+			"kind": &"recipe",
+			"display_name": rec.display_name,
+			"category": rec.product_type,
+			"prep_minutes": rec.cached_prep,
+			"tiers": RecipeManager.tiers_for(dish_id),
+			"suggested_price": RecipeManager.suggested_price_for(rec),
+		}
+	var def: DishDef = dishes.get(dish_id)
+	if def == null:
+		return {}
+	return {
+		"kind": &"dish",
+		"display_name": def.display_name,
+		"category": def.category,
+		"prep_minutes": def.base_prep_minutes,
+		"tiers": def.tiers,
+		"suggested_price": def.suggested_price,
+	}
+
+
+func category_for(dish_id: StringName) -> StringName:
+	var cat: StringName = RecipeManager.category_for(dish_id)
+	if cat != &"":
+		return cat
+	var def: DishDef = dishes.get(dish_id)
+	return def.category if def != null else &""
+
+
+func quality_for(dish_id: StringName, tier_id: StringName) -> float:
+	if RecipeManager.is_recipe(dish_id):
+		var t: QualityTier = RecipeManager.tier_for(dish_id, tier_id)
+		return t.quality_score if t != null else 0.5
+	var def: DishDef = dishes.get(dish_id)
+	if def != null:
+		var t2: QualityTier = def.tier_by_id(tier_id)
+		if t2 != null:
+			return t2.quality_score
+	return 0.5
 
 
 func staff_type(type_id: StringName) -> StaffTypeDef:
@@ -106,18 +180,15 @@ func signing_fee_for(building_id: int) -> float:
 
 
 func purchase(building_id: int, restaurant_name: String = "") -> bool:
-	if not is_purchasable(building_id):
+	var result: CommandResult = purchase_location(&"player", building_id, restaurant_name)
+	if not result.ok:
+		if result.code == &"insufficient_cash":
+			EconomyManager.post_message("alert", "Not enough cash to sign this lease ($%.0f)." % signing_fee_for(building_id))
 		return false
-	var value: float = price_for(building_id)
-	var fee: float = value * float(EconomyManager.tuning_value("purchase.signing_fee_fraction", 0.15))
-	if not EconomyManager.can_afford(fee):
-		EconomyManager.post_message("alert", "Not enough cash to sign this lease ($%.0f)." % fee)
-		return false
-	EconomyManager.transact(&"signing_fee", -fee)
-	var rest: RestaurantState = _add_restaurant(building_id, restaurant_name, fee, value)
+	var rest: RestaurantState = result.payload
 	var rents: Dictionary = EconomyManager.tuning_value("rent.daily_by_district", {})
 	var rent: float = float(rents.get(rest.district, 120.0))
-	EconomyManager.post_message("good", "Signed the lease on %s for $%.0f — rent is $%.0f/day." % [rest.restaurant_name, fee, rent])
+	EconomyManager.post_message("good", "Signed the lease on %s for $%.0f — rent is $%.0f/day." % [rest.restaurant_name, rest.purchase_price, rent])
 	EconomyManager.post_message("info", "Hire cooks and waiters so %s can serve customers." % rest.restaurant_name)
 	return true
 
@@ -125,19 +196,236 @@ func purchase(building_id: int, restaurant_name: String = "") -> bool:
 ## Pays the full property value; the location stops paying rent permanently.
 func buyout(building_id: int) -> bool:
 	var rest: RestaurantState = by_building.get(building_id)
-	if rest == null or rest.owned_outright:
+	var result: CommandResult = buyout_location(&"player", building_id)
+	if not result.ok:
+		if result.code == &"insufficient_cash" and rest != null:
+			EconomyManager.post_message("alert", "Not enough cash to buy %s outright ($%.0f)." % [rest.restaurant_name, rest.property_value])
 		return false
+	EconomyManager.post_message("good", "%s is now yours — no more rent!" % rest.restaurant_name)
+	return true
+
+
+# --- Company command layer (shared by the UI and the rival AI) --------------
+# Every command validates ownership + funds against the acting company and
+# returns a CommandResult, so AI and UI receive identical validation.
+
+
+func purchase_location(company_id: StringName, building_id: int, restaurant_name: String = "") -> CommandResult:
+	var company: CompanyState = CompanyManager.company(company_id)
+	if company == null:
+		return CommandResult.fail(&"unknown_company", "No company '%s'." % company_id)
+	if not is_purchasable(building_id):
+		return CommandResult.fail(&"not_purchasable", "Building %d is not for sale." % building_id)
+	var value: float = price_for(building_id)
+	var fee: float = value * float(EconomyManager.tuning_value("purchase.signing_fee_fraction", 0.15))
+	if not company.can_afford(fee):
+		return CommandResult.fail(&"insufficient_cash", "Signing fee is $%.0f." % fee)
+	company.transact(&"signing_fee", -fee)
+	return CommandResult.good(_add_restaurant(building_id, restaurant_name, fee, value, company_id))
+
+
+func buyout_location(company_id: StringName, building_id: int) -> CommandResult:
+	var check: CommandResult = _owned_branch(company_id, building_id)
+	if not check.ok:
+		return check
+	var rest: RestaurantState = check.payload
+	var company: CompanyState = CompanyManager.company(company_id)
+	if rest.owned_outright:
+		return CommandResult.fail(&"already_owned", "%s is already owned outright." % rest.restaurant_name)
 	if rest.property_value <= 0.0:
 		rest.property_value = price_for(building_id)
-	var price: float = rest.property_value
-	if not EconomyManager.can_afford(price):
-		EconomyManager.post_message("alert", "Not enough cash to buy %s outright ($%.0f)." % [rest.restaurant_name, price])
-		return false
-	EconomyManager.transact(&"property_purchase", -price)
+	if not company.can_afford(rest.property_value):
+		return CommandResult.fail(&"insufficient_cash", "Buyout costs $%.0f." % rest.property_value)
+	company.transact(&"property_purchase", -rest.property_value)
 	rest.owned_outright = true
-	EconomyManager.post_message("good", "%s is now yours — no more rent!" % rest.restaurant_name)
 	restaurant_updated.emit(building_id)
-	return true
+	return CommandResult.good(rest)
+
+
+## Closes a branch: staff are let go, the building returns to the market. If
+## the property was owned outright, a resale credit is paid out.
+func close_branch(company_id: StringName, building_id: int) -> CommandResult:
+	var check: CommandResult = _owned_branch(company_id, building_id)
+	if not check.ok:
+		return check
+	var rest: RestaurantState = check.payload
+	var company: CompanyState = CompanyManager.company(company_id)
+	for i: int in range(rest.staff.size() - 1, -1, -1):
+		var member: StaffMember = rest.staff[i]
+		var def: StaffTypeDef = staff_types.get(member.type_id)
+		if def != null and def.is_driver:
+			DeliveryManager.on_driver_fired(rest, member)
+		rest.staff.remove_at(i)
+	for seat: Dictionary in rest.dining:
+		_notify_citizen(seat["citizen"], "on_dine_rejected")
+	for waiting: Dictionary in rest.dine_queue:
+		_notify_citizen(waiting["citizen"], "on_dine_rejected")
+	rest.dining.clear()
+	rest.dine_queue.clear()
+	for order: FoodOrder in rest.cook_backlog:
+		order.state = FoodOrder.State.CANCELLED
+		order_state_changed.emit(order)
+	rest.cook_backlog.clear()
+	for job: Dictionary in rest.cooking:
+		var order: FoodOrder = job["order"]
+		order.state = FoodOrder.State.CANCELLED
+		order_state_changed.emit(order)
+	rest.cooking.clear()
+	if rest.owned_outright:
+		var resale: float = rest.property_value * float(EconomyManager.tuning_value("purchase.resale_fraction", 0.7))
+		company.transact(&"property_sale", resale)
+	company.restaurants.erase(rest)
+	by_building.erase(building_id)
+	if is_inside_tree() and get_tree().current_scene != null:
+		var marker: Node = get_tree().current_scene.get_node_or_null("RestaurantMarker_%d" % building_id)
+		if marker != null:
+			marker.queue_free()
+	restaurant_closed.emit(building_id)
+	return CommandResult.good(rest)
+
+
+func hire(company_id: StringName, building_id: int, candidate_uid: int, shift_start: float, shift_hours: float = 8.0) -> CommandResult:
+	var check: CommandResult = _owned_branch(company_id, building_id)
+	if not check.ok:
+		return check
+	var rest: RestaurantState = check.payload
+	for i: int in job_market.size():
+		var cand: JobCandidate = job_market[i]
+		if cand.uid != candidate_uid:
+			continue
+		var def: StaffTypeDef = staff_types.get(cand.type_id)
+		if def == null:
+			return CommandResult.fail(&"unknown_staff_type", "No staff type '%s'." % cand.type_id)
+		job_market.remove_at(i)
+		var member: StaffMember = _make_member(cand.type_id, cand.candidate_name, cand.attributes, cand.hourly_wage, shift_start, shift_hours)
+		rest.staff.append(member)
+		if def.is_driver:
+			DeliveryManager.on_driver_hired(rest, member)
+		restaurant_updated.emit(building_id)
+		job_market_changed.emit()
+		return CommandResult.good(member)
+	return CommandResult.fail(&"candidate_gone", "Candidate %d is no longer available." % candidate_uid)
+
+
+func fire_staff(company_id: StringName, building_id: int, uid: int) -> CommandResult:
+	var check: CommandResult = _owned_branch(company_id, building_id)
+	if not check.ok:
+		return check
+	var rest: RestaurantState = check.payload
+	for i: int in rest.staff.size():
+		var member: StaffMember = rest.staff[i]
+		if member.uid == uid:
+			rest.staff.remove_at(i)
+			var def: StaffTypeDef = staff_types.get(member.type_id)
+			if def != null and def.is_driver:
+				DeliveryManager.on_driver_fired(rest, member)
+			restaurant_updated.emit(building_id)
+			return CommandResult.good(member)
+	return CommandResult.fail(&"unknown_staff", "No staff member %d at this branch." % uid)
+
+
+func set_shift_cmd(company_id: StringName, building_id: int, uid: int, start: float, hours: float) -> CommandResult:
+	var check: CommandResult = _owned_branch(company_id, building_id)
+	if not check.ok:
+		return check
+	var rest: RestaurantState = check.payload
+	var lo: float = float(EconomyManager.tuning_value("staff.min_shift_hours", 2.0))
+	var hi: float = float(EconomyManager.tuning_value("staff.max_shift_hours", 10.0))
+	for member: StaffMember in rest.staff:
+		if member.uid == uid:
+			member.shift_start = wrapf(start, 0.0, 24.0)
+			member.shift_hours = clampf(hours, lo, hi)
+			restaurant_updated.emit(building_id)
+			return CommandResult.good(member)
+	return CommandResult.fail(&"unknown_staff", "No staff member %d at this branch." % uid)
+
+
+func set_menu_entry_cmd(company_id: StringName, building_id: int, dish_id: StringName, price: float, tier: StringName, enabled: bool) -> CommandResult:
+	var check: CommandResult = _owned_branch(company_id, building_id)
+	if not check.ok:
+		return check
+	var rest: RestaurantState = check.payload
+	for entry: MenuEntry in rest.menu:
+		if entry.dish_id == dish_id:
+			if enabled and not entry.enabled and not _has_free_menu_slot(rest):
+				restaurant_updated.emit(building_id)
+				return CommandResult.fail(&"no_slots", "All %d kitchen stations are in use." % rest.menu_slots)
+			entry.price = maxf(0.5, price)
+			entry.tier = tier
+			entry.enabled = enabled
+			restaurant_updated.emit(building_id)
+			return CommandResult.good(entry)
+	if enabled and not _has_free_menu_slot(rest):
+		return CommandResult.fail(&"no_slots", "All %d kitchen stations are in use." % rest.menu_slots)
+	var entry: MenuEntry = MenuEntry.new()
+	entry.dish_id = dish_id
+	entry.price = maxf(0.5, price)
+	entry.tier = tier
+	entry.enabled = enabled
+	rest.menu.append(entry)
+	restaurant_updated.emit(building_id)
+	return CommandResult.good(entry)
+
+
+func set_hours_cmd(company_id: StringName, building_id: int, new_open: float, new_close: float) -> CommandResult:
+	var check: CommandResult = _owned_branch(company_id, building_id)
+	if not check.ok:
+		return check
+	var rest: RestaurantState = check.payload
+	rest.open_hour = wrapf(new_open, 0.0, 24.0)
+	rest.close_hour = wrapf(new_close, 0.0, 24.0)
+	restaurant_updated.emit(building_id)
+	return CommandResult.good(rest)
+
+
+func set_channels_cmd(company_id: StringName, building_id: int, dine_in: bool, delivery: bool) -> CommandResult:
+	var check: CommandResult = _owned_branch(company_id, building_id)
+	if not check.ok:
+		return check
+	var rest: RestaurantState = check.payload
+	rest.dine_in_enabled = dine_in
+	rest.delivery_enabled = delivery
+	restaurant_updated.emit(building_id)
+	return CommandResult.good(rest)
+
+
+func set_delivery_cap_cmd(company_id: StringName, building_id: int, cap: int) -> CommandResult:
+	var check: CommandResult = _owned_branch(company_id, building_id)
+	if not check.ok:
+		return check
+	var rest: RestaurantState = check.payload
+	rest.delivery_cap = clampi(cap, 0, 99)
+	restaurant_updated.emit(building_id)
+	return CommandResult.good(rest)
+
+
+func buy_menu_slot_cmd(company_id: StringName, building_id: int) -> CommandResult:
+	var check: CommandResult = _owned_branch(company_id, building_id)
+	if not check.ok:
+		return check
+	var rest: RestaurantState = check.payload
+	var company: CompanyState = CompanyManager.company(company_id)
+	var max_slots: int = int(EconomyManager.tuning_value("menu.max_slots", 8))
+	if rest.menu_slots >= max_slots:
+		return CommandResult.fail(&"cap_reached", "The kitchen has no room for more stations.")
+	var price: float = menu_slot_price(rest)
+	if not company.can_afford(price):
+		return CommandResult.fail(&"insufficient_cash", "A new station costs $%.0f." % price)
+	company.transact(&"kitchen_stations", -price)
+	rest.menu_slots += 1
+	rest.today["expenses"] = float(rest.today.get("expenses", 0.0)) + price
+	restaurant_updated.emit(building_id)
+	return CommandResult.good(rest)
+
+
+## Resolves a branch and validates that `company_id` owns it.
+func _owned_branch(company_id: StringName, building_id: int) -> CommandResult:
+	var rest: RestaurantState = by_building.get(building_id)
+	if rest == null:
+		return CommandResult.fail(&"not_found", "No restaurant at building %d." % building_id)
+	if rest.company_id != company_id:
+		return CommandResult.fail(&"not_owner", "Building %d belongs to another company." % building_id)
+	return CommandResult.good(rest)
 
 
 # --- Order intake ----------------------------------------------------------
@@ -148,10 +436,8 @@ func make_order(building_id: int, citizen_id: int, dish_id: StringName, is_deliv
 	if rest == null:
 		return null
 	var entry: MenuEntry = rest.menu_entry_for(dish_id)
-	var def: DishDef = dishes.get(dish_id)
-	if entry == null or def == null:
+	if entry == null:
 		return null
-	var tier: QualityTier = def.tier_by_id(entry.tier)
 	var order: FoodOrder = FoodOrder.new()
 	order.order_id = _next_order_id
 	_next_order_id += 1
@@ -160,10 +446,31 @@ func make_order(building_id: int, citizen_id: int, dish_id: StringName, is_deliv
 	order.dish_id = dish_id
 	order.tier = entry.tier
 	order.price = entry.price
-	order.ingredient_cost = tier.ingredient_cost if tier != null else 2.0
-	order.prep_minutes = def.base_prep_minutes
 	order.placed_minute = GameClock.total_minutes()
 	order.is_delivery = is_delivery
+	if RecipeManager.is_recipe(dish_id):
+		# Snapshot the recipe so later edits never mutate this order.
+		var rec: RecipeDef = RecipeManager.recipe(dish_id)
+		var rtier: QualityTier = RecipeManager.tier_for(dish_id, entry.tier)
+		order.recipe_id = rec.id
+		order.recipe_version = rec.version
+		order.product_category = rec.product_type
+		for c: RecipeComponent in rec.components:
+			order.components_snapshot.append({
+				"ingredient_id": c.ingredient_id,
+				"role": c.role,
+				"qty": c.quantity,
+			})
+		order.ingredient_cost = rtier.ingredient_cost if rtier != null else rec.cached_cost
+		order.prep_minutes = rec.cached_prep
+	else:
+		var def: DishDef = dishes.get(dish_id)
+		if def == null:
+			return null
+		var tier: QualityTier = def.tier_by_id(entry.tier)
+		order.product_category = def.category
+		order.ingredient_cost = tier.ingredient_cost if tier != null else 2.0
+		order.prep_minutes = def.base_prep_minutes
 	return order
 
 
@@ -254,33 +561,11 @@ func _roll_attributes(def: StaffTypeDef) -> Dictionary:
 
 
 func set_shift(building_id: int, uid: int, start: float, hours: float) -> void:
-	var rest: RestaurantState = by_building.get(building_id)
-	if rest == null:
-		return
-	var lo: float = float(EconomyManager.tuning_value("staff.min_shift_hours", 2.0))
-	var hi: float = float(EconomyManager.tuning_value("staff.max_shift_hours", 10.0))
-	for member: StaffMember in rest.staff:
-		if member.uid == uid:
-			member.shift_start = wrapf(start, 0.0, 24.0)
-			member.shift_hours = clampf(hours, lo, hi)
-			restaurant_updated.emit(building_id)
-			return
+	set_shift_cmd(&"player", building_id, uid, start, hours)
 
 
 func fire(building_id: int, uid: int) -> bool:
-	var rest: RestaurantState = by_building.get(building_id)
-	if rest == null:
-		return false
-	for i: int in rest.staff.size():
-		var member: StaffMember = rest.staff[i]
-		if member.uid == uid:
-			rest.staff.remove_at(i)
-			var def: StaffTypeDef = staff_types.get(member.type_id)
-			if def != null and def.is_driver:
-				DeliveryManager.on_driver_fired(rest, member)
-			restaurant_updated.emit(building_id)
-			return true
-	return false
+	return fire_staff(&"player", building_id, uid).ok
 
 
 # --- Job market --------------------------------------------------------------
@@ -295,25 +580,7 @@ func candidates_for(type_id: StringName) -> Array[JobCandidate]:
 
 
 func hire_candidate(building_id: int, candidate_uid: int, shift_start: float, shift_hours: float = 8.0) -> StaffMember:
-	var rest: RestaurantState = by_building.get(building_id)
-	if rest == null:
-		return null
-	for i: int in job_market.size():
-		var cand: JobCandidate = job_market[i]
-		if cand.uid != candidate_uid:
-			continue
-		var def: StaffTypeDef = staff_types.get(cand.type_id)
-		if def == null:
-			return null
-		job_market.remove_at(i)
-		var member: StaffMember = _make_member(cand.type_id, cand.candidate_name, cand.attributes, cand.hourly_wage, shift_start, shift_hours)
-		rest.staff.append(member)
-		if def.is_driver:
-			DeliveryManager.on_driver_hired(rest, member)
-		restaurant_updated.emit(building_id)
-		job_market_changed.emit()
-		return member
-	return null
+	return hire(&"player", building_id, candidate_uid, shift_start, shift_hours).payload
 
 
 ## Ages the pool each day: stale/leaving candidates drop out, fresh ones apply.
@@ -368,37 +635,42 @@ func _asking_wage(def: StaffTypeDef, attrs: Dictionary) -> float:
 
 
 func set_menu_entry(building_id: int, dish_id: StringName, price: float, tier: StringName, enabled: bool) -> void:
-	var rest: RestaurantState = by_building.get(building_id)
-	if rest == null:
-		return
-	for entry: MenuEntry in rest.menu:
-		if entry.dish_id == dish_id:
-			if enabled and not entry.enabled and not _can_enable_dish(rest):
-				restaurant_updated.emit(building_id)
-				return
-			entry.price = maxf(0.5, price)
-			entry.tier = tier
-			entry.enabled = enabled
-			restaurant_updated.emit(building_id)
-			return
-	if enabled and not _can_enable_dish(rest):
-		enabled = false
-	var entry: MenuEntry = MenuEntry.new()
-	entry.dish_id = dish_id
-	entry.price = maxf(0.5, price)
-	entry.tier = tier
-	entry.enabled = enabled
-	rest.menu.append(entry)
-	restaurant_updated.emit(building_id)
+	var result: CommandResult = set_menu_entry_cmd(&"player", building_id, dish_id, price, tier, enabled)
+	if result.code == &"no_slots":
+		var rest: RestaurantState = by_building.get(building_id)
+		EconomyManager.post_message("alert",
+			"All %d kitchen stations at %s are in use — buy a station or take a dish off the menu."
+			% [rest.menu_slots, rest.restaurant_name])
+		# Preserve legacy behavior: a brand-new entry is still added, disabled.
+		if rest.menu_entry_for(dish_id) == null:
+			set_menu_entry_cmd(&"player", building_id, dish_id, price, tier, false)
 
 
-func _can_enable_dish(rest: RestaurantState) -> bool:
-	if rest.enabled_dish_count() < rest.menu_slots:
-		return true
-	EconomyManager.post_message("alert",
-		"All %d kitchen stations at %s are in use — buy a station or take a dish off the menu."
-		% [rest.menu_slots, rest.restaurant_name])
-	return false
+## Every live recipe needs a (disabled) menu row in every restaurant so the
+## player can enable freshly saved recipes. Runs on each book change.
+func _sync_recipe_menu_entries() -> void:
+	for rest: RestaurantState in owned:
+		var changed: bool = false
+		for rec: RecipeDef in RecipeManager.live_recipes():
+			var found: bool = false
+			for entry: MenuEntry in rest.menu:
+				if entry.dish_id == rec.id:
+					found = true
+					break
+			if not found:
+				var rentry: MenuEntry = MenuEntry.new()
+				rentry.dish_id = rec.id
+				rentry.tier = &"med"
+				rentry.price = RecipeManager.suggested_price_for(rec)
+				rentry.enabled = false
+				rest.menu.append(rentry)
+				changed = true
+		if changed:
+			restaurant_updated.emit(rest.building_id)
+
+
+func _has_free_menu_slot(rest: RestaurantState) -> bool:
+	return rest.enabled_dish_count() < rest.menu_slots
 
 
 ## Price of the next kitchen station: escalates per station already added.
@@ -413,19 +685,14 @@ func buy_menu_slot(building_id: int) -> bool:
 	var rest: RestaurantState = by_building.get(building_id)
 	if rest == null:
 		return false
-	var max_slots: int = int(EconomyManager.tuning_value("menu.max_slots", 8))
-	if rest.menu_slots >= max_slots:
-		EconomyManager.post_message("info", "The kitchen at %s has no room for more stations." % rest.restaurant_name)
+	var result: CommandResult = buy_menu_slot_cmd(&"player", building_id)
+	if not result.ok:
+		if result.code == &"cap_reached":
+			EconomyManager.post_message("info", "The kitchen at %s has no room for more stations." % rest.restaurant_name)
+		elif result.code == &"insufficient_cash":
+			EconomyManager.post_message("alert", "Not enough cash for a new kitchen station ($%.0f)." % menu_slot_price(rest))
 		return false
-	var price: float = menu_slot_price(rest)
-	if not EconomyManager.can_afford(price):
-		EconomyManager.post_message("alert", "Not enough cash for a new kitchen station ($%.0f)." % price)
-		return false
-	EconomyManager.transact(&"kitchen_stations", -price)
-	rest.menu_slots += 1
-	rest.today["expenses"] = float(rest.today.get("expenses", 0.0)) + price
 	EconomyManager.post_message("good", "%s installed a kitchen station — %d dish slots now." % [rest.restaurant_name, rest.menu_slots])
-	restaurant_updated.emit(building_id)
 	return true
 
 
@@ -445,34 +712,31 @@ func menu_upkeep_for(rest: RestaurantState) -> float:
 	var total: float = 0.0
 	for entry: MenuEntry in rest.menu:
 		if entry.enabled:
-			total += dish_upkeep(dishes.get(entry.dish_id), entry.tier)
+			total += upkeep_for_id(entry.dish_id, entry.tier)
 	return total
 
 
+## Daily upkeep for any menu id — recipe or fixed dish.
+func upkeep_for_id(dish_id: StringName, tier_id: StringName) -> float:
+	if not RecipeManager.is_recipe(dish_id):
+		return dish_upkeep(dishes.get(dish_id), tier_id)
+	var base: float = float(EconomyManager.tuning_value("menu.daily_upkeep_per_dish", 8.0))
+	var factor: float = float(EconomyManager.tuning_value("menu.upkeep_ingredient_factor", 1.5))
+	var tier: QualityTier = RecipeManager.tier_for(dish_id, tier_id)
+	var cost: float = tier.ingredient_cost if tier != null else 2.0
+	return base + cost * factor
+
+
 func set_hours(building_id: int, open_hour: float, close_hour: float) -> void:
-	var rest: RestaurantState = by_building.get(building_id)
-	if rest == null:
-		return
-	rest.open_hour = wrapf(open_hour, 0.0, 24.0)
-	rest.close_hour = wrapf(close_hour, 0.0, 24.0)
-	restaurant_updated.emit(building_id)
+	set_hours_cmd(&"player", building_id, open_hour, close_hour)
 
 
 func set_channels(building_id: int, dine_in: bool, delivery: bool) -> void:
-	var rest: RestaurantState = by_building.get(building_id)
-	if rest == null:
-		return
-	rest.dine_in_enabled = dine_in
-	rest.delivery_enabled = delivery
-	restaurant_updated.emit(building_id)
+	set_channels_cmd(&"player", building_id, dine_in, delivery)
 
 
 func set_delivery_cap(building_id: int, cap: int) -> void:
-	var rest: RestaurantState = by_building.get(building_id)
-	if rest == null:
-		return
-	rest.delivery_cap = clampi(cap, 0, 99)
-	restaurant_updated.emit(building_id)
+	set_delivery_cap_cmd(&"player", building_id, cap)
 
 
 # --- Per-minute simulation ---------------------------------------------------
@@ -487,7 +751,7 @@ func _on_minute(_day: int, hour: int, _minute: int) -> void:
 	if dm <= 0:
 		return
 	_last_tick_minute = now
-	for rest: RestaurantState in owned:
+	for rest: RestaurantState in all_restaurants():
 		_tick_restaurant(rest, now, dm, hour)
 		restaurant_updated.emit(rest.building_id)
 
@@ -519,7 +783,7 @@ func _tick_restaurant(rest: RestaurantState, now: int, dm: int, _hour: int) -> v
 		var slot: Dictionary = cook_slots[rest.cooking.size()]
 		order.state = FoodOrder.State.COOKING
 		order.cook_consistency = float(slot.get("consistency", 0.5))
-		EconomyManager.transact(&"ingredients", -order.ingredient_cost)
+		rest.company().transact(&"ingredients", -order.ingredient_cost)
 		rest.today["expenses"] = float(rest.today.get("expenses", 0.0)) + order.ingredient_cost
 		rest.cooking.append({
 			"order": order,
@@ -589,7 +853,7 @@ func _tick_dining(rest: RestaurantState, now: int) -> void:
 			rest.tables_occupied = maxi(0, rest.tables_occupied - 1)
 			order.state = FoodOrder.State.CANCELLED
 			rest.today["queue_leaves"] = int(rest.today.get("queue_leaves", 0)) + 1
-			EconomyManager.add_reputation(float(EconomyManager.tuning_value("reputation.per_queue_leave", -0.04)))
+			add_company_reputation(rest, float(EconomyManager.tuning_value("reputation.per_queue_leave", -0.04)))
 			_notify_citizen(seat["citizen"], "on_dine_rejected")
 			order_state_changed.emit(order)
 
@@ -608,7 +872,7 @@ func _tick_dine_queue(rest: RestaurantState, now: int) -> void:
 		if now - int(waiting["arrived_minute"]) > leave_after:
 			rest.dine_queue.remove_at(i)
 			rest.today["queue_leaves"] = int(rest.today.get("queue_leaves", 0)) + 1
-			EconomyManager.add_reputation(float(EconomyManager.tuning_value("reputation.per_queue_leave", -0.04)))
+			add_company_reputation(rest, float(EconomyManager.tuning_value("reputation.per_queue_leave", -0.04)))
 			_notify_citizen(citizen, "on_dine_rejected")
 
 
@@ -634,9 +898,10 @@ func _try_seat(rest: RestaurantState, citizen: Node, dish_id: StringName) -> boo
 
 
 func _complete_dine_in(rest: RestaurantState, citizen: Node, order: FoodOrder) -> void:
-	EconomyManager.transact(&"dine_in_sales", order.price)
+	rest.company().transact(&"dine_in_sales", order.price)
 	rest.record_sale(order.price)
 	record_category_sale(rest, order.dish_id)
+	record_recipe_sale(rest, order)
 	DemandManager.charge_citizen(order.citizen_id, order.price)
 	award_service_reputation(order)
 	_award_charm_reputation(rest)
@@ -644,18 +909,17 @@ func _complete_dine_in(rest: RestaurantState, citizen: Node, order: FoodOrder) -
 	_notify_citizen(citizen, "on_meal_done")
 
 
-## Shared reputation payout for a successfully served/delivered order.
+## Shared reputation payout for a successfully served/delivered order,
+## credited to the company that owns the restaurant.
 func award_service_reputation(order: FoodOrder) -> void:
+	var rest: RestaurantState = by_building.get(order.restaurant_id)
+	if rest == null:
+		return
 	var base: float = float(EconomyManager.tuning_value("reputation.per_served", 0.01))
-	var def: DishDef = dishes.get(order.dish_id)
-	var quality: float = 0.5
-	if def != null:
-		var tier: QualityTier = def.tier_by_id(order.tier)
-		if tier != null:
-			quality = tier.quality_score
+	var quality: float = quality_for(order.dish_id, order.tier)
 	var bonus: float = (quality - 0.5) * float(EconomyManager.tuning_value("reputation.quality_bonus_scale", 0.02))
 	bonus += (order.cook_consistency - 0.5) * float(EconomyManager.tuning_value("staff.effects.consistency_rep_scale", 0.02))
-	EconomyManager.add_reputation(base + bonus)
+	add_company_reputation(rest, base + bonus)
 
 
 ## Charming waiters on shift leave a small extra impression on dine-in guests.
@@ -674,17 +938,25 @@ func _award_charm_reputation(rest: RestaurantState) -> void:
 	if count == 0:
 		return
 	var scale: float = float(EconomyManager.tuning_value("staff.effects.charm_rep_scale", 0.015))
-	EconomyManager.add_reputation((total / float(count) - 0.5) * scale)
+	add_company_reputation(rest, (total / float(count) - 0.5) * scale)
 
 
 ## Track which cuisine categories sell (customer-profile UI).
 func record_category_sale(rest: RestaurantState, dish_id: StringName) -> void:
-	var def: DishDef = dishes.get(dish_id)
-	if def == null:
+	var cat: StringName = category_for(dish_id)
+	if cat == &"":
 		return
 	var by_cat: Dictionary = rest.today.get("by_category", {})
-	by_cat[def.category] = int(by_cat.get(def.category, 0)) + 1
+	by_cat[cat] = int(by_cat.get(cat, 0)) + 1
 	rest.today["by_category"] = by_cat
+
+
+## Per-recipe sales stats for the Performance tab (recipe orders only).
+func record_recipe_sale(rest: RestaurantState, order: FoodOrder) -> void:
+	if order.recipe_id == &"":
+		return
+	rest.record_recipe_sale(order.recipe_id, order.recipe_version, order.price,
+		order.ingredient_cost, DemandManager.demographic_of(order.citizen_id))
 
 
 func _cook_slot_descriptors(rest: RestaurantState, hourf: float) -> Array[Dictionary]:
@@ -820,7 +1092,7 @@ func _bottleneck_for(rest: RestaurantState, snapshot: Dictionary) -> Dictionary:
 
 
 func _on_day_changed(day: int) -> void:
-	for rest: RestaurantState in owned:
+	for rest: RestaurantState in all_restaurants():
 		rest.sales_history.append(float(rest.today.get("sales", 0.0)))
 		if rest.sales_history.size() > 14:
 			rest.sales_history.remove_at(0)
@@ -832,24 +1104,25 @@ func _on_day_changed(day: int) -> void:
 	_refresh_job_market(day)
 
 
-## Registered with EconomyManager.daily_cost_providers.
-func _charge_daily_costs(_day: int) -> void:
+## Registered with EconomyManager.daily_cost_providers; CompanyManager calls
+## it once per company on day rollover.
+func _charge_daily_costs(company: CompanyState, _day: int) -> void:
 	var rents: Dictionary = EconomyManager.tuning_value("rent.daily_by_district", {})
-	for rest: RestaurantState in owned:
+	for rest: RestaurantState in company.restaurants:
 		var wages: float = 0.0
 		for member: StaffMember in rest.staff:
 			wages += member.daily_pay()
 		if wages > 0.0:
-			EconomyManager.transact(&"wages", -wages)
+			company.transact(&"wages", -wages)
 		var rent: float = 0.0
 		if not rest.owned_outright:
 			rent = float(rents.get(rest.district, 120.0))
-			EconomyManager.transact(&"rent", -rent)
+			company.transact(&"rent", -rent)
 		# Mise en place: every enabled dish costs daily prep + stocked
 		# ingredients, so an unsold dish is a real loss on the ledger.
 		var upkeep: float = menu_upkeep_for(rest)
 		if upkeep > 0.0:
-			EconomyManager.transact(&"menu_upkeep", -upkeep)
+			company.transact(&"menu_upkeep", -upkeep)
 		rest.today["expenses"] = float(rest.today.get("expenses", 0.0)) + wages + rent + upkeep
 
 
@@ -881,56 +1154,33 @@ func _load_dir(dir_path: String) -> Array[Resource]:
 
 
 func _restore_from_save(save: SaveGame) -> void:
-	GameClock.day = save.day
-	GameClock.game_hours = save.game_hours
-	EconomyManager.cash = save.cash
-	EconomyManager.loan = save.loan
-	EconomyManager.reputation = save.reputation
-	EconomyManager.history = save.history.duplicate()
-	EconomyManager.cash_changed.emit(EconomyManager.cash)
-	for rest: RestaurantState in save.restaurants:
-		var info: Dictionary = CityData.get_building(rest.building_id)
-		if info.is_empty():
-			push_warning("Save references missing building %d; skipping" % rest.building_id)
-			continue
-		rest.door_pos = info.get("door_pos", Vector3.ZERO)
-		rest.curb_pos = info.get("position", Vector3.ZERO)
-		rest.reset_today()
-		_migrate_restaurant(rest, save.save_version)
-		owned.append(rest)
-		by_building[rest.building_id] = rest
-		_spawn_marker(rest)
-		for member: StaffMember in rest.staff:
-			_next_staff_uid = maxi(_next_staff_uid, member.uid + 1)
-			var def: StaffTypeDef = staff_types.get(member.type_id)
-			if def != null and def.is_driver:
-				DeliveryManager.on_driver_hired(rest, member)
-		restaurant_purchased.emit(rest)
+	for company: CompanyState in CompanyManager.companies:
+		for rest: RestaurantState in company.restaurants.duplicate():
+			var info: Dictionary = CityData.get_building(rest.building_id)
+			if info.is_empty():
+				push_warning("Save references missing building %d; skipping" % rest.building_id)
+				company.restaurants.erase(rest)
+				continue
+			rest.door_pos = info.get("door_pos", Vector3.ZERO)
+			rest.curb_pos = info.get("position", Vector3.ZERO)
+			rest.reset_today()
+			by_building[rest.building_id] = rest
+			_spawn_marker(rest)
+			for member: StaffMember in rest.staff:
+				_next_staff_uid = maxi(_next_staff_uid, member.uid + 1)
+				var def: StaffTypeDef = staff_types.get(member.type_id)
+				if def != null and def.is_driver:
+					DeliveryManager.on_driver_hired(rest, member)
+			restaurant_purchased.emit(rest)
 	job_market = save.job_market.duplicate()
 	for cand: JobCandidate in job_market:
 		_next_candidate_uid = maxi(_next_candidate_uid, cand.uid + 1)
 	_next_candidate_uid = maxi(_next_candidate_uid, save.next_candidate_uid)
 	DemandManager.pending_wealth = save.citizen_wealth.duplicate()
+	# The recipe book was loaded before our book_changed hookup — backfill
+	# menu rows for any recipes the save's branches have never seen.
+	_sync_recipe_menu_entries()
 	EconomyManager.post_message("good", "Save loaded — welcome back, boss!")
-
-
-## Fills in fields introduced after the save was written (save_version < 2).
-func _migrate_restaurant(rest: RestaurantState, version: int) -> void:
-	var lo: float = float(EconomyManager.tuning_value("staff.min_shift_hours", 2.0))
-	var hi: float = float(EconomyManager.tuning_value("staff.max_shift_hours", 8.0))
-	for member: StaffMember in rest.staff:
-		if member.hourly_wage <= 0.0:
-			member.hourly_wage = maxf(1.0, member.daily_wage / 8.0)
-		if member.attributes.is_empty():
-			member.attributes = _roll_attributes(staff_types.get(member.type_id))
-		member.shift_hours = clampf(member.shift_hours, lo, hi)
-	if rest.property_value <= 0.0:
-		rest.property_value = price_for(rest.building_id)
-	if version < 2 and rest.purchase_price > 0.0:
-		# Pre-v2 saves paid the full purchase price, so they keep ownership.
-		rest.owned_outright = true
-	while rest.expense_history.size() < rest.sales_history.size():
-		rest.expense_history.append(0.0)
 
 
 func _found_starting_restaurant() -> void:
@@ -960,10 +1210,12 @@ func _found_starting_restaurant() -> void:
 	EconomyManager.post_message("good", "Welcome! %s opened its first restaurant." % EconomyManager.company_name)
 
 
-func _add_restaurant(building_id: int, restaurant_name: String, fee: float, value: float) -> RestaurantState:
+func _add_restaurant(building_id: int, restaurant_name: String, fee: float, value: float, company_id: StringName = &"player") -> RestaurantState:
+	var company: CompanyState = CompanyManager.company(company_id)
 	var info: Dictionary = CityData.get_building(building_id)
 	var rest: RestaurantState = RestaurantState.new()
 	rest.building_id = building_id
+	rest.company_id = company_id
 	rest.district = String(info.get("district", "N"))
 	rest.restaurant_name = restaurant_name if restaurant_name != "" else "Restaurant %d" % building_id
 	rest.purchase_price = fee
@@ -971,10 +1223,22 @@ func _add_restaurant(building_id: int, restaurant_name: String, fee: float, valu
 	rest.door_pos = info.get("door_pos", Vector3.ZERO)
 	rest.curb_pos = info.get("position", Vector3.ZERO)
 	rest.table_count = _table_count_for(info)
-	rest.star_rating = EconomyManager.reputation
+	rest.star_rating = company.reputation
 	rest.menu_slots = int(EconomyManager.tuning_value("menu.base_slots", 4))
 	rest.reset_today()
 	var enabled_count: int = 0
+	# Rivals cook from the shared starter catalog; only the player's branches
+	# see the player's custom recipe book.
+	var recipe_pool: Array[RecipeDef] = RecipeManager.live_recipes() if company.is_player else RecipeManager.rival_recipe_pool()
+	for rec: RecipeDef in recipe_pool:
+		var rentry: MenuEntry = MenuEntry.new()
+		rentry.dish_id = rec.id
+		rentry.tier = &"med"
+		rentry.price = RecipeManager.suggested_price_for(rec)
+		rentry.enabled = RecipeManager.book.base_menu_ids.has(rec.id) and enabled_count < rest.menu_slots
+		if rentry.enabled:
+			enabled_count += 1
+		rest.menu.append(rentry)
 	for dish_id: StringName in dishes:
 		var def: DishDef = dishes[dish_id]
 		var entry: MenuEntry = MenuEntry.new()
@@ -985,7 +1249,7 @@ func _add_restaurant(building_id: int, restaurant_name: String, fee: float, valu
 		if entry.enabled:
 			enabled_count += 1
 		rest.menu.append(entry)
-	owned.append(rest)
+	company.restaurants.append(rest)
 	by_building[building_id] = rest
 	_spawn_marker(rest)
 	restaurant_purchased.emit(rest)
@@ -993,6 +1257,8 @@ func _add_restaurant(building_id: int, restaurant_name: String, fee: float, valu
 
 
 func _spawn_marker(rest: RestaurantState) -> void:
+	if not is_inside_tree():
+		return  # Headless harness — no world to decorate.
 	var scene_root: Node = get_tree().current_scene
 	if scene_root == null:
 		return

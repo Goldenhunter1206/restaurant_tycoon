@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="RecipeDef" format=3 uid="uid://cf4ckftmgwagf"]
+
+[ext_resource type="Script" uid="uid://bftvo3jlodei7" path="res://scripts/data/recipe_component.gd" id="1_kkp6w"]
+[ext_resource type="Script" uid="uid://yw6vb3d70rt6" path="res://scripts/data/recipe_def.gd" id="2_dsf0g"]
+
+[sub_resource type="Resource" id="Resource_lqc4e"]
+script = ExtResource("1_kkp6w")
+ingredient_id = &"tomato_sauce"
+role = &"sauce"
+thickness = 0.2
+coverage = 0.8
+
+[sub_resource type="Resource" id="Resource_lws4a"]
+script = ExtResource("1_kkp6w")
+ingredient_id = &"beef_patty"
+role = &"patty"
+stack_index = 1
+thickness = 1.6
+
+[sub_resource type="Resource" id="Resource_olf8f"]
+script = ExtResource("1_kkp6w")
+ingredient_id = &"tomato"
+role = &"layer"
+stack_index = 2
+thickness = 0.4
+
+[sub_resource type="Resource" id="Resource_cwemg"]
+script = ExtResource("1_kkp6w")
+ingredient_id = &"onion"
+role = &"layer"
+stack_index = 3
+thickness = 0.3
+
+[sub_resource type="Resource" id="Resource_h0c57"]
+script = ExtResource("1_kkp6w")
+ingredient_id = &"lettuce"
+role = &"layer"
+stack_index = 4
+thickness = 0.5
+
+[resource]
+script = ExtResource("2_dsf0g")
+id = &"classic_burger"
+display_name = "Classic Burger"
+product_type = &"burger"
+base_id = &"sesame_bun"
+components = Array[ExtResource("1_kkp6w")]([SubResource("Resource_lqc4e"), SubResource("Resource_lws4a"), SubResource("Resource_olf8f"), SubResource("Resource_cwemg"), SubResource("Resource_h0c57")])
+suggested_price = 8.0
+unlock_source = &"starter"
+is_starter = true

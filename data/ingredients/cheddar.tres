@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://cqax11r2hy3ps"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_c6hyo"]
+
+[resource]
+script = ExtResource("1_c6hyo")
+id = &"cheddar"
+display_name = "Cheddar"
+category = &"cheese"
+unit_cost = 0.65
+quality = 0.55
+spice = 0.1
+oil = 0.5
+novelty = 0.2
+roles = Array[StringName]([&"cheese"])
+swatch_color = Color(1, 0.7882353, 0.24313726, 1)
+marker_shape = &"square"
+affinity = {
+&"families": 0.4,
+&"seniors": 0.3,
+&"students": 0.4,
+&"teens": 0.4,
+&"workers": 0.4
+}

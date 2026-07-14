@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://cxq332srg2pnp"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_rr06i"]
+
+[resource]
+script = ExtResource("1_rr06i")
+id = &"truffle_oil"
+display_name = "Truffle Oil"
+category = &"extra"
+unit_cost = 1.6
+prep_mod = 0.05
+quality = 0.95
+nutrition = 0.2
+oil = 0.9
+novelty = 0.9
+roles = Array[StringName]([&"spread"])
+swatch_color = Color(0.7529412, 0.65882355, 0.3764706, 1)
+marker_shape = &"ring"
+affinity = {
+&"families": 0.2,
+&"seniors": 0.5,
+&"students": 0.2,
+&"teens": -0.2,
+&"workers": 0.5
+}

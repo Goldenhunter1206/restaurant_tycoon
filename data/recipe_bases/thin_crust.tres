@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="RecipeBaseDef" format=3 uid="uid://cv4id6bypyn6f"]
+
+[ext_resource type="Script" uid="uid://bovaaj2hq3iut" path="res://scripts/data/recipe_base_def.gd" id="1_c8to6"]
+
+[resource]
+script = ExtResource("1_c8to6")
+id = &"thin_crust"
+display_name = "Thin Crust"
+base_cost = 0.5
+base_prep_minutes = 10.0
+station_id = &"pizza_oven"
+size_scale = 0.95
+affinity = {
+&"seniors": 0.2,
+&"students": 0.1,
+&"workers": 0.2
+}

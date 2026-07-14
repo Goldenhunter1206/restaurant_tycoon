@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://cc2s5dbofxbe4"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_bxbf1"]
+
+[resource]
+script = ExtResource("1_bxbf1")
+id = &"olives"
+display_name = "Olives"
+unit_cost = 0.45
+prep_mod = 0.15
+quality = 0.6
+nutrition = 0.3
+oil = 0.5
+novelty = 0.5
+products = Array[StringName]([&"pizza"])
+swatch_color = Color(0.22745098, 0.17254902, 0.11764706, 1)
+affinity = {
+&"families": 0.2,
+&"seniors": 0.5,
+&"students": 0.2,
+&"teens": -0.2,
+&"workers": 0.4
+}

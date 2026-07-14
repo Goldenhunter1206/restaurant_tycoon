@@ -1,8 +1,9 @@
 class_name RestaurantMarker
 extends Node3D
-## Floating map-pin above a player-owned restaurant: a pizza sign prop from
+## Floating map-pin above a company-owned restaurant: a pizza sign prop from
 ## the megapack plus a billboard name label, with a gentle bob so owned
-## locations read at a glance from RTS height.
+## locations read at a glance from RTS height. Pin and label outline take
+## the owning company's brand color, so rival coverage reads on the map.
 
 const SIGN_GLB: String = "res://Cartoon City Massive Megapack/gLTF/Food Props/PizzaSign_2_A.glb"
 const BOB_HEIGHT: float = 0.6
@@ -41,6 +42,10 @@ func setup(rest: RestaurantState) -> void:
 		sign.scale = Vector3.ONE * 1.6
 		_bobber.add_child(sign)
 
+	var brand: Color = Color("#EA4A2F")
+	var owner_company: CompanyState = rest.company() as CompanyState
+	if owner_company != null:
+		brand = owner_company.brand_color
 	var assets: GDScript = load("res://scripts/ui/ui_assets.gd")
 	var pin_tex: Texture2D = assets.pin(&"pizza")
 	if pin_tex != null:
@@ -55,6 +60,8 @@ func setup(rest: RestaurantState) -> void:
 		# (fixed_size sprites would render huge into the ortho bake).
 		pin.layers = 1 << 19
 		pin.position.y = 6.0
+		if owner_company != null and not owner_company.is_player:
+			pin.modulate = brand.lerp(Color.WHITE, 0.3)
 		_bobber.add_child(pin)
 
 	var label: Label3D = Label3D.new()
@@ -64,7 +71,7 @@ func setup(rest: RestaurantState) -> void:
 	label.pixel_size = LABEL_PIXEL_SIZE
 	label.modulate = Color("#fff2cf")
 	label.outline_size = 24
-	label.outline_modulate = Color("#8a5a2b")
+	label.outline_modulate = brand.darkened(0.35) if owner_company != null and not owner_company.is_player else Color("#8a5a2b")
 	label.position.y = 3.4
 	label.no_depth_test = true
 	_bobber.add_child(label)

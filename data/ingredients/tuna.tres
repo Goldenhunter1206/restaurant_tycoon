@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://bu3ycxh7tywtl"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_misfq"]
+
+[resource]
+script = ExtResource("1_misfq")
+id = &"tuna"
+display_name = "Tuna"
+category = &"meat"
+unit_cost = 0.95
+prep_mod = 0.25
+quality = 0.6
+nutrition = 0.6
+oil = 0.3
+novelty = 0.6
+products = Array[StringName]([&"pizza"])
+swatch_color = Color(0.7529412, 0.53333336, 0.5647059, 1)
+affinity = {
+&"families": 0.2,
+&"seniors": 0.4,
+&"students": 0.2,
+&"teens": -0.2,
+&"workers": 0.4
+}

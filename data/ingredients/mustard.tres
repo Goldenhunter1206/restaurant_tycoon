@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://bdoklvos02ta0"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_3f3dp"]
+
+[resource]
+script = ExtResource("1_3f3dp")
+id = &"mustard"
+display_name = "Mustard"
+category = &"sauce"
+unit_cost = 0.2
+prep_mod = 0.05
+quality = 0.45
+nutrition = 0.1
+spice = 0.4
+oil = 0.1
+novelty = 0.3
+products = Array[StringName]([&"burger"])
+roles = Array[StringName]([&"spread"])
+swatch_color = Color(0.8784314, 0.65882355, 0.05490196, 1)
+marker_shape = &"triangle"
+affinity = {
+&"families": 0.2,
+&"seniors": 0.3,
+&"students": 0.3,
+&"teens": 0.2,
+&"workers": 0.4
+}

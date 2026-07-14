@@ -1,9 +1,12 @@
 class_name RestaurantState
 extends Resource
-## Full state of one player-owned restaurant. Exported fields are persisted
-## by the save system; the rest is runtime-only and rebuilt on load.
+## Full state of one company-owned restaurant (player or AI rival). Exported
+## fields are persisted by the save system; the rest is runtime-only and
+## rebuilt on load.
 
 @export var building_id: int = -1
+## Owning company (CompanyManager id); every branch belongs to exactly one.
+@export var company_id: StringName = &"player"
 @export var restaurant_name: String = ""
 @export var district: String = "N"
 @export var table_count: int = 8
@@ -20,6 +23,9 @@ extends Resource
 @export var property_value: float = 0.0
 @export var owned_outright: bool = false
 @export var menu: Array[MenuEntry] = []
+## Per-recipe lifetime sales, keyed "recipe_id@version" ->
+## {units: int, revenue: float, cost: float, by_segment: {segment: int}}.
+@export var recipe_sales: Dictionary = {}
 @export var staff: Array[StaffMember] = []
 @export var star_rating: float = 3.0
 @export var sales_history: Array[float] = []
@@ -42,6 +48,13 @@ var dining: Array[Dictionary] = []
 var waiter_credits: float = 0.0
 var today: Dictionary = {}
 var active_deliveries: int = 0
+
+
+## Returns the owning CompanyState. Typed loosely on purpose: a hard
+## RestaurantState <-> CompanyState type cycle breaks cold headless script
+## loads (CompanyState.restaurants already references this class).
+func company() -> Resource:
+	return CompanyManager.company(company_id)
 
 
 func reset_today() -> void:
@@ -100,6 +113,20 @@ func staff_count(type_id: StringName) -> int:
 		if member.type_id == type_id:
 			count += 1
 	return count
+
+
+func record_recipe_sale(recipe_id: StringName, version: int, price: float, cost: float, segment: StringName) -> void:
+	if recipe_id == &"":
+		return
+	var key: String = "%s@%d" % [recipe_id, version]
+	var row: Dictionary = recipe_sales.get(key, {"units": 0, "revenue": 0.0, "cost": 0.0, "by_segment": {}})
+	row["units"] = int(row["units"]) + 1
+	row["revenue"] = float(row["revenue"]) + price
+	row["cost"] = float(row["cost"]) + cost
+	if segment != &"":
+		var seg_counts: Dictionary = row["by_segment"]
+		seg_counts[segment] = int(seg_counts.get(segment, 0)) + 1
+	recipe_sales[key] = row
 
 
 func record_sale(amount: float) -> void:

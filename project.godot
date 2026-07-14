@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="New Game Project"
-run/main_scene="res://scenes/Main.tscn"
+run/main_scene="res://scenes/Frontend.tscn"
 config/features=PackedStringArray("4.7", "Mobile")
 config/icon="res://icon.svg"
 
@@ -27,6 +27,10 @@ EconomyManager="*res://scripts/autoload/economy_manager.gd"
 RestaurantManager="*res://scripts/autoload/restaurant_manager.gd"
 DemandManager="*res://scripts/autoload/demand_manager.gd"
 DeliveryManager="*res://scripts/autoload/delivery_manager.gd"
+RecipeManager="*res://scripts/autoload/recipe_manager.gd"
+GameSetup="*res://scripts/autoload/game_setup.gd"
+CompanyManager="*res://scripts/autoload/company_manager.gd"
+MarketingManager="*res://scripts/autoload/marketing_manager.gd"
 
 [display]
 

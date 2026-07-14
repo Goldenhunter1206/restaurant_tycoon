@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://bm0eynphq5drj"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_qtn6m"]
+
+[resource]
+script = ExtResource("1_qtn6m")
+id = &"mayo"
+display_name = "Mayo"
+category = &"sauce"
+unit_cost = 0.2
+prep_mod = 0.05
+quality = 0.4
+nutrition = 0.1
+oil = 0.7
+products = Array[StringName]([&"burger"])
+roles = Array[StringName]([&"spread"])
+swatch_color = Color(0.9607843, 0.92941177, 0.8117647, 1)
+affinity = {
+&"families": 0.3,
+&"seniors": 0.2,
+&"students": 0.3,
+&"teens": 0.3,
+&"workers": 0.3
+}

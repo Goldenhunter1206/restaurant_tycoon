@@ -20,6 +20,12 @@ var order_id: int = -1
 var restaurant_id: int = -1
 var citizen_id: int = -1
 var dish_id: StringName = &""
+# Recipe snapshot — frozen at order time so editing a recipe never mutates an
+# in-flight order. Empty recipe_id means a fixed DishDef catalog item.
+var recipe_id: StringName = &""
+var recipe_version: int = 0
+var product_category: StringName = &""
+var components_snapshot: Array[Dictionary] = []  # [{ingredient_id, role, qty}]
 var tier: StringName = &"med"
 var price: float = 0.0
 var ingredient_cost: float = 0.0

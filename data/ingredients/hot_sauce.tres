@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://chgi6e2eqv84o"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_h3knj"]
+
+[resource]
+script = ExtResource("1_h3knj")
+id = &"hot_sauce"
+display_name = "Hot Sauce"
+category = &"sauce"
+unit_cost = 0.35
+prep_mod = 0.1
+nutrition = 0.1
+spice = 0.9
+novelty = 0.6
+roles = Array[StringName]([&"sauce", &"spread"])
+swatch_color = Color(0.78039217, 0.2, 0.10980392, 1)
+marker_shape = &"triangle"
+affinity = {
+&"families": -0.2,
+&"seniors": -0.4,
+&"students": 0.5,
+&"teens": 0.6,
+&"workers": 0.2
+}

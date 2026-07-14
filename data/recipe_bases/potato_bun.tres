@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="RecipeBaseDef" format=3 uid="uid://bt3kbfdwi8a7j"]
+
+[ext_resource type="Script" uid="uid://bovaaj2hq3iut" path="res://scripts/data/recipe_base_def.gd" id="1_4gru6"]
+
+[resource]
+script = ExtResource("1_4gru6")
+id = &"potato_bun"
+display_name = "Potato Bun"
+product_type = &"burger"
+assembly_mode = &"stack"
+base_cost = 0.5
+base_prep_minutes = 6.0
+station_id = &"grill"
+affinity = {
+&"families": 0.2,
+&"teens": 0.2
+}

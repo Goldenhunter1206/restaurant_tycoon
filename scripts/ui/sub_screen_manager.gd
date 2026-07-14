@@ -3,16 +3,16 @@ extends Control
 ## Modal overlay hosting one management screen at a time. Screens register
 ## as GDScript classes in SCREENS — adding a screen is one dictionary entry.
 
-const SCREENS: Dictionary = {
-	&"recipes": preload("res://scripts/ui/screens/menu_screen.gd"),
+var SCREENS: Dictionary = {
+	&"recipes": preload("res://scripts/ui/screens/recipes_screen.gd"),
 	&"staff": preload("res://scripts/ui/screens/staff_screen.gd"),
 	&"finances": preload("res://scripts/ui/screens/finances_screen.gd"),
 	&"deliveries": preload("res://scripts/ui/screens/delivery_screen.gd"),
 	&"build": preload("res://scripts/ui/screens/purchase_screen.gd"),
-	&"marketing": preload("res://scripts/ui/screens/stub_screen.gd"),
+	&"marketing": load("res://scripts/ui/screens/marketing_screen.gd"),
 	&"suppliers": preload("res://scripts/ui/screens/stub_screen.gd"),
 	&"reports": preload("res://scripts/ui/screens/stub_screen.gd"),
-	&"rankings": preload("res://scripts/ui/screens/stub_screen.gd"),
+	&"rankings": load("res://scripts/ui/screens/rankings_screen.gd"),
 }
 
 var _active: TycoonScreen
@@ -43,6 +43,8 @@ func open(screen_id: StringName, building_id: int) -> void:
 	add_child(_active)
 	_active.setup(building_id)
 	_active.closed.connect(close)
+	if _active.has_signal("open_workshop_requested"):
+		_active.connect("open_workshop_requested", _on_workshop_requested)
 	_active.set_anchors_preset(Control.PRESET_CENTER)
 	_active.reset_size.call_deferred()
 	_center_active.call_deferred()
@@ -60,6 +62,17 @@ func close() -> void:
 ## Nav-bar "CITY MAP" behaviour: close whatever modal is open.
 func close_active() -> void:
 	close()
+
+
+## Recipe Book -> full-screen workshop: the takeover lives beside the HUD, so
+## route through it (same pattern as the interior viewer).
+func _on_workshop_requested(recipe_id: StringName, product_type: StringName) -> void:
+	var bid: int = _active.building_id if is_instance_valid(_active) else -1
+	close()
+	var hud: Node = get_parent()
+	if hud != null and hud.has_method("_open_workshop"):
+		var recipe: RecipeDef = RecipeManager.recipe(recipe_id) if recipe_id != &"" else null
+		hud._open_workshop(bid, recipe, product_type)
 
 
 func _animate_open() -> void:

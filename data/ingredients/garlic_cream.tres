@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://b7tq00qjw8q8u"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_4vuuq"]
+
+[resource]
+script = ExtResource("1_4vuuq")
+id = &"garlic_cream"
+display_name = "Garlic Cream"
+category = &"sauce"
+unit_cost = 0.45
+prep_mod = 0.1
+quality = 0.55
+nutrition = 0.3
+oil = 0.5
+novelty = 0.4
+roles = Array[StringName]([&"sauce", &"spread"])
+swatch_color = Color(0.9490196, 0.9098039, 0.8156863, 1)
+marker_shape = &"ring"
+affinity = {
+&"families": 0.3,
+&"seniors": 0.3,
+&"students": 0.2,
+&"teens": 0.1,
+&"workers": 0.3
+}

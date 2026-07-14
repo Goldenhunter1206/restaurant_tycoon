@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="RecipeDef" format=3 uid="uid://c7x78piu83fi7"]
+
+[ext_resource type="Script" uid="uid://bftvo3jlodei7" path="res://scripts/data/recipe_component.gd" id="1_nmqlk"]
+[ext_resource type="Script" uid="uid://yw6vb3d70rt6" path="res://scripts/data/recipe_def.gd" id="2_0kp5y"]
+
+[sub_resource type="Resource" id="Resource_qy0k2"]
+script = ExtResource("1_nmqlk")
+ingredient_id = &"tomato_sauce"
+role = &"sauce"
+radius = 0.85
+
+[sub_resource type="Resource" id="Resource_reb3c"]
+script = ExtResource("1_nmqlk")
+ingredient_id = &"mozzarella"
+role = &"cheese"
+quantity = 1.5
+radius = 0.8
+
+[sub_resource type="Resource" id="Resource_k145y"]
+script = ExtResource("1_nmqlk")
+ingredient_id = &"pepperoni"
+quantity = 2.0
+radius = 0.65
+
+[resource]
+script = ExtResource("2_0kp5y")
+id = &"pepperoni"
+display_name = "Pepperoni Pizza"
+base_id = &"classic_crust"
+components = Array[ExtResource("1_nmqlk")]([SubResource("Resource_qy0k2"), SubResource("Resource_reb3c"), SubResource("Resource_k145y")])
+suggested_price = 11.0
+unlock_source = &"starter"
+is_starter = true

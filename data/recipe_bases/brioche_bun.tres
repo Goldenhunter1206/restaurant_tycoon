@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="RecipeBaseDef" format=3 uid="uid://5ef8pbslk6pp"]
+
+[ext_resource type="Script" uid="uid://bovaaj2hq3iut" path="res://scripts/data/recipe_base_def.gd" id="1_yhryj"]
+
+[resource]
+script = ExtResource("1_yhryj")
+id = &"brioche_bun"
+display_name = "Brioche Bun"
+product_type = &"burger"
+assembly_mode = &"stack"
+base_cost = 0.55
+base_prep_minutes = 6.5
+station_id = &"grill"
+affinity = {
+&"seniors": 0.1,
+&"students": 0.2,
+&"workers": 0.2
+}

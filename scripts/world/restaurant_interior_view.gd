@@ -721,16 +721,17 @@ func _spawn_food(file_name: String) -> Node3D:
 func _dish_entry(dish_id: StringName) -> Dictionary:
 	if DISH_MODELS.has(dish_id):
 		return DISH_MODELS[dish_id]
-	var def: DishDef = RestaurantManager.dish(dish_id)
-	if def != null and CATEGORY_FALLBACK.has(def.category):
-		return DISH_MODELS[CATEGORY_FALLBACK[def.category]]
+	# Custom recipes render through their product category's dish models.
+	var cat: StringName = RestaurantManager.category_for(dish_id)
+	if CATEGORY_FALLBACK.has(cat):
+		return DISH_MODELS[CATEGORY_FALLBACK[cat]]
 	return DEFAULT_DISH_MODEL
 
 
 func _dish_name(dish_id: StringName) -> String:
-	var def: DishDef = RestaurantManager.dish(dish_id)
-	if def != null:
-		return def.display_name
+	var item: Dictionary = RestaurantManager.resolve_item(dish_id)
+	if not item.is_empty():
+		return String(item["display_name"])
 	return String(dish_id).replace("_", " ").capitalize()
 
 

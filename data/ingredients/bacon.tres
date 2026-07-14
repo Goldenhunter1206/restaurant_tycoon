@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://cdg6kfsrikiox"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_6g0y0"]
+
+[resource]
+script = ExtResource("1_6g0y0")
+id = &"bacon"
+display_name = "Bacon"
+category = &"meat"
+unit_cost = 0.85
+prep_mod = 0.3
+quality = 0.6
+nutrition = 0.3
+spice = 0.2
+oil = 0.9
+novelty = 0.4
+roles = Array[StringName]([&"topping", &"layer"])
+swatch_color = Color(0.64705884, 0.32156864, 0.18039216, 1)
+marker_shape = &"triangle"
+affinity = {
+&"families": 0.3,
+&"seniors": 0.2,
+&"students": 0.6,
+&"teens": 0.6,
+&"workers": 0.5
+}

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://dsl1xcufmeqh6"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_kxb3i"]
+
+[resource]
+script = ExtResource("1_kxb3i")
+id = &"bell_pepper"
+display_name = "Bell Pepper"
+unit_cost = 0.3
+prep_mod = 0.15
+quality = 0.55
+nutrition = 0.6
+spice = 0.1
+oil = 0.1
+novelty = 0.3
+roles = Array[StringName]([&"topping", &"layer"])
+swatch_color = Color(1, 0.54901963, 0.29411766, 1)
+marker_shape = &"triangle"
+affinity = {
+&"families": 0.4,
+&"seniors": 0.3,
+&"students": 0.3,
+&"teens": 0.2,
+&"workers": 0.4
+}

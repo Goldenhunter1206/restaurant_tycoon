@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CompetitorProfile" format=3 uid="uid://0yxfbpp5is0o"]
+
+[ext_resource type="Script" uid="uid://c73xvfofpkoyb" path="res://scripts/data/competitor_profile.gd" id="1_cc3sy"]
+
+[resource]
+script = ExtResource("1_cc3sy")
+id = &"nonna"
+display_name = "Nonna's Kitchen"
+brand_color = Color(0.30588236, 0.56078434, 0.15294118, 1)
+tagline = "Strength: beloved neighborhood quality"
+difficulty = &"hard"
+risk_tolerance = 0.3
+expansion_appetite = 0.3
+price_bias = 0.75
+quality_bias = 0.9
+marketing_style = 0.3
+operational_skill = 0.8
+aggression = 0.3
+target_demographics = Array[StringName]([&"families", &"seniors"])
+forecast_accuracy = 0.85
+reaction_delay_min = 360
+planning_noise = 0.1

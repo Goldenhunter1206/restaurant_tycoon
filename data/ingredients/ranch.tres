@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://e262a0uulwm5"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_xoq0p"]
+
+[resource]
+script = ExtResource("1_xoq0p")
+id = &"ranch"
+display_name = "Ranch"
+category = &"sauce"
+unit_cost = 0.35
+prep_mod = 0.05
+quality = 0.45
+nutrition = 0.1
+spice = 0.1
+oil = 0.6
+novelty = 0.4
+roles = Array[StringName]([&"sauce", &"spread"])
+swatch_color = Color(0.9411765, 0.91764706, 0.84705883, 1)
+affinity = {
+&"families": 0.2,
+&"seniors": 0.0,
+&"students": 0.5,
+&"teens": 0.5,
+&"workers": 0.2
+}

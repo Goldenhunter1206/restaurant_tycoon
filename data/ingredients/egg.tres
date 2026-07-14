@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://ej6wcshfbnlo"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_5tn41"]
+
+[resource]
+script = ExtResource("1_5tn41")
+id = &"egg"
+display_name = "Fried Egg"
+category = &"meat"
+unit_cost = 0.4
+prep_mod = 0.3
+quality = 0.55
+nutrition = 0.6
+oil = 0.4
+novelty = 0.5
+roles = Array[StringName]([&"topping", &"layer"])
+swatch_color = Color(0.9607843, 0.77254903, 0.09411765, 1)
+marker_shape = &"ring"
+affinity = {
+&"families": 0.3,
+&"seniors": 0.4,
+&"students": 0.4,
+&"teens": 0.2,
+&"workers": 0.4
+}

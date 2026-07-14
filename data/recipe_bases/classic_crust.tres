@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RecipeBaseDef" format=3 uid="uid://dquwmutu0ddq2"]
+
+[ext_resource type="Script" uid="uid://bovaaj2hq3iut" path="res://scripts/data/recipe_base_def.gd" id="1_a6wem"]
+
+[resource]
+script = ExtResource("1_a6wem")
+id = &"classic_crust"
+display_name = "Classic Crust"
+base_prep_minutes = 11.0
+station_id = &"pizza_oven"
+affinity = {
+&"families": 0.3,
+&"teens": 0.1
+}

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://bbjf14wvw8ejo"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_232ov"]
+
+[resource]
+script = ExtResource("1_232ov")
+id = &"sausage"
+display_name = "Sausage"
+category = &"meat"
+unit_cost = 0.9
+prep_mod = 0.35
+quality = 0.55
+nutrition = 0.4
+spice = 0.3
+oil = 0.7
+novelty = 0.3
+roles = Array[StringName]([&"topping", &"layer"])
+swatch_color = Color(0.5411765, 0.2901961, 0.16470589, 1)
+affinity = {
+&"families": 0.4,
+&"seniors": 0.3,
+&"students": 0.4,
+&"teens": 0.4,
+&"workers": 0.4
+}

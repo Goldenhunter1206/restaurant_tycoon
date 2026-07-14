@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="RecipeDef" format=3 uid="uid://bi8na71ron4mi"]
+
+[ext_resource type="Script" uid="uid://bftvo3jlodei7" path="res://scripts/data/recipe_component.gd" id="1_1ws33"]
+[ext_resource type="Script" uid="uid://yw6vb3d70rt6" path="res://scripts/data/recipe_def.gd" id="2_cip4a"]
+
+[sub_resource type="Resource" id="Resource_r31ok"]
+script = ExtResource("1_1ws33")
+ingredient_id = &"tomato_sauce"
+role = &"sauce"
+radius = 0.85
+
+[sub_resource type="Resource" id="Resource_ijqj4"]
+script = ExtResource("1_1ws33")
+ingredient_id = &"mozzarella"
+role = &"cheese"
+quantity = 2.0
+radius = 0.8
+
+[sub_resource type="Resource" id="Resource_r4t1j"]
+script = ExtResource("1_1ws33")
+ingredient_id = &"basil"
+pos = Vector2(0.5, 0.45)
+radius = 0.55
+
+[resource]
+script = ExtResource("2_cip4a")
+id = &"margherita"
+display_name = "Margherita Pizza"
+base_id = &"thin_crust"
+components = Array[ExtResource("1_1ws33")]([SubResource("Resource_r31ok"), SubResource("Resource_ijqj4"), SubResource("Resource_r4t1j")])
+suggested_price = 9.0
+unlock_source = &"starter"
+is_starter = true

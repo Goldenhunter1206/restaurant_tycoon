@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="RecipeBaseDef" format=3 uid="uid://brjm5iteuc0cw"]
+
+[ext_resource type="Script" uid="uid://bovaaj2hq3iut" path="res://scripts/data/recipe_base_def.gd" id="1_0h1ih"]
+
+[resource]
+script = ExtResource("1_0h1ih")
+id = &"deep_dish"
+display_name = "Deep Dish"
+base_cost = 0.9
+base_prep_minutes = 13.0
+station_id = &"pizza_oven"
+size_scale = 1.05
+affinity = {
+&"families": 0.1,
+&"seniors": -0.1,
+&"students": 0.2,
+&"teens": 0.3
+}

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://cx0jqympqhfk3"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_gi0wv"]
+
+[resource]
+script = ExtResource("1_gi0wv")
+id = &"salami"
+display_name = "Salami"
+category = &"meat"
+unit_cost = 0.85
+prep_mod = 0.25
+quality = 0.6
+nutrition = 0.3
+spice = 0.3
+oil = 0.7
+novelty = 0.3
+products = Array[StringName]([&"pizza"])
+swatch_color = Color(0.6039216, 0.1882353, 0.1254902, 1)
+marker_shape = &"square"
+affinity = {
+&"families": 0.3,
+&"seniors": 0.3,
+&"students": 0.4,
+&"teens": 0.3,
+&"workers": 0.4
+}

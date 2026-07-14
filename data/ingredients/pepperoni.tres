@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://bsh375smbprvy"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_lvhwl"]
+
+[resource]
+script = ExtResource("1_lvhwl")
+id = &"pepperoni"
+display_name = "Pepperoni"
+category = &"meat"
+unit_cost = 0.8
+prep_mod = 0.3
+quality = 0.6
+nutrition = 0.3
+spice = 0.4
+oil = 0.7
+novelty = 0.2
+products = Array[StringName]([&"pizza"])
+swatch_color = Color(0.7058824, 0.16078432, 0.101960786, 1)
+affinity = {
+&"families": 0.4,
+&"seniors": 0.2,
+&"students": 0.5,
+&"teens": 0.6,
+&"workers": 0.4
+}

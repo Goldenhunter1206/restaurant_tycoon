@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://dkufqocvbb07k"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_xvwnm"]
+
+[resource]
+script = ExtResource("1_xvwnm")
+id = &"beef_patty"
+display_name = "Beef Patty"
+category = &"meat"
+unit_cost = 1.3
+prep_mod = 0.8
+quality = 0.6
+nutrition = 0.6
+spice = 0.1
+oil = 0.6
+products = Array[StringName]([&"burger"])
+roles = Array[StringName]([&"patty"])
+swatch_color = Color(0.3529412, 0.20392157, 0.09411765, 1)
+marker_shape = &"square"
+affinity = {
+&"families": 0.5,
+&"seniors": 0.3,
+&"students": 0.5,
+&"teens": 0.5,
+&"workers": 0.5
+}

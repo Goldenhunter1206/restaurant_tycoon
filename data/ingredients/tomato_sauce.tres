@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://bfyto6yhbds1a"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_5mpxu"]
+
+[resource]
+script = ExtResource("1_5mpxu")
+id = &"tomato_sauce"
+display_name = "Tomato Sauce"
+category = &"sauce"
+unit_cost = 0.3
+prep_mod = 0.1
+spice = 0.1
+oil = 0.1
+novelty = 0.0
+roles = Array[StringName]([&"sauce"])
+swatch_color = Color(0.7529412, 0.20784314, 0.05882353, 1)
+affinity = {
+&"families": 0.4,
+&"seniors": 0.3,
+&"students": 0.2,
+&"teens": 0.2,
+&"workers": 0.3
+}

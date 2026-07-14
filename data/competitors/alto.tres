@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CompetitorProfile" format=3 uid="uid://dfnd8a0oiafs5"]
+
+[ext_resource type="Script" uid="uid://c73xvfofpkoyb" path="res://scripts/data/competitor_profile.gd" id="1_mo8ku"]
+
+[resource]
+script = ExtResource("1_mo8ku")
+id = &"alto"
+display_name = "Alto Cucina"
+brand_color = Color(0.5411765, 0.32156864, 0.13333334, 1)
+tagline = "Strength: premium dining, top ratings"
+difficulty = &"hard"
+risk_tolerance = 0.4
+expansion_appetite = 0.35
+price_bias = 0.9
+quality_bias = 0.95
+marketing_style = 0.7
+operational_skill = 0.85
+aggression = 0.4
+target_demographics = Array[StringName]([&"workers", &"seniors"])
+forecast_accuracy = 0.8
+reaction_delay_min = 300
+planning_noise = 0.15

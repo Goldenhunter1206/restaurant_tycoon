@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://cu2gt1c3xrkv1"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_pyu2q"]
+
+[resource]
+script = ExtResource("1_pyu2q")
+id = &"pineapple"
+display_name = "Pineapple"
+category = &"extra"
+unit_cost = 0.4
+prep_mod = 0.1
+nutrition = 0.4
+oil = 0.1
+novelty = 0.9
+products = Array[StringName]([&"pizza"])
+swatch_color = Color(0.9607843, 0.77254903, 0.09411765, 1)
+marker_shape = &"triangle"
+affinity = {
+&"families": 0.3,
+&"seniors": 0.1,
+&"students": 0.4,
+&"teens": 0.4,
+&"workers": 0.2
+}

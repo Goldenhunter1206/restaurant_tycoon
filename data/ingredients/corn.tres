@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="IngredientDef" format=3 uid="uid://biixh1yfnmiq5"]
+
+[ext_resource type="Script" uid="uid://bsohtciem66hg" path="res://scripts/data/ingredient_def.gd" id="1_a1joe"]
+
+[resource]
+script = ExtResource("1_a1joe")
+id = &"corn"
+display_name = "Sweetcorn"
+prep_mod = 0.1
+oil = 0.1
+novelty = 0.5
+products = Array[StringName]([&"pizza"])
+swatch_color = Color(0.9607843, 0.77254903, 0.09411765, 1)
+affinity = {
+&"families": 0.4,
+&"seniors": 0.1,
+&"students": 0.4,
+&"teens": 0.4,
+&"workers": 0.2
+}
