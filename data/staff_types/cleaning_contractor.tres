@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="StaffTypeDef" format=3 uid="uid://cu2kix6hafvy"]
+
+[ext_resource type="Script" uid="uid://df0t3s120mewj" path="res://scripts/data/staff_type_def.gd" id="1_08wdg"]
+
+[resource]
+script = ExtResource("1_08wdg")
+id = &"cleaning_contractor"
+display_name = "Cleaning Contractor"
+base_daily_wage = 120.0
+base_hourly_wage = 15.0
+attribute_keys = Array[StringName]([&"cleaning", &"care", &"speed"])
+competency_keys = Array[StringName]([&"cleaning", &"care", &"speed"])
+cleaning_per_hour = 1.25
+operational_tags = [&"cleanliness", &"condition", &"contractor"]
+is_contractor = true

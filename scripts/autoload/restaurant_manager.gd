@@ -662,12 +662,16 @@ func _make_member(type_id: StringName, member_name: String, attrs: Dictionary, w
 	return member
 
 
-func _roll_attributes(def: StaffTypeDef) -> Dictionary:
+func _roll_attributes(def: StaffTypeDef, rng: RandomNumberGenerator = null) -> Dictionary:
 	var attrs: Dictionary = {}
 	if def == null:
 		return attrs
+	var roller: RandomNumberGenerator = rng
+	if roller == null:
+		roller = RandomNumberGenerator.new()
+		roller.randomize()
 	for key: StringName in def.attribute_keys:
-		attrs[key] = clampf(randfn(0.5, 0.2), 0.05, 0.95)
+		attrs[key] = clampf(roller.randfn(0.5, 0.2), 0.05, 0.95)
 	return attrs
 
 
@@ -680,6 +684,10 @@ func fire(building_id: int, uid: int) -> bool:
 
 
 # --- Job market --------------------------------------------------------------
+
+## City labor-market climate, nudged by Phase 4 events. 0 = neutral.
+var labor_market_supply_shift: float = 0.0
+var labor_market_wage_shift: float = 0.0
 
 
 func candidates_for(type_id: StringName) -> Array[JobCandidate]:
@@ -698,38 +706,62 @@ func hire_candidate(building_id: int, candidate_uid: int, shift_start: float, sh
 func _refresh_job_market(day: int) -> void:
 	var lifetime: int = int(EconomyManager.tuning_value("hiring.candidate_lifetime_days", 4))
 	var leave_chance: float = float(EconomyManager.tuning_value("hiring.daily_leave_chance", 0.2))
+	var rng: RandomNumberGenerator = WorkforceRng.make(&"market", day, [])
 	for i: int in range(job_market.size() - 1, -1, -1):
 		var cand: JobCandidate = job_market[i]
-		if day - cand.posted_day >= lifetime or randf() < leave_chance:
+		if day - cand.posted_day >= lifetime or rng.randf() < leave_chance:
 			job_market.remove_at(i)
 	var lo: int = int(EconomyManager.tuning_value("hiring.market_min", 3))
 	var hi: int = int(EconomyManager.tuning_value("hiring.market_max", 5))
+	var supply_bonus: int = _market_supply_bonus()
 	for type_id: StringName in staff_types:
 		var have: int = candidates_for(type_id).size()
-		var target: int = randi_range(lo, hi)
+		var target: int = maxi(1, rng.randi_range(lo, hi) + supply_bonus)
 		while have < target:
-			job_market.append(_generate_candidate(type_id))
+			var cand_rng: RandomNumberGenerator = WorkforceRng.make(&"market", day, [type_id, _next_candidate_uid])
+			job_market.append(_generate_candidate(type_id, cand_rng))
 			have += 1
 	job_market_changed.emit()
 
 
-func _generate_candidate(type_id: StringName) -> JobCandidate:
+func _market_supply_bonus() -> int:
+	var player: CompanyState = CompanyManager.player
+	var reputation: float = player.reputation if player != null else 3.0
+	# A stronger reputation and a healthy wage climate attract more applicants.
+	var bonus: float = clampf((reputation - 3.0) * 0.5, -1.0, 2.0) + labor_market_supply_shift
+	return int(round(bonus))
+
+
+func _generate_candidate(type_id: StringName, rng: RandomNumberGenerator = null) -> JobCandidate:
+	if rng == null:
+		rng = RandomNumberGenerator.new()
+		rng.randomize()
 	var def: StaffTypeDef = staff_types.get(type_id)
 	var cand: JobCandidate = JobCandidate.new()
 	cand.uid = _next_candidate_uid
 	_next_candidate_uid += 1
 	cand.type_id = type_id
-	cand.candidate_name = _random_person_name()
-	cand.attributes = _roll_attributes(def)
-	cand.hourly_wage = _asking_wage(def, cand.attributes)
+	cand.candidate_name = _random_person_name(rng)
+	cand.attributes = _roll_attributes(def, rng)
+	cand.hourly_wage = _asking_wage(def, cand.attributes, rng)
 	cand.posted_day = GameClock.day
 	cand.expires_day = GameClock.day + int(EconomyManager.tuning_value("hiring.candidate_lifetime_days", 4))
 	cand.competencies = cand.attributes.duplicate(true)
 	cand.experience = _average_attributes(cand.attributes) * 120.0
 	cand.manager_eligible = type_id == &"manager"
+	# Imperfect info: the roster shows only noised bands until an interview.
+	cand.interview_state = &"unseen"
+	cand.revealed_competencies = _noised_competencies(cand.competencies, rng)
 	for weekday: int in 7:
 		cand.availability_by_weekday[weekday] = true
 	return cand
+
+
+func _noised_competencies(source: Dictionary, rng: RandomNumberGenerator) -> Dictionary:
+	var noised: Dictionary = {}
+	for key: Variant in source:
+		noised[key] = clampf(float(source[key]) + rng.randf_range(-0.2, 0.2), 0.0, 1.0)
+	return noised
 
 
 func _average_attributes(attributes: Dictionary) -> float:
@@ -742,7 +774,7 @@ func _average_attributes(attributes: Dictionary) -> float:
 
 
 ## Better attributes -> higher asking wage (~0.6x to ~1.4x of the role base).
-func _asking_wage(def: StaffTypeDef, attrs: Dictionary) -> float:
+func _asking_wage(def: StaffTypeDef, attrs: Dictionary, rng: RandomNumberGenerator = null) -> float:
 	var base_frac: float = float(EconomyManager.tuning_value("hiring.wage_base_frac", 0.6))
 	var span: float = float(EconomyManager.tuning_value("hiring.wage_attr_span", 0.8))
 	var noise: float = float(EconomyManager.tuning_value("hiring.wage_noise", 0.06))
@@ -753,7 +785,8 @@ func _asking_wage(def: StaffTypeDef, attrs: Dictionary) -> float:
 			total += float(value)
 		avg = total / float(attrs.size())
 	var base: float = def.base_hourly_wage if def != null else 8.0
-	var wage: float = base * (base_frac + span * avg) * randf_range(1.0 - noise, 1.0 + noise)
+	var noise_mult: float = rng.randf_range(1.0 - noise, 1.0 + noise) if rng != null else randf_range(1.0 - noise, 1.0 + noise)
+	var wage: float = base * (base_frac + span * avg) * noise_mult * (1.0 + labor_market_wage_shift)
 	return snappedf(wage, 0.25)
 
 
@@ -1570,10 +1603,12 @@ func _city_center() -> Vector3:
 	return total / float(maxi(count, 1))
 
 
-func _random_person_name() -> String:
+func _random_person_name(rng: RandomNumberGenerator = null) -> String:
 	var first: Array = PopulationManager.FIRST_NAMES
 	var last: Array = PopulationManager.LAST_NAMES
-	return "%s %s" % [first.pick_random(), last.pick_random()]
+	if rng == null:
+		return "%s %s" % [first.pick_random(), last.pick_random()]
+	return "%s %s" % [first[rng.randi() % first.size()], last[rng.randi() % last.size()]]
 
 
 func _notify_citizen(citizen: Node, method: String) -> void:

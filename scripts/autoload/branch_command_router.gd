@@ -56,6 +56,7 @@ func describe(command_id: StringName) -> Dictionary:
 		&"staff.save_schedule_template": _spec(&"schedules", "Save schedule template", false, 1, &"approval"),
 		&"staff.apply_schedule_template": _spec(&"schedules", "Apply schedule template", false, 2, &"approval"),
 		&"staff.set_contract": _spec(&"staffing", "Change contract policy", false, 12, &"approval"),
+		&"staff.interview": _spec(&"staffing", "Interview candidate", false, 4, &"automatic"),
 		&"restaurant.set_hours": _spec(&"hours", "Change opening hours", true, 6, &"approval"),
 		&"restaurant.set_channels": _spec(&"channels", "Change service channels", true, 3, &"approval"),
 		&"delivery.set_cap": _spec(&"delivery", "Change delivery cap", true, 3, &"automatic"),
@@ -325,6 +326,8 @@ func _dispatch(command_id: StringName, arguments: Dictionary,
 		&"staff.hire":
 			return _staff.hire_candidate_cmd(company_id, building_id,
 				int(arguments.get("candidate_uid", -1)), arguments.get("offer", {}))
+		&"staff.interview":
+			return _staff.interview_candidate_cmd(company_id, int(arguments.get("candidate_uid", -1)))
 		&"staff.fire":
 			return _staff.fire_staff_cmd(company_id, building_id, int(arguments.get("staff_uid", -1)))
 		&"staff.transfer":

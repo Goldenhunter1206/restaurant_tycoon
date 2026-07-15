@@ -2,7 +2,7 @@ class_name JobCandidate
 extends Resource
 ## Shared, time-limited applicant used by player and rival companies.
 
-@export var schema_version: int = 2
+@export var schema_version: int = 3
 @export var uid: int = 0
 @export var type_id: StringName = &""
 @export var candidate_name: String = ""
@@ -25,6 +25,10 @@ extends Resource
 @export var competing_offers: Array[Dictionary] = []
 @export var reserved_by_company_id: StringName = &""
 @export var reservation_expires_day: int = -1
+## Interview / imperfect information (v3).
+@export var interview_state: StringName = &"unseen"
+@export var revealed_competencies: Dictionary = {}
+@export_range(0.0, 1.0, 0.01) var assessment_confidence: float = 0.35
 
 
 func is_available_for(company_id: StringName, day: int) -> bool:
@@ -39,3 +43,14 @@ func competency(key: StringName) -> float:
 
 func has_contract_preference(contract_type: StringName) -> bool:
 	return contract_preferences.is_empty() or contract_preferences.has(contract_type)
+
+
+func is_interviewed() -> bool:
+	return interview_state == &"interviewed"
+
+
+## Competency the player currently sees: a noised estimate until interviewed.
+func shown_competency(key: StringName) -> float:
+	if interview_state == &"interviewed":
+		return competency(key)
+	return clampf(float(revealed_competencies.get(key, competency(key))), 0.0, 1.0)

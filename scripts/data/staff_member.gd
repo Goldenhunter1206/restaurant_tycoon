@@ -2,7 +2,7 @@ class_name StaffMember
 extends Resource
 ## Persistent employee shared by every workforce role.
 
-@export var schema_version: int = 2
+@export var schema_version: int = 3
 @export var uid: int = 0
 @export var type_id: StringName = &""
 @export var staff_name: String = ""
@@ -39,8 +39,22 @@ extends Resource
 @export var manager_relationships: Dictionary = {}
 @export var resignation_risk: float = 0.0
 @export var resignation_warning_day: int = -1
+@export var resignation_committed_day: int = -1
+## Deeper condition, development, and location (v3).
+@export_range(0.0, 1.0, 0.01) var loyalty: float = 0.5
+@export var desired_wage: float = 0.0
+@export var raise_history: Array[Dictionary] = []
+@export var warnings: Array[Dictionary] = []
+@export var performance_history: Array[Dictionary] = []
+@export var injury: Dictionary = {}
+@export var injury_until_day: int = -1
+@export var home_building_id: int = -1
+@export_range(0.0, 1.0, 0.01) var commute_tolerance: float = 0.6
+@export var goals: Array[Dictionary] = []
 @export var employment_status: StringName = &"active"
 @export var last_condition_update_window: int = -1
+## Transient (recomputed on load, never saved): output cut while in training.
+var active_training_penalty: float = 0.0
 
 
 func attr(key: StringName) -> float:
@@ -81,11 +95,20 @@ func condition_score() -> float:
 func operational_effect(competency_id: StringName) -> float:
 	var skill := competency(competency_id)
 	var readiness := condition_score()
-	return clampf(0.75 + skill * 0.2 + readiness * 0.1, 0.70, 1.05)
+	var base := (0.75 + skill * 0.2 + readiness * 0.1) * (1.0 - active_training_penalty)
+	return clampf(base, 0.70, 1.05)
 
 
 func add_experience(amount: float) -> void:
 	experience = maxf(0.0, experience + amount)
+
+
+func tenure_days(current_day: int) -> int:
+	return maxi(0, current_day - contract_start_day)
+
+
+func is_injured(day: int) -> bool:
+	return injury_until_day >= day
 
 
 func relationship_with(manager_uid: int) -> float:

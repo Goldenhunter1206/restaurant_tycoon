@@ -66,6 +66,7 @@ func on_day(day: int) -> void:
 	_plan_liquidity(day)
 	_plan_expansion(day)
 	_plan_procurement(day)
+	_plan_workforce(day)
 	_consider_headquarters(day)
 
 
@@ -88,6 +89,42 @@ func _plan_liquidity(day: int) -> void:
 		if worst != null and _branch_profit(worst, 5) < 0.0:
 			_enqueue(&"close", {"building_id": worst.building_id},
 				"stops the bleeding at %s" % worst.restaurant_name)
+
+
+## Rivals invest in their people too: retain an at-risk employee or develop an
+## under-skilled one. Gated by operational skill so weak rivals neglect staff.
+func _plan_workforce(day: int) -> void:
+	if company.restaurants.is_empty():
+		return
+	if _rng.randf() > profile.operational_skill * 0.5:
+		return
+	var rest: RestaurantState = company.restaurants[_rng.randi_range(0, company.restaurants.size() - 1)]
+	var at_risk: StaffMember = null
+	for member: StaffMember in rest.staff:
+		if member.resignation_committed_day >= 0:
+			continue
+		if at_risk == null or member.resignation_risk > at_risk.resignation_risk:
+			at_risk = member
+	if at_risk != null and at_risk.resignation_risk >= 0.45:
+		_command(&"staff.set_contract", {
+			"building_id": rest.building_id,
+			"staff_uid": at_risk.uid,
+			"contract_type": at_risk.contract_type,
+			"hourly_wage": snappedf(at_risk.hourly_wage * 1.08, 0.05),
+			"overtime_allowed": at_risk.overtime_allowed,
+			"maximum_overtime_hours": at_risk.maximum_overtime_hours,
+		}, "retain:%d:%d" % [at_risk.uid, day])
+		return
+	var staff_mgr: Node = (Engine.get_main_loop() as SceneTree).root.get_node_or_null("/root/StaffManager")
+	if staff_mgr == null:
+		return
+	var hint: Dictionary = staff_mgr.suggest_training(company.id, rest.building_id)
+	if not hint.is_empty():
+		_command(&"staff.train", {
+			"building_id": rest.building_id,
+			"staff_uid": int(hint.get("staff_uid", -1)),
+			"program_id": StringName(hint.get("program_id", &"")),
+		}, "train:%d:%d" % [int(hint.get("staff_uid", -1)), day])
 
 
 func _plan_expansion(day: int) -> void:

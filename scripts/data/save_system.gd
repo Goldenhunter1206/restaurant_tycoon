@@ -52,6 +52,8 @@ static func load_game() -> SaveGame:
 		return null
 	if save.save_version < 7:
 		_migrate_v7(save)
+	if save.save_version < 8:
+		_migrate_v8(save)
 	return save
 
 
@@ -85,3 +87,35 @@ static func _migrate_v7(save: SaveGame) -> void:
 		if candidate.expires_day <= candidate.posted_day:
 			candidate.expires_day = candidate.posted_day + lifetime
 	save.save_version = 7
+
+
+static func _migrate_v8(save: SaveGame) -> void:
+	var renames: Dictionary = {&"quality": &"consistency", &"management": &"judgment", &"reliability": &"driving"}
+	for company: CompanyState in save.companies:
+		for rest: RestaurantState in company.restaurants:
+			for member: StaffMember in rest.staff:
+				member.schema_version = 3
+				_rename_competency_keys(member.competencies, renames)
+				_rename_competency_keys(member.attributes, renames)
+				if member.desired_wage <= 0.0:
+					member.desired_wage = member.hourly_wage
+				var tenure: int = maxi(0, save.day - member.contract_start_day)
+				member.loyalty = clampf(0.4 + float(tenure) / 365.0 * 0.3 + (member.satisfaction - 0.5) * 0.4, 0.0, 1.0)
+				if member.home_building_id < 0:
+					member.home_building_id = member.current_branch_building_id
+	for candidate: JobCandidate in save.job_market:
+		candidate.schema_version = 3
+		_rename_competency_keys(candidate.competencies, renames)
+		_rename_competency_keys(candidate.attributes, renames)
+		candidate.interview_state = &"unseen"
+	save.workforce_schema_version = 2
+	save.save_version = 8
+
+
+static func _rename_competency_keys(dict: Dictionary, renames: Dictionary) -> void:
+	for old_key: StringName in renames:
+		if not dict.has(old_key):
+			continue
+		var new_key: StringName = renames[old_key]
+		dict[new_key] = maxf(float(dict.get(new_key, 0.0)), float(dict[old_key]))
+		dict.erase(old_key)

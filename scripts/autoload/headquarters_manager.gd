@@ -404,8 +404,8 @@ func _capability_hints() -> Dictionary:
 		&"procurement.warehouse_count": "Build Procurement in a Tier 3 headquarters.",
 		&"analytics.report_depth": "Build Analytics in a Tier 2 headquarters.",
 		&"operations.portfolio_alerts": "Build Operations in a Tier 1 headquarters.",
-		&"staff.training_slots": "Staff Training is not installed in this build.",
-		&"management.branch_managers": "Branch Managers are not installed in this build.",
+		&"workforce.training_slots": "Build People Ops to train more staff at once.",
+		&"management.branch_managers": "Build People Ops to delegate more branches to managers.",
 		&"security.guard_capacity": "Security specialization is not installed in this build.",
 		&"crime.crew_capacity": "Underworld specialization is disabled in this scenario.",
 	}
@@ -462,7 +462,8 @@ func _post_migration_notice() -> void:
 func _build_definitions() -> void:
 	_tiers.clear()
 	_departments.clear()
-	_add_tier(0, "Founder", 0, 0.0, 0, 0.0, 0, &"founder", {},
+	_add_tier(0, "Founder", 0, 0.0, 0, 0.0, 0, &"founder",
+		{&"management.branch_managers": 1, &"workforce.training_slots": 1},
 		"hands-on restaurant management")
 	_add_tier(1, "Office", 1, 6000.0, 2 * MINUTES_PER_DAY, 80.0, 1, &"office",
 		{&"headquarters.dashboard": 1}, "company dashboard and one department")
@@ -495,6 +496,14 @@ func _build_definitions() -> void:
 		[90.0, 150.0], [
 			{&"procurement.warehouse_count": 1},
 			{&"procurement.warehouse_count": 2},
+		])
+	_add_department(&"people", "People Ops", "Delegate more branches to managers and train more staff at once.", &"people",
+		[1, 2, 3], [3000.0, 5000.0, 7500.0],
+		[2 * MINUTES_PER_DAY, 3 * MINUTES_PER_DAY, 4 * MINUTES_PER_DAY],
+		[50.0, 90.0, 150.0], [
+			{&"management.branch_managers": 2, &"workforce.training_slots": 1},
+			{&"management.branch_managers": 4, &"workforce.training_slots": 2},
+			{&"management.branch_managers": 8, &"workforce.training_slots": 3},
 		])
 
 

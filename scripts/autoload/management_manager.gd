@@ -51,6 +51,7 @@ func initialize() -> void:
 	RestaurantManager.restaurant_updated.connect(_on_restaurant_updated)
 	_staff.resignation_warning.connect(_on_resignation_warning)
 	_router.command_executed.connect(_on_command_executed)
+	CapabilityRegistry.capabilities_changed.connect(_on_capabilities_changed)
 	reconcile_capacity()
 	_ensure_founder_assistance()
 
@@ -374,6 +375,10 @@ func reconcile_capacity() -> void:
 	assignments_changed.emit()
 
 
+func _on_capabilities_changed(_company_id: StringName) -> void:
+	reconcile_capacity()
+
+
 func write_save(save: SaveGame) -> void:
 	save.set("management_schema_version", 1)
 	save.set("manager_assignments", assignments.duplicate())
@@ -575,6 +580,34 @@ func _candidate_actions(_assignment: ManagerAssignment, policy: BranchPolicy,
 			0.58,
 			["A reported wait has exceeded 18 minutes."],
 			"Pause new service while the branch clears its backlog."))
+	var at_risk: StaffMember = _highest_resignation_risk(rest)
+	if at_risk != null and at_risk.resignation_risk >= 0.4:
+		var raised_wage: float = snappedf(at_risk.hourly_wage * 1.08, 0.05)
+		candidates.append(_candidate_action(
+			&"staff.set_contract",
+			{
+				"building_id": rest.building_id,
+				"staff_uid": at_risk.uid,
+				"contract_type": at_risk.contract_type,
+				"hourly_wage": raised_wage,
+				"overtime_allowed": at_risk.overtime_allowed,
+				"maximum_overtime_hours": at_risk.maximum_overtime_hours,
+			},
+			clampf(at_risk.resignation_risk, 0.0, 0.9),
+			["%s is at risk of resigning (%d%%)." % [at_risk.staff_name, int(round(at_risk.resignation_risk * 100.0))]],
+			"Raise pay to retain a valued employee."))
+	var training_hint: Dictionary = _staff.suggest_training(policy.company_id, rest.building_id)
+	if not training_hint.is_empty():
+		candidates.append(_candidate_action(
+			&"staff.train",
+			{
+				"building_id": rest.building_id,
+				"staff_uid": int(training_hint.get("staff_uid", -1)),
+				"program_id": StringName(training_hint.get("program_id", &"")),
+			},
+			0.32,
+			[String(training_hint.get("evidence", ""))],
+			String(training_hint.get("expected", "Develop an employee's skills."))))
 	if candidates.is_empty() and current_window % 24 == 0:
 		candidates.append(_candidate_action(
 			&"delivery.set_cap",
@@ -618,6 +651,16 @@ func _candidate_action(command_id: StringName, arguments: Dictionary, severity: 
 		"evidence": evidence,
 		"expected": expected,
 	}
+
+
+func _highest_resignation_risk(rest: RestaurantState) -> StaffMember:
+	var worst: StaffMember = null
+	for member: StaffMember in rest.staff:
+		if member.resignation_committed_day >= 0:
+			continue
+		if worst == null or member.resignation_risk > worst.resignation_risk:
+			worst = member
+	return worst
 
 
 func _select_action(alternatives: Array[Dictionary], assignment: ManagerAssignment,
@@ -742,6 +785,8 @@ func _evaluate_due_decisions(current_window: int) -> void:
 		var report: Dictionary = RestaurantManager.operations_snapshot(rest.building_id)
 		var goal_improved := true
 		match decision.selected_command:
+			&"staff.set_contract", &"staff.train":
+				goal_improved = true
 			&"inventory.reorder":
 				goal_improved = SupplyManager.stockout_risks(rest).is_empty()
 			&"staff.hire":
@@ -910,6 +955,8 @@ func _seed_automation_rules() -> void:
 		{"category": &"delivery", "cooldown": 4, "horizon": 8, "severity": 0.35},
 		{"category": &"emergency", "cooldown": 2, "horizon": 4, "severity": 0.50},
 		{"category": &"maintenance", "cooldown": 12, "horizon": 24, "severity": 0.30},
+		{"category": &"training", "cooldown": 24, "horizon": 48, "severity": 0.30},
+		{"category": &"schedules", "cooldown": 6, "horizon": 12, "severity": 0.35},
 	]
 	for row: Dictionary in rows:
 		var rule := AutomationRule.new()

@@ -854,12 +854,8 @@ func _manager_name(uid: int) -> String:
 func _manager_skill(member: StaffMember) -> float:
 	if member == null:
 		return 0.0
-	var judgment := member.competency(&"management")
-	var planning := member.competency(&"planning")
-	if judgment <= 0.0:
-		judgment = member.attr("quality")
-	if planning <= 0.0:
-		planning = member.attr("service")
+	var judgment := member.competency(&"judgment")
+	var planning := member.competency(&"forecasting")
 	return clampf((judgment * 0.55 + planning * 0.25 + member.condition_score() * 0.20), 0.0, 1.0)
 
 

@@ -1,8 +1,8 @@
 class_name SaveGame
 extends Resource
-## Serializable snapshot (v7: management, automation, and workforce).
+## Serializable snapshot (v8: workforce depth, training, labor events).
 
-@export var save_version: int = 7
+@export var save_version: int = 8
 @export var day: int = 1
 @export var game_hours: float = 7.0
 ## Every competing company carries its own finances, restaurants, and workforce.
@@ -26,11 +26,13 @@ extends Resource
 @export var supply_disruptions: Array[SupplyDisruption] = []
 @export var supply_next_id: int = 1
 ## Workforce section.
-@export var workforce_schema_version: int = 1
+@export var workforce_schema_version: int = 2
 @export var schedule_templates: Dictionary = {}
 @export var training_enrollments: Array[TrainingEnrollment] = []
 @export var training_completion_keys: Dictionary = {}
 @export var absence_log: Array[Dictionary] = []
+@export var city_labor_events: Array[Dictionary] = []
+@export var turnover_log: Array[Dictionary] = []
 ## Shared command router section.
 @export var command_router_schema_version: int = 1
 @export var processed_command_ids: Dictionary = {}

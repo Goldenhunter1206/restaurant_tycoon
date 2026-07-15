@@ -248,6 +248,9 @@ func _render_roster(rest: RestaurantState) -> void:
 		"%d on shift  ·  %d absent" % [on_shift, absent]))
 	summary.add_child(_metric_row("Scheduled payroll", "$%.0f/day" % total_pay,
 		"Only scheduled hours are paid."))
+	var analytics: Dictionary = _staff_service().workforce_analytics(CompanyManager.player.id) if _staff_service() != null else {}
+	if not analytics.is_empty():
+		summary.add_child(_metric_row("Morale", "%d%% motivated" % int(round(float(analytics.get("avg_motivation", 0.0)) * 100.0)), "turnover %d (14d)  ·  %d in training" % [int(analytics.get("turnover_14d", 0)), int(analytics.get("training_active", 0))]))
 	if rest.staff.is_empty():
 		_workspace.add_child(_empty_card("Nobody Hired",
 			"Open Job Market to compare candidates shared with rival companies."))
@@ -267,8 +270,8 @@ func _render_roster(rest: RestaurantState) -> void:
 			state = "Resignation warning"
 		card.add_child(_message("%s  ·  %s  ·  $%.2f/h" % [
 			state, String(member.contract_type).capitalize(), member.hourly_wage], INK_SOFT))
-		card.add_child(_condition_bars(member))
-		card.add_child(_message(_competency_summary(member), MUTED))
+		card.add_child(_skill_bar("Skill", _primary_competency_value(member), ROLE_COLORS.get(member.type_id, GOLD)))
+		card.add_child(_message("Energy %d%%  ·  %s  ·  $%.0f/day" % [int(round(member.energy * 100.0)), _shift_text(member), member.daily_pay()], MUTED))
 		var actions := HBoxContainer.new()
 		actions.add_theme_constant_override("separation", 8)
 		var detail := _button("View Detail", false, true)
@@ -289,6 +292,25 @@ func _render_schedule(rest: RestaurantState) -> void:
 	var balance := _button("Build Coverage Schedule", false, true)
 	balance.pressed.connect(_balance_schedule.bind(rest))
 	summary.add_child(balance)
+	var forecast: Dictionary = _staff_service().forecast_coverage(rest.building_id) if _staff_service() != null else {}
+	if not forecast.is_empty():
+		var fcard := _add_card(_workspace, GOLD)
+		fcard.add_child(_label("Coverage Forecast", 16, INK))
+		fcard.add_child(_message("Staffed capacity vs. peak demand by department.", MUTED))
+		var departments: Dictionary = forecast.get("departments", {})
+		for dept: StringName in departments:
+			var data: Dictionary = departments[dept]
+			var demand_arr: Array = data.get("demand", [])
+			var cap_arr: Array = data.get("capacity", [])
+			var peak_demand := 0
+			var cap_at_peak := 0
+			for hour: int in demand_arr.size():
+				if int(demand_arr[hour]) > peak_demand:
+					peak_demand = int(demand_arr[hour])
+					cap_at_peak = int(cap_arr[hour])
+			if peak_demand <= 0:
+				continue
+			fcard.add_child(_metric_row(String(dept).capitalize(), "%d / %d" % [cap_at_peak, peak_demand], "understaffed at peak" if cap_at_peak < peak_demand else "covered"))
 	if rest.staff.is_empty():
 		_workspace.add_child(_empty_card("No Schedule Yet", "Hire people before building shift coverage."))
 		return
@@ -376,9 +398,18 @@ func _render_market(rest: RestaurantState) -> void:
 			card.add_child(_message("%d competing offer%s" % [
 				candidate.competing_offers.size(),
 				"" if candidate.competing_offers.size() == 1 else "s"], ORANGE))
+		var market_actions := HBoxContainer.new()
+		market_actions.add_theme_constant_override("separation", 8)
+		if not candidate.is_interviewed():
+			var interview := _button("Interview  ·  $40")
+			interview.pressed.connect(_interview_candidate.bind(candidate))
+			market_actions.add_child(interview)
+		else:
+			market_actions.add_child(_pill("Interviewed", GREEN))
 		var hire := _button("Make Offer  ·  $%.2f/h" % candidate.hourly_wage, false, true)
 		hire.pressed.connect(_hire_candidate.bind(rest, candidate))
-		card.add_child(hire)
+		market_actions.add_child(hire)
+		card.add_child(market_actions)
 
 
 func _render_employee_detail(rest: RestaurantState) -> void:
@@ -412,6 +443,18 @@ func _render_employee_detail(rest: RestaurantState) -> void:
 	if member.resignation_warning_day >= 0:
 		card.add_child(_message("Resignation warning active. Risk %.0f%%." % [
 			member.resignation_risk * 100.0], RED))
+	var goals_card := _add_card(_workspace)
+	goals_card.add_child(_label("Goals & Pay", 18, INK))
+	goals_card.add_child(_message("Loyalty %d%%  ·  desired $%.2f/h" % [int(round(member.loyalty * 100.0)), member.desired_wage], MUTED))
+	if member.goals.is_empty():
+		goals_card.add_child(_message("No active goals.", MUTED))
+	else:
+		for goal: Dictionary in member.goals:
+			var done: bool = bool(goal.get(&"completed", false))
+			goals_card.add_child(_message(String(goal.get(&"label", "Goal")) + ("  ·  done" if done else ""), GREEN if done else INK_SOFT))
+	var raise_button := _button("Give Raise (+8%)", false, true)
+	raise_button.pressed.connect(_give_raise.bind(rest, member))
+	goals_card.add_child(raise_button)
 	var history := _add_card(_workspace)
 	history.add_child(_label("History", 18, INK))
 	history.add_child(_message("Training completions: %d  ·  employment events: %d" % [
@@ -600,6 +643,22 @@ func _hire_candidate(rest: RestaurantState, candidate: JobCandidate) -> void:
 	}, "hire:%d" % candidate.uid)
 
 
+func _interview_candidate(candidate: JobCandidate) -> void:
+	_execute(&"staff.interview", {"candidate_uid": candidate.uid}, "interview:%d" % candidate.uid)
+
+
+func _give_raise(rest: RestaurantState, member: StaffMember) -> void:
+	var new_wage: float = snappedf(member.hourly_wage * 1.08, 0.05)
+	_execute(&"staff.set_contract", {
+		"building_id": rest.building_id,
+		"staff_uid": member.uid,
+		"contract_type": member.contract_type,
+		"hourly_wage": new_wage,
+		"overtime_allowed": member.overtime_allowed,
+		"maximum_overtime_hours": member.maximum_overtime_hours,
+	}, "raise:%d:%d" % [member.uid, _window()])
+
+
 func _fire_member(member: StaffMember) -> void:
 	_execute(&"staff.fire", {
 		"building_id": building_id,
@@ -776,6 +835,29 @@ func _coverage_summary(rest: RestaurantState) -> String:
 	return "No available coverage" if parts.is_empty() else ", ".join(parts)
 
 
+func _skill_bar(label_text: String, value_0_1: float, _color: Color) -> Control:
+	var box := VBoxContainer.new()
+	var head := HBoxContainer.new()
+	var name_label := _label(label_text, 12, MUTED)
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(name_label)
+	head.add_child(_label("%d%%" % int(round(value_0_1 * 100.0)), 12, INK))
+	box.add_child(head)
+	var bar := ProgressBar.new()
+	bar.custom_minimum_size = Vector2(0, 18)
+	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	bar.min_value = 0.0
+	bar.max_value = 100.0
+	bar.value = clampf(value_0_1, 0.0, 1.0) * 100.0
+	bar.show_percentage = false
+	box.add_child(bar)
+	return box
+
+
+func _primary_competency_value(member: StaffMember) -> float:
+	return member.competency(_primary_competency(member))
+
+
 func _condition_bars(member: StaffMember) -> Control:
 	var grid := GridContainer.new()
 	grid.columns = 2
@@ -828,10 +910,14 @@ func _all_competencies(member: StaffMember) -> String:
 func _candidate_competencies(candidate: JobCandidate) -> String:
 	var parts: Array[String] = []
 	for key: Variant in candidate.competencies:
-		parts.append("%s %.0f%%" % [String(key).capitalize(), float(candidate.competencies[key]) * 100.0])
+		parts.append("%s %.0f%%" % [String(key).capitalize(), candidate.shown_competency(key) * 100.0])
 		if parts.size() >= 3:
 			break
-	return "Skills pending assessment" if parts.is_empty() else ", ".join(parts)
+	if parts.is_empty():
+		return "Skills pending assessment"
+	if candidate.is_interviewed():
+		return ", ".join(parts)
+	return "%s  (estimated — interview to confirm)" % ", ".join(parts)
 
 
 func _availability_summary(member: StaffMember) -> String:
