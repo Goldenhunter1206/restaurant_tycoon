@@ -18,6 +18,9 @@ func _ready() -> void:
 	SupplyManager.initialize.call_deferred()
 	DemandManager.initialize.call_deferred()
 	DeliveryManager.initialize.call_deferred()
+	get_node("/root/StaffManager").call_deferred("initialize")
+	get_node("/root/BranchCommandRouter").call_deferred("initialize")
+	get_node("/root/ManagementManager").call_deferred("initialize")
 	CompanyManager.start_ai.call_deferred()
 
 

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TrainingProgramDef" format=3 uid="uid://bvh8qlyyoou1u"]
+
+[ext_resource type="Script" uid="uid://ch7b557ko4u06" path="res://scripts/data/training_program_def.gd" id="1_2flgt"]
+
+[resource]
+script = ExtResource("1_2flgt")
+id = &"leadership"
+display_name = "Leadership"
+description = "Improves report interpretation and policy decisions."
+role_ids = Array[StringName]([&"manager"])
+competency_id = &"management"
+competency_gain = 0.08
+experience_gain = 18.0
+duration_hours = 32
+cost = 1000.0
+work_penalty = 0.3

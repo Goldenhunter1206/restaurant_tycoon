@@ -32,8 +32,11 @@ GameSetup="*res://scripts/autoload/game_setup.gd"
 CompanyManager="*res://scripts/autoload/company_manager.gd"
 MarketingManager="*res://scripts/autoload/marketing_manager.gd"
 CapabilityRegistry="*res://scripts/autoload/capability_registry.gd"
-HeadquartersManager="*res://scripts/autoload/headquarters_manager.gd"
 SupplyManager="*res://scripts/autoload/supply_manager.gd"
+HeadquartersManager="*res://scripts/autoload/headquarters_manager.gd"
+StaffManager="*res://scripts/autoload/staff_manager.gd"
+BranchCommandRouter="*res://scripts/autoload/branch_command_router.gd"
+ManagementManager="*res://scripts/autoload/management_manager.gd"
 
 [display]
 

@@ -25,6 +25,7 @@ var _slots_label: Label
 var _buy_button: Button
 var _menu_list: VBoxContainer
 var _performance_box: VBoxContainer
+var _command_serial: int = 0
 
 
 class CardArt:
@@ -563,10 +564,27 @@ func _apply_menu_row(dish_id: StringName) -> void:
 	var row: Dictionary = _menu_rows[dish_id]
 	var tier_select: OptionButton = row["tier"]
 	var tier: StringName = tier_select.get_item_metadata(tier_select.selected)
-	RestaurantManager.set_menu_entry(
-		building_id, dish_id,
-		(row["price"] as SpinBox).value, tier,
-		(row["enabled"] as CheckBox).button_pressed)
+	var router := get_node_or_null("/root/BranchCommandRouter")
+	if router == null or CompanyManager.player == null:
+		EconomyManager.post_message("alert", "The branch command router is unavailable.")
+		return
+	_command_serial += 1
+	var result := router.call("execute", &"menu.set_entry", {
+		"building_id": building_id,
+		"dish_id": dish_id,
+		"price": (row["price"] as SpinBox).value,
+		"tier": tier,
+		"enabled": (row["enabled"] as CheckBox).button_pressed,
+	}, {
+		"kind": &"player",
+		"id": "recipes_workspace",
+		"company_id": CompanyManager.player.id,
+	}, "ui:menu:%d:%s:%d:%d" % [building_id, dish_id,
+		GameClock.total_minutes(), _command_serial]) as CommandResult
+	if result == null or not result.ok:
+		EconomyManager.post_message("alert",
+			result.message if result != null else "The menu command was unavailable.")
+		return
 	_update_margin(dish_id)
 
 

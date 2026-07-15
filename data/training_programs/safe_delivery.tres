@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TrainingProgramDef" format=3 uid="uid://c7gv3n8cqrjie"]
+
+[ext_resource type="Script" uid="uid://ch7b557ko4u06" path="res://scripts/data/training_program_def.gd" id="1_b6j5s"]
+
+[resource]
+script = ExtResource("1_b6j5s")
+id = &"safe_delivery"
+display_name = "Safe Delivery"
+description = "Improves reliable handoffs and delivery timing."
+role_ids = Array[StringName]([&"driver"])
+competency_id = &"reliability"
+competency_gain = 0.08
+experience_gain = 12.0
+duration_hours = 18
+cost = 600.0
+work_penalty = 0.2

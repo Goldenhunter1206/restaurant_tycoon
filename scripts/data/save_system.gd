@@ -1,9 +1,6 @@
 class_name SaveSystem
 extends RefCounted
-## Static save/load for the tycoon layer. Companies (with their restaurants)
-## + job market + citizen wealth; the city itself is deterministic and never
-## saved. Pre-v4 single-company saves are NOT migrated: load_game() treats
-## them as absent, and the Load screen offers deletion.
+## Static v7 save/load for companies, supply, workforce, and management.
 
 const SAVE_PATH: String = "user://savegame.tres"
 
@@ -12,7 +9,7 @@ static func has_save() -> bool:
 	return ResourceLoader.exists(SAVE_PATH)
 
 
-## &"none" (no file), &"ok" (loadable v4), or &"incompatible" (pre-v4/corrupt).
+## &"none", &"ok", or &"incompatible".
 static func save_state() -> StringName:
 	if not has_save():
 		return &"none"
@@ -20,7 +17,7 @@ static func save_state() -> StringName:
 
 
 static func save_game() -> bool:
-	var save: SaveGame = SaveGame.new()
+	var save := SaveGame.new()
 	save.day = GameClock.day
 	save.game_hours = GameClock.game_hours
 	CompanyManager.player.recipe_book = RecipeManager.export_book()
@@ -29,32 +26,62 @@ static func save_game() -> bool:
 	MarketingManager.write_save(save)
 	SupplyManager.write_save(save)
 	CapabilityRegistry.write_save(save)
-	for cand: JobCandidate in RestaurantManager.job_market:
-		save.job_market.append(cand)
+	_write_service_save("/root/StaffManager", save)
+	_write_service_save("/root/BranchCommandRouter", save)
+	_write_service_save("/root/ManagementManager", save)
+	for candidate: JobCandidate in RestaurantManager.job_market:
+		save.job_market.append(candidate)
 	save.next_candidate_uid = RestaurantManager._next_candidate_uid
 	for citizen_id: int in DemandManager.econ:
 		save.citizen_wealth[citizen_id] = float(DemandManager.econ[citizen_id]["wealth"])
 	save.world_seed = GameSetup.world_seed
 	save.difficulty = GameSetup.difficulty
-	var err: Error = ResourceSaver.save(save, SAVE_PATH)
-	if err == OK:
+	var error := ResourceSaver.save(save, SAVE_PATH)
+	if error == OK:
 		EconomyManager.post_message("good", "Game saved.")
 	else:
-		EconomyManager.post_message("alert", "Save failed (error %d)." % err)
-	return err == OK
+		EconomyManager.post_message("alert", "Save failed (error %d)." % error)
+	return error == OK
 
 
 static func load_game() -> SaveGame:
 	if not has_save():
 		return null
-	var save: SaveGame = load(SAVE_PATH) as SaveGame
+	var save := load(SAVE_PATH) as SaveGame
 	if save == null or save.companies.is_empty():
-		# Pre-v4 (single-company) or corrupt — treated as absent; the file
-		# stays on disk so the player can delete it from the Load screen.
 		return null
+	if save.save_version < 7:
+		_migrate_v7(save)
 	return save
 
 
 static func delete_save() -> void:
 	if has_save():
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
+
+
+static func _write_service_save(node_path: String, save: SaveGame) -> void:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return
+	var service := tree.root.get_node_or_null(node_path)
+	if service != null and service.has_method("write_save"):
+		service.call("write_save", save)
+
+
+static func _migrate_v7(save: SaveGame) -> void:
+	for company: CompanyState in save.companies:
+		for rest: RestaurantState in company.restaurants:
+			for member: StaffMember in rest.staff:
+				member.schema_version = 2
+				member.current_branch_building_id = rest.building_id
+				if member.competencies.is_empty():
+					member.competencies = member.attributes.duplicate(true)
+	var lifetime := 4
+	for candidate: JobCandidate in save.job_market:
+		candidate.schema_version = 2
+		if candidate.competencies.is_empty():
+			candidate.competencies = candidate.attributes.duplicate(true)
+		if candidate.expires_day <= candidate.posted_day:
+			candidate.expires_day = candidate.posted_day + lifetime
+	save.save_version = 7

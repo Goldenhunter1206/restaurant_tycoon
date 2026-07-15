@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="BranchPolicy" format=3 uid="uid://dslexwvrfv33q"]
+
+[ext_resource type="Script" uid="uid://bf0p6m0njf15v" path="res://scripts/data/branch_policy.gd" id="1_8qcgf"]
+
+[resource]
+script = ExtResource("1_8qcgf")
+uid = "preset:custom"
+authority_by_category = {
+&"delivery": &"recommend",
+&"emergency": &"recommend",
+&"hours": &"recommend",
+&"inventory": &"recommend",
+&"layout": &"recommend",
+&"maintenance": &"recommend",
+&"marketing": &"recommend",
+&"menu": &"recommend",
+&"schedules": &"recommend",
+&"staffing": &"recommend",
+&"training": &"recommend"
+}
+daily_budget_by_category = {
+&"delivery": 1200.0,
+&"emergency": 1200.0,
+&"hours": 1200.0,
+&"inventory": 1200.0,
+&"layout": 1200.0,
+&"maintenance": 1200.0,
+&"marketing": 1200.0,
+&"menu": 1200.0,
+&"schedules": 1200.0,
+&"staffing": 1200.0,
+&"training": 1200.0
+}
+cash_reserve = 3000.0
+minimum_price = 0.0
+approved_layout_templates = Array[StringName]([&"classic_trattoria", &"cozy_lounge", &"fast_flow_diner"])

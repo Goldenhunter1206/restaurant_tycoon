@@ -303,6 +303,13 @@ func hire(company_id: StringName, building_id: int, candidate_uid: int, shift_st
 			return CommandResult.fail(&"unknown_staff_type", "No staff type '%s'." % cand.type_id)
 		job_market.remove_at(i)
 		var member: StaffMember = _make_member(cand.type_id, cand.candidate_name, cand.attributes, cand.hourly_wage, shift_start, shift_hours)
+		member.experience = cand.experience
+		member.competencies = cand.competencies.duplicate(true)
+		if member.competencies.is_empty():
+			member.competencies = cand.attributes.duplicate(true)
+		member.traits = cand.traits.duplicate()
+		member.availability_by_weekday = cand.availability_by_weekday.duplicate(true)
+		member.current_branch_building_id = building_id
 		rest.staff.append(member)
 		if def.is_driver:
 			DeliveryManager.on_driver_hired(rest, member)
@@ -631,6 +638,7 @@ func _hire_generated(rest: RestaurantState, type_id: StringName, shift_start: fl
 	if rest == null or def == null:
 		return null
 	var member: StaffMember = _make_member(type_id, _random_person_name(), _roll_attributes(def), def.base_hourly_wage, shift_start, shift_hours)
+	member.current_branch_building_id = rest.building_id
 	rest.staff.append(member)
 	if def.is_driver:
 		DeliveryManager.on_driver_hired(rest, member)
@@ -647,6 +655,7 @@ func _make_member(type_id: StringName, member_name: String, attrs: Dictionary, w
 	member.type_id = type_id
 	member.staff_name = member_name
 	member.attributes = attrs.duplicate()
+	member.competencies = attrs.duplicate(true)
 	member.hourly_wage = wage
 	member.shift_start = wrapf(shift_start, 0.0, 24.0)
 	member.shift_hours = clampf(shift_hours, lo, hi)
@@ -714,7 +723,22 @@ func _generate_candidate(type_id: StringName) -> JobCandidate:
 	cand.attributes = _roll_attributes(def)
 	cand.hourly_wage = _asking_wage(def, cand.attributes)
 	cand.posted_day = GameClock.day
+	cand.expires_day = GameClock.day + int(EconomyManager.tuning_value("hiring.candidate_lifetime_days", 4))
+	cand.competencies = cand.attributes.duplicate(true)
+	cand.experience = _average_attributes(cand.attributes) * 120.0
+	cand.manager_eligible = type_id == &"manager"
+	for weekday: int in 7:
+		cand.availability_by_weekday[weekday] = true
 	return cand
+
+
+func _average_attributes(attributes: Dictionary) -> float:
+	if attributes.is_empty():
+		return 0.5
+	var total: float = 0.0
+	for value: Variant in attributes.values():
+		total += float(value)
+	return total / float(attributes.size())
 
 
 ## Better attributes -> higher asking wage (~0.6x to ~1.4x of the role base).
@@ -864,13 +888,13 @@ func _tick_restaurant(rest: RestaurantState, now: int, dm: int, _hour: int) -> v
 	var waiters: int = 0
 	var serve_per_hour: float = 0.0
 	for member: StaffMember in rest.staff:
-		if not member.on_shift(hourf):
+		if not member.on_shift(hourf) or member.is_absent(GameClock.day):
 			continue
 		var wdef: StaffTypeDef = staff_types.get(member.type_id)
 		if wdef == null or wdef.waiter_customers_per_hour <= 0.0:
 			continue
 		waiters += 1
-		serve_per_hour += wdef.waiter_customers_per_hour * (1.0 + (member.attr(&"service") - 0.5) * waiter_span)
+		serve_per_hour += wdef.waiter_customers_per_hour * (1.0 + (member.competency(&"service") - 0.5) * waiter_span)
 	if waiters > 0:
 		var cap: float = maxf(2.0, float(waiters) * 2.0)
 		# Layout flow: long walks and crowded aisles slow every serve.
@@ -1041,12 +1065,12 @@ func _award_charm_reputation(rest: RestaurantState) -> void:
 	var total: float = 0.0
 	var count: int = 0
 	for member: StaffMember in rest.staff:
-		if not member.on_shift(hourf):
+		if not member.on_shift(hourf) or member.is_absent(GameClock.day):
 			continue
 		var def: StaffTypeDef = staff_types.get(member.type_id)
 		if def == null or def.waiter_customers_per_hour <= 0.0:
 			continue
-		total += member.attr(&"charm")
+		total += member.competency(&"charm") * member.operational_effect(&"service")
 		count += 1
 	if count == 0:
 		return
@@ -1076,7 +1100,7 @@ func _cook_slot_descriptors(rest: RestaurantState, hourf: float) -> Array[Dictio
 	var prep_span: float = float(EconomyManager.tuning_value("staff.effects.prep_span", 0.5))
 	var slots: Array[Dictionary] = []
 	for member: StaffMember in rest.staff:
-		if not member.on_shift(hourf):
+		if not member.on_shift(hourf) or member.is_absent(GameClock.day):
 			continue
 		var def: StaffTypeDef = staff_types.get(member.type_id)
 		if def == null or def.cook_slots <= 0:
@@ -1086,8 +1110,8 @@ func _cook_slot_descriptors(rest: RestaurantState, hourf: float) -> Array[Dictio
 				"cook_uid": member.uid,
 				"cook_name": member.staff_name,
 				"slot_index": slot_index,
-				"speed_mult": 1.0 + (member.attr(&"speed") - 0.5) * prep_span,
-				"consistency": member.attr(&"consistency"),
+				"speed_mult": (1.0 + (member.competency(&"speed") - 0.5) * prep_span) * member.operational_effect(&"speed"),
+				"consistency": clampf(member.competency(&"consistency") * member.operational_effect(&"consistency"), 0.0, 1.0),
 			})
 	# Physical kitchen stations (ovens) cap concurrent cooking: a cook with
 	# two slots still needs two ovens to use them.
@@ -1281,7 +1305,15 @@ func _decay_interior(rest: RestaurantState) -> void:
 			if item.condition() < rest.repair_threshold:
 				worn.append(item.instance_id)
 		if not worn.is_empty():
-			var repair: CommandResult = repair_furniture_cmd(rest.company_id, rest.building_id, worn)
+			var repair: CommandResult = CommandResult.fail(&"router_unavailable", "Command router is unavailable.")
+			var command_router: Node = get_node_or_null("/root/BranchCommandRouter")
+			if command_router != null:
+				repair = command_router.call(
+					"execute",
+					&"furniture.repair",
+					{"building_id": rest.building_id, "instance_ids": worn},
+					{"kind": &"manager", "id": "legacy_repair_policy", "company_id": rest.company_id},
+					"legacy-repair:%s:%d:%d" % [rest.company_id, rest.building_id, GameClock.day]) as CommandResult
 			if repair.ok:
 				EconomyManager.post_message("info", "%s: manager repaired %d worn items ($%.0f)." % [rest.restaurant_name, int(repair.payload["count"]), float(repair.payload["cost"])])
 	var ev: InteriorEvaluation = interior.evaluate(layout)

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TrainingProgramDef" format=3 uid="uid://bw415il12mccg"]
+
+[ext_resource type="Script" uid="uid://ch7b557ko4u06" path="res://scripts/data/training_program_def.gd" id="1_e2kds"]
+
+[resource]
+script = ExtResource("1_e2kds")
+id = &"kitchen_mastery"
+display_name = "Kitchen Mastery"
+description = "Improves preparation quality and waste control."
+role_ids = Array[StringName]([&"cook"])
+competency_id = &"quality"
+competency_gain = 0.08
+experience_gain = 14.0
+cost = 750.0
+work_penalty = 0.25

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TrainingProgramDef" format=3 uid="uid://clmfhg1husm2l"]
+
+[ext_resource type="Script" uid="uid://ch7b557ko4u06" path="res://scripts/data/training_program_def.gd" id="1_ywoo6"]
+
+[resource]
+script = ExtResource("1_ywoo6")
+id = &"hygiene_standard"
+display_name = "Hygiene Standard"
+description = "Improves branch cleaning and condition care."
+role_ids = Array[StringName]([&"cleaner"])
+competency_id = &"cleaning"
+competency_gain = 0.09
+experience_gain = 10.0
+duration_hours = 14
+cost = 450.0
+work_penalty = 0.15

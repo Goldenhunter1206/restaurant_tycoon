@@ -153,7 +153,7 @@ func _plan_tactical(day: int) -> void:
 ## evaluation never touches the 3D scene.
 func _consider_interior(rest: RestaurantState, day: int) -> void:
 	if rest.repair_policy != &"auto":
-		RestaurantManager.set_repair_policy_cmd(company.id, rest.building_id, &"auto", 0.5)
+		_command(&"furniture.set_repair_policy", {"building_id": rest.building_id, "policy": &"auto", "threshold": 0.5}, "repair-policy:%d" % rest.building_id)
 	# Weekly (staggered per branch) look at a richer template.
 	if (day + rest.building_id) % 7 != 0 or company.cash < 6000.0:
 		return
@@ -171,7 +171,7 @@ func _consider_interior(rest: RestaurantState, day: int) -> void:
 		candidate_sum += value
 	if candidate_sum <= current_sum + 0.5 or candidate.table_seats.size() < current.table_seats.size():
 		return
-	var result: CommandResult = RestaurantManager.apply_template_cmd(company.id, rest.building_id, pick.id)
+	var result: CommandResult = _command(&"layout.apply_template", {"building_id": rest.building_id, "template_id": pick.id}, "layout:%d:%s" % [rest.building_id, pick.id])
 	if result.ok:
 		_record("interior", String(pick.id), [], "appeal %.1f -> %.1f" % [current_sum, candidate_sum])
 
@@ -256,8 +256,7 @@ func _tune_menu(rest: RestaurantState, day: int) -> void:
 		price = snappedf(price, 0.5)
 		if absf(price - entry.price) < 0.5 and tier_id == entry.tier:
 			continue
-		RestaurantManager.set_menu_entry_cmd(company.id, rest.building_id,
-			entry.dish_id, price, tier_id, true)
+		_command(&"menu.set_entry", {"building_id": rest.building_id, "dish_id": entry.dish_id, "price": price, "tier": tier_id, "enabled": true}, "menu:%d:%s" % [rest.building_id, entry.dish_id])
 		changed += 1
 	if changed > 0:
 		_record("tactical", "re-priced %d dishes at %s" % [changed, rest.restaurant_name],
@@ -283,8 +282,8 @@ func _ensure_channels(rest: RestaurantState) -> void:
 	if not _wants_delivery(rest):
 		return
 	if _staff_count(rest, &"driver") > 0:
-		RestaurantManager.set_channels_cmd(company.id, rest.building_id, true, true)
-		RestaurantManager.set_delivery_cap_cmd(company.id, rest.building_id, 4)
+		_command(&"restaurant.set_channels", {"building_id": rest.building_id, "dine_in": true, "delivery": true}, "channels:%d" % rest.building_id)
+		_command(&"delivery.set_cap", {"building_id": rest.building_id, "cap": 4}, "delivery-cap:%d" % rest.building_id)
 		_record("tactical", "enabled delivery at %s" % rest.restaurant_name, [], "")
 		_news("%s now delivers from %s." % [company.display_name, DISTRICT_NAMES.get(rest.district, "town")])
 
@@ -322,7 +321,7 @@ func _consider_marketing(rest: RestaurantState) -> void:
 		if not rent.ok:
 			return
 		campaign.placement_ids = [site.id] as Array[int]
-	var result: CommandResult = MarketingManager.start_campaign(campaign)
+	var result: CommandResult = _command(&"marketing.start_local", {"building_id": rest.building_id, "campaign": campaign, "exact_cost": campaign.cost_per_day}, "marketing:%d:%s" % [rest.building_id, campaign.channel_id])
 	if result.ok:
 		_record("tactical", "%s campaign at %s" % [campaign.channel_id, rest.restaurant_name], [],
 			"$%.0f/day for %d days" % [campaign.cost_per_day, campaign.days_left])
@@ -506,9 +505,15 @@ func _execute(item: Dictionary) -> void:
 					DISTRICT_NAMES.get(district, "town")])
 			_record_outcome(item, result)
 		&"hire":
-			var result: CommandResult = RestaurantManager.hire(company.id,
-				int(args["building_id"]), int(args["candidate_uid"]),
-				float(args["shift_start"]))
+			var candidate_uid: int = int(args["candidate_uid"])
+			var candidate: JobCandidate = null
+			for market_candidate: JobCandidate in RestaurantManager.job_market:
+				if market_candidate.uid == candidate_uid:
+					candidate = market_candidate
+					break
+			var result: CommandResult = CommandResult.fail(&"candidate_gone", "Candidate is no longer available.")
+			if candidate != null:
+				result = _command(&"staff.hire", {"building_id": int(args["building_id"]), "candidate_uid": candidate.uid, "offer": {"hourly_wage": candidate.hourly_wage, "shift_start": float(args["shift_start"]), "shift_hours": 8.0, "contract_type": &"permanent"}}, "hire:%d" % candidate.uid)
 			_record_outcome(item, result)
 		&"buy_warehouse":
 			var result: CommandResult = SupplyManager.buy_warehouse_cmd(company.id, int(args["building_id"]))
@@ -531,8 +536,7 @@ func _execute(item: Dictionary) -> void:
 				var tier: QualityTier = RecipeManager.tier_for(entry.dish_id, entry.tier)
 				if tier != null:
 					price = maxf(price, tier.ingredient_cost * 1.15)
-				RestaurantManager.set_menu_entry_cmd(company.id, rest.building_id,
-					entry.dish_id, snappedf(price, 0.5), entry.tier, true)
+				_command(&"menu.set_entry", {"building_id": rest.building_id, "dish_id": entry.dish_id, "price": snappedf(price, 0.5), "tier": entry.tier, "enabled": true}, "defend-price:%d:%s" % [rest.building_id, entry.dish_id])
 				cut += 1
 			if cut > 0:
 				_news("%s cut prices near %s." % [company.display_name,
@@ -552,12 +556,12 @@ func _plan_procurement(_day: int) -> void:
 		for ing: StringName in inv.policies.keys():
 			var policy: ReorderPolicy = inv.policies[ing]
 			var supplier: SupplierDef = SupplyManager.supplier_for_style(ing, profile.procurement_style)
-			SupplyManager.set_reorder_policy_cmd(company.id, rest.building_id, ing, {
+			_command(&"inventory.set_policy", {"building_id": rest.building_id, "ingredient_id": ing, "fields": {
 				"preferred_supplier": supplier.id if supplier != null else &"",
 				"target_stock": ceilf(policy.target_stock * profile.safety_stock_bias),
 				"reorder_point": ceilf(policy.reorder_point * profile.safety_stock_bias),
 				"mode": &"automatic",
-			})
+			}}, "supply-policy:%d:%s" % [rest.building_id, ing])
 	# Warehouse consideration.
 	var now: int = GameClock.total_minutes()
 	if int(_cooldown_until.get(&"warehouse", 0)) > now:
@@ -587,16 +591,31 @@ func _plan_procurement(_day: int) -> void:
 ## next tactical passes because hiring runs through the shared job market.
 func _setup_new_branch(rest: RestaurantState) -> void:
 	var open_hour: float = 11.0 if profile.price_bias > 0.7 else 10.0
-	RestaurantManager.set_hours_cmd(company.id, rest.building_id, open_hour, 22.0)
-	RestaurantManager.set_channels_cmd(company.id, rest.building_id, true, false)
+	_command(&"restaurant.set_hours", {"building_id": rest.building_id, "open_hour": open_hour, "close_hour": 22.0}, "hours:%d" % rest.building_id)
+	_command(&"restaurant.set_channels", {"building_id": rest.building_id, "dine_in": true, "delivery": false}, "channels:%d" % rest.building_id)
 	_menu_review_day.erase(rest.building_id)
-	RestaurantManager.set_repair_policy_cmd(company.id, rest.building_id, &"auto", 0.5)
+	_command(&"furniture.set_repair_policy", {"building_id": rest.building_id, "policy": &"auto", "threshold": 0.5}, "repair-policy:%d" % rest.building_id)
 	# Fit the branch with the best designer set the war chest allows.
 	var pick: InteriorTemplateDef = RestaurantManager.interior.choose_template_for(rest, company.cash * 0.35)
 	if pick != null:
-		var result: CommandResult = RestaurantManager.apply_template_cmd(company.id, rest.building_id, pick.id)
+		var result: CommandResult = _command(&"layout.apply_template", {"building_id": rest.building_id, "template_id": pick.id}, "layout:%d:%s" % [rest.building_id, pick.id])
 		if result.ok:
 			_record("interior", String(pick.id), [], "furnished new branch")
+
+
+func _command(command_id: StringName, arguments: Dictionary, suffix: String) -> CommandResult:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return CommandResult.fail(&"router_unavailable", "The command router is unavailable.")
+	var router: Node = tree.root.get_node_or_null("/root/BranchCommandRouter")
+	if router == null:
+		return CommandResult.fail(&"router_unavailable", "The command router is unavailable.")
+	return router.call(
+		"execute",
+		command_id,
+		arguments,
+		{"kind": &"ai", "id": String(company.id), "company_id": company.id},
+		"ai:%s:%d:%s:%s" % [company.id, GameClock.total_minutes(), command_id, suffix]) as CommandResult
 
 
 # --- Journal & helpers ---------------------------------------------------------

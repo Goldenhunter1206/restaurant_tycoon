@@ -106,8 +106,7 @@ func _build_tabs() -> void:
 		{"id": &"upgrades", "text": "UPGRADES"},
 		{"id": &"procurement", "text": "PROCUREMENT"},
 		{"id": &"analytics", "text": "ANALYTICS"},
-		{"id": &"managers", "text": "MANAGERS & POLICIES",
-			"lock": "Requires a Tier 2 headquarters and the Branch Managers feature."},
+		{"id": &"managers", "text": "MANAGERS & POLICIES"},
 		{"id": &"training", "text": "TRAINING",
 			"lock": "Requires a Tier 2 headquarters and the Staff Training feature."},
 		{"id": &"security", "text": "SECURITY",
@@ -141,6 +140,9 @@ func _refresh_tabs(state: HeadquartersState) -> void:
 
 
 func _select_tab(tab_id: StringName) -> void:
+	if tab_id == &"managers":
+		request_screen.emit(&"company.managers")
+		return
 	if _active_tab == tab_id:
 		return
 	_active_tab = tab_id

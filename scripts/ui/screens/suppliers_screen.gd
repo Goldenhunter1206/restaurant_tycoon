@@ -24,6 +24,7 @@ var _risk_pill: PanelContainer
 var _risk_label: Label
 ## Warehouses tab drill-in: -1 = list, else the warehouse being inspected.
 var _view_warehouse_id: int = -1
+var _command_serial: int = 0
 
 
 func screen_title() -> String:
@@ -349,9 +350,20 @@ func _do_restock(ing: StringName) -> void:
 	if rest == null:
 		return
 	var qty: float = _restock_qty(rest, ing)
-	var result: CommandResult = SupplyManager.manual_restock_cmd(&"player", building_id, ing, qty)
-	if not result.ok:
-		EconomyManager.post_message("alert", result.message)
+	var policy: ReorderPolicy = SupplyManager.inventory_for_restaurant(rest).policy_for(ing)
+	var supplier: SupplierDef = null
+	if policy != null and policy.preferred_supplier != &"":
+		supplier = SupplyManager.supplier(policy.preferred_supplier)
+	if supplier == null:
+		supplier = SupplyManager.cheapest_supplier_for(ing)
+	if supplier == null:
+		EconomyManager.post_message("alert", "No supplier currently carries that ingredient.")
+		return
+	_route_branch_command(&"inventory.reorder", {
+		"building_id": building_id,
+		"supplier_id": supplier.id,
+		"lines": [{"ingredient_id": ing, "quantity": qty}],
+	}, "reorder:%s" % ing)
 	refresh()
 
 
@@ -945,7 +957,7 @@ func _policy_row(rest: RestaurantState, inv: InventoryState, ing: StringName) ->
 	var policy: ReorderPolicy = inv.policy_for(ing)
 	if policy == null:
 		policy = SupplyManager._default_policy(ing, SupplyManager.estimated_daily_use(rest, ing))
-		inv.policies[ing] = policy
+		# The router creates the authoritative policy on the first edit.
 	var card: PanelContainer = PanelContainer.new()
 	card.add_theme_stylebox_override("panel", BellaUi.tile_box())
 	var row: HBoxContainer = HBoxContainer.new()
@@ -964,20 +976,20 @@ func _policy_row(rest: RestaurantState, inv: InventoryState, ing: StringName) ->
 	reorder_label.add_theme_color_override("font_color", INK_MUTED)
 	row.add_child(reorder_label)
 	row.add_child(_level_spin(policy.reorder_point, func(value: float) -> void:
-		policy.reorder_point = value))
+		_set_policy_fields(ing, {"reorder_point": value})))
 	var target_label: Label = Label.new()
 	target_label.text = "top up to"
 	target_label.add_theme_font_size_override("font_size", 11)
 	target_label.add_theme_color_override("font_color", INK_MUTED)
 	row.add_child(target_label)
 	row.add_child(_level_spin(policy.target_stock, func(value: float) -> void:
-		policy.target_stock = value))
+		_set_policy_fields(ing, {"target_stock": value})))
 	row.add_child(_supplier_picker(policy))
 	for mode_spec: Array in [[&"recommend", "Recommend"], [&"approve", "Approve"], [&"automatic", "Automatic"]]:
 		var mode: StringName = mode_spec[0]
 		var chip: Button = BellaUi.chip(mode_spec[1], policy.mode == mode)
 		chip.pressed.connect(func() -> void:
-			SupplyManager.set_policy_mode_cmd(&"player", building_id, ing, mode)
+			_set_policy_fields(ing, {"mode": mode})
 			refresh())
 		row.add_child(chip)
 	return card
@@ -1011,8 +1023,36 @@ func _supplier_picker(policy: ReorderPolicy) -> OptionButton:
 			picker.select(index)
 		index += 1
 	picker.item_selected.connect(func(selected: int) -> void:
-		policy.preferred_supplier = picker.get_item_metadata(selected))
+		_set_policy_fields(policy.ingredient_id, {
+			"preferred_supplier": picker.get_item_metadata(selected),
+		}))
 	return picker
+
+
+func _set_policy_fields(ingredient_id: StringName, fields: Dictionary) -> void:
+	_route_branch_command(&"inventory.set_policy", {
+		"building_id": building_id,
+		"ingredient_id": ingredient_id,
+		"fields": fields,
+	}, "policy:%s" % ingredient_id)
+
+
+func _route_branch_command(command_id: StringName, arguments: Dictionary,
+		suffix: String) -> CommandResult:
+	var router := get_node_or_null("/root/BranchCommandRouter")
+	if router == null or CompanyManager.player == null:
+		return CommandResult.fail(&"router_unavailable", "The branch command router is unavailable.")
+	_command_serial += 1
+	var result := router.call("execute", command_id, arguments, {
+		"kind": &"player",
+		"id": "suppliers_workspace",
+		"company_id": CompanyManager.player.id,
+	}, "ui:supply:%s:%d:%d" % [suffix, GameClock.total_minutes(), _command_serial]) as CommandResult
+	if result == null:
+		result = CommandResult.fail(&"command_unavailable", "The supply command was unavailable.")
+	if not result.ok:
+		EconomyManager.post_message("alert", result.message)
+	return result
 
 
 # --- Shared helpers ----------------------------------------------------------------

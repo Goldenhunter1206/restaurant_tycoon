@@ -1,38 +1,49 @@
 class_name SaveGame
 extends Resource
-## Serializable snapshot of a play session (format v6: headquarters +
-## source-aware capabilities). In-flight orders are not saved — kitchens restart empty on
-## load, and inventory lot reservations are cleared on restore.
-## v4 saves load fine: supply fields default empty and SupplyManager seeds
-## starter stock into any restaurant without an inventory.
+## Serializable snapshot (v7: management, automation, and workforce).
 
-@export var save_version: int = 6
+@export var save_version: int = 7
 @export var day: int = 1
 @export var game_hours: float = 7.0
-## Every competing company (player + rivals), each carrying its own finances,
-## restaurants and — player only — recipe book. Empty means pre-v4 save;
-## pre-v4 saves are not migrated and load as "incompatible".
+## Every competing company carries its own finances, restaurants, and workforce.
 @export var companies: Array[CompanyState] = []
 @export var active_campaigns: Array[MarketingCampaign] = []
-## Billboard sites (vacant + rented); regenerated from seed when empty.
 @export var ad_placements: Array[AdPlacement] = []
-## company_id -> district -> segment -> awareness (0-1).
 @export var marketing_awareness: Dictionary = {}
 @export var city_trends: Array[CityTrend] = []
+## Shared, time-limited labor market.
 @export var job_market: Array[JobCandidate] = []
 @export var next_candidate_uid: int = 1
-## citizen_id -> wealth (tastes/wages regenerate deterministically).
 @export var citizen_wealth: Dictionary = {}
-## World seed chosen in the New Game Wizard (drives AI determinism).
 @export var world_seed: int = 0
 @export var difficulty: StringName = &"medium"
-## Persistent scenario/award capability sources; HQ sources are derived.
 @export var capability_sources: Array[CapabilitySourceState] = []
-## Supply chain (v5+). Per-restaurant stock rides inside companies via
-## RestaurantState.inventory; the rest is manager-owned global state.
+## Supply chain.
 @export var warehouses: Array[WarehouseState] = []
 @export var purchase_orders: Array[PurchaseOrder] = []
 @export var transfer_orders: Array[TransferOrder] = []
 @export var supplier_contracts: Array[SupplierContractState] = []
 @export var supply_disruptions: Array[SupplyDisruption] = []
 @export var supply_next_id: int = 1
+## Workforce section.
+@export var workforce_schema_version: int = 1
+@export var schedule_templates: Dictionary = {}
+@export var training_enrollments: Array[TrainingEnrollment] = []
+@export var training_completion_keys: Dictionary = {}
+@export var absence_log: Array[Dictionary] = []
+## Shared command router section.
+@export var command_router_schema_version: int = 1
+@export var processed_command_ids: Dictionary = {}
+@export var command_undo_records: Dictionary = {}
+@export var command_daily_spend: Dictionary = {}
+## Management and automation section.
+@export var management_schema_version: int = 1
+@export var manager_assignments: Array[ManagerAssignment] = []
+@export var branch_policies: Array[BranchPolicy] = []
+@export var manager_policy_templates: Array[BranchPolicy] = []
+@export var manager_approvals: Array[ManagerApproval] = []
+@export var manager_decisions: Array[ManagerDecisionRecord] = []
+@export var manager_escalations: Array[ManagerEscalation] = []
+@export var manager_observations: Array[BranchObservationSnapshot] = []
+@export var manager_processed_windows: Dictionary = {}
+@export var manager_next_uid: int = 1

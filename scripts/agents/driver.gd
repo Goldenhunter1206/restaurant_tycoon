@@ -51,7 +51,7 @@ func _ready() -> void:
 		data = {"id": staff_member.uid, "name": staff_member.staff_name}
 		name = "Driver_%d" % staff_member.uid
 		var walk_span: float = float(EconomyManager.tuning_value("staff.effects.walk_span", 0.3))
-		_walk_mult = 1.0 + (staff_member.attr(&"navigation") - 0.5) * walk_span
+		_walk_mult = clampf((1.0 + (staff_member.competency(&"navigation") - 0.5) * walk_span) * staff_member.operational_effect(&"navigation"), 0.7, 1.2)
 	_anim = get_node_or_null("AnimationPlayer")
 	_attach_model()
 	_spawn_company_car()
@@ -258,7 +258,7 @@ func _on_reached_customer() -> void:
 	var dwell: float = float(EconomyManager.tuning_value("delivery.deliver_dwell_minutes", 2))
 	if staff_member != null:
 		var dwell_span: float = float(EconomyManager.tuning_value("staff.effects.dwell_span", 0.5))
-		dwell *= 1.0 - (staff_member.attr(&"navigation") - 0.5) * dwell_span
+		dwell *= (1.0 - (staff_member.competency(&"navigation") - 0.5) * dwell_span) / staff_member.operational_effect(&"reliability")
 	_dwell_until = GameClock.total_minutes() + int(maxf(1.0, dwell))
 
 
@@ -333,7 +333,7 @@ func _spawn_company_car() -> void:
 	company_car.set("delivery_driver", self)
 	if staff_member != null:
 		var drive_span: float = float(EconomyManager.tuning_value("staff.effects.drive_span", 0.3))
-		company_car.set("speed_multiplier", 1.0 + (staff_member.attr(&"driving") - 0.5) * drive_span)
+		company_car.set("speed_multiplier", clampf((1.0 + (staff_member.competency(&"driving") - 0.5) * drive_span) * staff_member.operational_effect(&"reliability"), 0.7, 1.2))
 	if ResourceLoader.exists(DELIVERY_MARKER_SCENE_PATH):
 		var marker_scene: PackedScene = load(DELIVERY_MARKER_SCENE_PATH)
 		var marker: Node = marker_scene.instantiate()

@@ -428,6 +428,7 @@ func create_transfer_cmd(company_id: StringName, warehouse_id: int,
 	var eta: float = route_eta(wh.world_pos, rest.door_pos)
 	if eta < 0.0:
 		return CommandResult.fail(&"unreachable", "No road route reaches that branch.")
+	eta += _stock_handling_delay(rest)
 	var cost: float = _logi.transfer_cost(eta,
 		EconomyManager.tuning_value("supply.transfer_base_fee", 12.0),
 		EconomyManager.tuning_value("supply.transfer_per_minute", 0.5))
@@ -447,6 +448,15 @@ func create_transfer_cmd(company_id: StringName, warehouse_id: int,
 	_maybe_spawn_truck.call_deferred(transfer, wh, rest)
 	orders_changed.emit()
 	return CommandResult.good(transfer)
+
+
+func _stock_handling_delay(rest: RestaurantState) -> float:
+	var workforce: Node = get_node_or_null("/root/StaffManager")
+	if workforce == null:
+		return 12.0
+	var effects: Dictionary = workforce.call("role_effects_for", rest)
+	var handling: float = clampf(float(effects.get("stock", 0.0)), 0.0, 1.0)
+	return lerpf(12.0, 4.0, handling)
 
 
 ## Door-to-door route ETA in game minutes (-1 = unreachable).

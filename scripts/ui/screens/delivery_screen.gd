@@ -88,8 +88,30 @@ func refresh() -> void:
 
 
 func _apply() -> void:
-	RestaurantManager.set_channels(
-		building_id, _dine_toggle.button_pressed, _delivery_toggle.button_pressed)
-	RestaurantManager.set_delivery_cap(building_id, int(_cap.value))
-	RestaurantManager.set_hours(building_id, _open_hour.value, _close_hour.value)
+	var router := get_node_or_null("/root/BranchCommandRouter")
+	if router == null or CompanyManager.player == null:
+		_status.text = "The branch command router is unavailable."
+		return
+	var actor := {"kind": &"player", "id": "delivery_workspace", "company_id": CompanyManager.player.id}
+	var stamp := "%d:%d" % [GameClock.total_minutes(), building_id]
+	var results: Array[CommandResult] = []
+	results.append(router.call("execute", &"restaurant.set_channels", {
+		"building_id": building_id,
+		"dine_in": _dine_toggle.button_pressed,
+		"delivery": _delivery_toggle.button_pressed,
+	}, actor, "ui:channels:%s" % stamp) as CommandResult)
+	results.append(router.call("execute", &"delivery.set_cap", {
+		"building_id": building_id,
+		"cap": int(_cap.value),
+	}, actor, "ui:delivery_cap:%s" % stamp) as CommandResult)
+	results.append(router.call("execute", &"restaurant.set_hours", {
+		"building_id": building_id,
+		"open_hour": _open_hour.value,
+		"close_hour": _close_hour.value,
+	}, actor, "ui:hours:%s" % stamp) as CommandResult)
+	for result: CommandResult in results:
+		if result == null or not result.ok:
+			_status.text = result.message if result != null else "A delivery command was unavailable."
+			return
+	_status.text = "Branch service settings updated."
 	refresh()

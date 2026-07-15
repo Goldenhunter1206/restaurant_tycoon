@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StaffTypeDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/staff_type_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"manager"
+display_name = "Manager"
+base_daily_wage = 150.0
+base_hourly_wage = 18.75
+attribute_keys = Array[StringName]([&"judgment", &"forecasting", &"leadership"])
+competency_keys = Array[StringName]([&"judgment", &"forecasting", &"leadership"])
+is_manager = true
+operational_tags = Array[StringName]([&"management"])
+promotion_from_roles = Array[StringName]([&"cook", &"waiter", &"runner"])
+minimum_experience_for_promotion = 240.0

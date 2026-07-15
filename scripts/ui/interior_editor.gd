@@ -39,6 +39,7 @@ var _hover_label: Label = null
 var _warning_label: Label = null
 var _undo_button: Button = null
 var _redo_button: Button = null
+var _command_serial: int = 0
 
 
 func setup(target_building_id: int, controller: InteriorEditController, view: Node3D) -> void:
@@ -157,7 +158,7 @@ func _build_bottom_bar() -> void:
 	_redo_button.pressed.connect(_do_redo)
 	actions.add_child(_redo_button)
 	var repair: Button = Button.new()
-	repair.text = "🔧 Repair"
+	repair.text = "Repair"
 	repair.tooltip_text = "Repair and clean the selected furniture (everything when nothing is selected). Paid immediately."
 	repair.custom_minimum_size = Vector2(110, 48)
 	TycoonTheme.apply_orange(repair)
@@ -296,7 +297,9 @@ func _load_template(tpl: InteriorTemplateDef) -> void:
 
 
 func _expand_room() -> void:
-	var result: CommandResult = RestaurantManager.expand_interior_cmd(&"player", building_id)
+	var result: CommandResult = _execute_branch_command(&"layout.expand", {
+		"building_id": building_id,
+	}, "expand")
 	if not result.ok:
 		_warning_label.text = "✗ %s" % result.message
 		return
@@ -479,7 +482,10 @@ func _repair_selected() -> void:
 	if ids.is_empty():
 		for item: PlacedFurnitureState in _controller.draft.placed:
 			ids.append(item.instance_id)
-	var result: CommandResult = RestaurantManager.repair_furniture_cmd(&"player", building_id, ids)
+	var result: CommandResult = _execute_branch_command(&"furniture.repair", {
+		"building_id": building_id,
+		"instance_ids": ids,
+	}, "repair")
 	if not result.ok:
 		_warning_label.text = "✗ %s" % result.message
 		return
@@ -503,17 +509,38 @@ func _commit() -> void:
 	if _pending_template != null:
 		# Route through the template command so the design fee applies.
 		if _layouts_equal(_controller.draft, _pending_template):
-			var template_result: CommandResult = RestaurantManager.apply_template_cmd(&"player", building_id, _pending_template.id)
+			var template_result: CommandResult = _execute_branch_command(&"layout.apply_template", {
+				"building_id": building_id,
+				"template_id": _pending_template.id,
+			}, "template:%s" % _pending_template.id)
 			if not template_result.ok:
 				_warning_label.text = "✗ %s" % template_result.message
 				return
 			closed.emit(true)
 			return
-	var result: CommandResult = RestaurantManager.edit_interior(building_id, _controller.draft)
+	var result: CommandResult = _execute_branch_command(&"layout.apply_draft", {
+		"building_id": building_id,
+		"draft": _controller.draft,
+	}, "draft")
 	if not result.ok:
 		_warning_label.text = "✗ %s" % result.message
 		return
 	closed.emit(true)
+
+
+func _execute_branch_command(command_id: StringName, arguments: Dictionary,
+		suffix: String) -> CommandResult:
+	var router := get_node_or_null("/root/BranchCommandRouter")
+	if router == null or CompanyManager.player == null:
+		return CommandResult.fail(&"router_unavailable", "The branch command router is unavailable.")
+	_command_serial += 1
+	var result := router.call("execute", command_id, arguments, {
+		"kind": &"player",
+		"id": "interior_editor",
+		"company_id": CompanyManager.player.id,
+	}, "ui:interior:%s:%d:%d" % [suffix, GameClock.total_minutes(), _command_serial]) as CommandResult
+	return result if result != null else CommandResult.fail(
+		&"command_unavailable", "The interior command was unavailable.")
 
 
 func _layouts_equal(draft: InteriorLayoutState, tpl: InteriorTemplateDef) -> bool:

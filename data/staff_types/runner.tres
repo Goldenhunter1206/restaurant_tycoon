@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="StaffTypeDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/staff_type_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"runner"
+display_name = "Runner"
+base_daily_wage = 76.0
+base_hourly_wage = 9.5
+attribute_keys = Array[StringName]([&"stock_handling", &"speed", &"accuracy"])
+competency_keys = Array[StringName]([&"stock_handling", &"speed", &"accuracy"])
+stock_handling_per_hour = 1.0
+operational_tags = Array[StringName]([&"inventory", &"stock"])

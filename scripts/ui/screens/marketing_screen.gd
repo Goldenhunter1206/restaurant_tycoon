@@ -58,6 +58,7 @@ var _sel_recipe: StringName = &""
 var _sel_rival: StringName = &""
 var _intensity: float = 1.0
 var _duration: int = 7
+var _command_serial: int = 0
 
 
 func screen_title() -> String:
@@ -198,7 +199,7 @@ func _campaign_card(campaign: MarketingCampaign) -> Control:
 	top.add_child(days)
 	var stop: Button = Button.new()
 	stop.text = "Stop"
-	stop.pressed.connect(func() -> void: MarketingManager.stop_campaign(campaign))
+	stop.pressed.connect(_stop_campaign.bind(campaign))
 	top.add_child(stop)
 	var pills: HBoxContainer = HBoxContainer.new()
 	pills.add_theme_constant_override("separation", 6)
@@ -707,7 +708,9 @@ func _launch() -> void:
 				if not rent.ok:
 					EconomyManager.post_message("alert", rent.message)
 					return
-	var result: CommandResult = MarketingManager.start_campaign(draft)
+	var preview: Dictionary = MarketingManager.preview(draft)
+	var result: CommandResult = _run_marketing_command(&"marketing.start_local", draft,
+		float(preview.get("total_cost", 0.0)))
 	if result.ok:
 		EconomyManager.post_message("good", "Campaign launched: %s." % _campaign_title(draft))
 		_step = 0
@@ -717,6 +720,32 @@ func _launch() -> void:
 		_tabs.current_tab = 0
 	else:
 		EconomyManager.post_message("alert", result.message)
+
+
+func _stop_campaign(campaign: MarketingCampaign) -> void:
+	var result := _run_marketing_command(&"marketing.stop_local", campaign, 0.0)
+	if result.ok:
+		refresh()
+
+
+func _run_marketing_command(command_id: StringName, campaign: MarketingCampaign,
+		exact_cost: float) -> CommandResult:
+	var router := get_node_or_null("/root/BranchCommandRouter")
+	if router == null or CompanyManager.player == null:
+		return CommandResult.fail(&"router_unavailable", "The branch command router is unavailable.")
+	_command_serial += 1
+	var result := router.call("execute", command_id, {
+		"building_id": campaign.building_id,
+		"campaign": campaign,
+		"exact_cost": exact_cost,
+	}, {
+		"kind": &"player",
+		"id": "marketing_workspace",
+		"company_id": CompanyManager.player.id,
+	}, "ui:marketing:%s:%d:%d:%d" % [command_id, campaign.building_id,
+		GameClock.total_minutes(), _command_serial]) as CommandResult
+	return result if result != null else CommandResult.fail(
+		&"command_unavailable", "The marketing command was unavailable.")
 
 
 func _draft() -> MarketingCampaign:

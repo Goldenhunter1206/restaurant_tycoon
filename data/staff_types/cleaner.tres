@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="StaffTypeDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/staff_type_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"cleaner"
+display_name = "Cleaner"
+base_daily_wage = 72.0
+base_hourly_wage = 9.0
+attribute_keys = Array[StringName]([&"cleaning", &"care", &"speed"])
+competency_keys = Array[StringName]([&"cleaning", &"care", &"speed"])
+cleaning_per_hour = 1.0
+operational_tags = Array[StringName]([&"cleanliness", &"condition"])

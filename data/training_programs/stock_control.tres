@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TrainingProgramDef" format=3 uid="uid://sanr08bq0npn"]
+
+[ext_resource type="Script" uid="uid://ch7b557ko4u06" path="res://scripts/data/training_program_def.gd" id="1_brum0"]
+
+[resource]
+script = ExtResource("1_brum0")
+id = &"stock_control"
+display_name = "Stock Control"
+description = "Improves warehouse transfer and stock handling."
+role_ids = Array[StringName]([&"runner"])
+competency_id = &"stock_handling"
+competency_gain = 0.09
+experience_gain = 10.0
+duration_hours = 14
+cost = 450.0
+work_penalty = 0.15

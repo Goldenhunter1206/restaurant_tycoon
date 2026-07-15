@@ -14,6 +14,8 @@ var SCREENS: Dictionary = {
 	&"reports": preload("res://scripts/ui/screens/stub_screen.gd"),
 	&"rankings": load("res://scripts/ui/screens/rankings_screen.gd"),
 	&"headquarters": load("res://scenes/ui/HeadquartersScreen.tscn"),
+	&"company.managers": load("res://scripts/ui/screens/managers_screen.gd"),
+	&"managers": load("res://scripts/ui/screens/managers_screen.gd"),
 }
 
 var _active: TycoonScreen

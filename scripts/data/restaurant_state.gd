@@ -118,7 +118,7 @@ func enabled_menu() -> Array[MenuEntry]:
 func staff_on_shift(type_id: StringName, hour: float) -> int:
 	var count: int = 0
 	for member: StaffMember in staff:
-		if member.type_id == type_id and member.on_shift(hour):
+		if member.type_id == type_id and member.on_shift(hour) and not member.is_absent(GameClock.day):
 			count += 1
 	return count
 

@@ -146,7 +146,7 @@ func _idle_driver_for(building_id: int) -> Node:
 	for slot: Dictionary in roster:
 		var member: StaffMember = slot["member"]
 		var node: Node = slot["node"]
-		if not member.on_shift(hourf):
+		if not member.on_shift(hourf) or member.is_absent(GameClock.day):
 			continue
 		if is_instance_valid(node) and node.has_method("is_idle") and node.is_idle():
 			return node

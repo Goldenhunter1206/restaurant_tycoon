@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="BranchPolicy" format=3 uid="uid://ck6ccbinr1j7i"]
+
+[ext_resource type="Script" uid="uid://bf0p6m0njf15v" path="res://scripts/data/branch_policy.gd" id="1_afcip"]
+
+[resource]
+script = ExtResource("1_afcip")
+uid = "preset:conservative"
+display_name = "Conservative"
+preset_id = &"conservative"
+goal_weights = {
+&"cash": 1.6,
+&"inventory": 1.2,
+&"maintenance": 1.1
+}
+authority_by_category = {
+&"delivery": &"approval",
+&"emergency": &"automatic",
+&"hours": &"approval",
+&"inventory": &"automatic",
+&"layout": &"approval",
+&"maintenance": &"automatic",
+&"marketing": &"approval",
+&"menu": &"approval",
+&"schedules": &"approval",
+&"staffing": &"approval",
+&"training": &"approval"
+}
+daily_budget_by_category = {
+&"delivery": 800.0,
+&"emergency": 800.0,
+&"hours": 800.0,
+&"inventory": 800.0,
+&"layout": 800.0,
+&"maintenance": 800.0,
+&"marketing": 800.0,
+&"menu": 800.0,
+&"schedules": 800.0,
+&"staffing": 800.0,
+&"training": 800.0
+}
+cash_reserve = 5000.0
+minimum_price = 0.0
+approved_layout_templates = Array[StringName]([&"classic_trattoria", &"cozy_lounge", &"fast_flow_diner"])
