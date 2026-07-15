@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="InventoryItemDef" format=3 uid="uid://b3im4t72w04dv"]
+
+[ext_resource type="Script" uid="uid://dktppjuijulbq" path="res://scripts/data/inventory_item_def.gd" id="1_hkwls"]
+
+[resource]
+script = ExtResource("1_hkwls")
+id = &"parmesan"
+storage_class = &"chilled"
+shelf_life_minutes = 43200

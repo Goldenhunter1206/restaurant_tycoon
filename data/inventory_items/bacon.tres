@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="InventoryItemDef" format=3 uid="uid://dy87obel0w8bl"]
+
+[ext_resource type="Script" uid="uid://dktppjuijulbq" path="res://scripts/data/inventory_item_def.gd" id="1_65vro"]
+
+[resource]
+script = ExtResource("1_65vro")
+id = &"bacon"
+storage_class = &"chilled"
+shelf_life_minutes = 20160
+substitutes = Array[StringName]([&"ham"])

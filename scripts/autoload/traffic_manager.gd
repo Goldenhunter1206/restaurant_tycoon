@@ -53,6 +53,7 @@ const KIND_MODELS := {
 	"ambulance": ["Other/Ambulance_1_A.gltf", "Other/Ambulance_2_A.gltf"],
 	"icecream": ["IceCream Truck/IceTruck_1_A.gltf", "IceCream Truck/IceTruck_1_C.gltf"],
 	"post": ["Post Car/PostCar_1_A.gltf", "Post Car/PostCar_1_C.gltf"],
+	"supply": ["Post Car/PostCar_1_A.gltf", "IceCream Truck/IceTruck_1_A.gltf"],
 }
 
 var vehicles: Array[Node] = []

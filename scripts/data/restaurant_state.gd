@@ -31,6 +31,8 @@ extends Resource
 ## Furniture layout of the interior (save v4 additive; null on legacy saves
 ## and regenerated as the classic default layout on load).
 @export var interior_layout: InteriorLayoutState = null
+## Ingredient stock lots (save v5 additive; null = seeded on first access).
+@export var inventory: InventoryState = null
 ## Manager auto-repair: &"off" or &"auto" (repairs below repair_threshold).
 @export var repair_policy: StringName = &"off"
 @export_range(0.0, 1.0) var repair_threshold: float = 0.4

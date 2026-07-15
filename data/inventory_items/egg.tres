@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="InventoryItemDef" format=3 uid="uid://bd70hdb7nvabx"]
+
+[ext_resource type="Script" uid="uid://dktppjuijulbq" path="res://scripts/data/inventory_item_def.gd" id="1_x17sm"]
+
+[resource]
+script = ExtResource("1_x17sm")
+id = &"egg"
+storage_class = &"chilled"
+shelf_life_minutes = 20160

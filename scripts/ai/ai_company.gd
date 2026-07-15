@@ -25,6 +25,8 @@ var _queue: Array[Dictionary] = []
 var _cooldown_until: Dictionary = {}
 var _menu_review_day: Dictionary = {}
 var _tactical_hours: Array[int] = []
+## building_id -> true once its supply policies match this rival's style.
+var _procurement_tuned: Dictionary = {}
 
 
 func setup(target: CompanyState, world_seed: int) -> void:
@@ -63,6 +65,7 @@ func on_day(day: int) -> void:
 		return
 	_plan_liquidity(day)
 	_plan_expansion(day)
+	_plan_procurement(day)
 
 
 # --- Strategic planner ---------------------------------------------------------
@@ -506,6 +509,15 @@ func _execute(item: Dictionary) -> void:
 				int(args["building_id"]), int(args["candidate_uid"]),
 				float(args["shift_start"]))
 			_record_outcome(item, result)
+		&"buy_warehouse":
+			var result: CommandResult = SupplyManager.buy_warehouse_cmd(company.id, int(args["building_id"]))
+			if result.ok and result.payload is WarehouseState:
+				var wh: WarehouseState = result.payload
+				# Route every branch through the new warehouse.
+				for rest: RestaurantState in company.restaurants:
+					SupplyManager.assign_restaurant_cmd(company.id, wh.id, rest.building_id, true)
+				_news("%s opened a central warehouse." % company.display_name)
+			_record_outcome(item, result)
 		&"defend_prices":
 			var rest: RestaurantState = RestaurantManager.by_building.get(int(args["building_id"]))
 			if rest == null or rest.company_id != company.id:
@@ -525,6 +537,49 @@ func _execute(item: Dictionary) -> void:
 				_news("%s cut prices near %s." % [company.display_name,
 					DISTRICT_NAMES.get(rest.district, "town")])
 			_record_outcome(item, CommandResult.good(cut))
+
+
+## Procurement strategy: bias each branch's supply policies to this rival's
+## cheap-vs-premium style and safety-stock appetite, then consider a central
+## warehouse once it runs two or more branches. All via the shared commands.
+func _plan_procurement(_day: int) -> void:
+	for rest: RestaurantState in company.restaurants:
+		if _procurement_tuned.has(rest.building_id):
+			continue
+		_procurement_tuned[rest.building_id] = true
+		var inv: InventoryState = SupplyManager.inventory_for_restaurant(rest)
+		for ing: StringName in inv.policies.keys():
+			var policy: ReorderPolicy = inv.policies[ing]
+			var supplier: SupplierDef = SupplyManager.supplier_for_style(ing, profile.procurement_style)
+			SupplyManager.set_reorder_policy_cmd(company.id, rest.building_id, ing, {
+				"preferred_supplier": supplier.id if supplier != null else &"",
+				"target_stock": ceilf(policy.target_stock * profile.safety_stock_bias),
+				"reorder_point": ceilf(policy.reorder_point * profile.safety_stock_bias),
+				"mode": &"automatic",
+			})
+	# Warehouse consideration.
+	var now: int = GameClock.total_minutes()
+	if int(_cooldown_until.get(&"warehouse", 0)) > now:
+		return
+	if company.restaurants.size() < 2:
+		return
+	if not CapabilityRegistry.has(company.id, &"supply.warehouses"):
+		return
+	if not SupplyManager.warehouses_of(company.id).is_empty():
+		return
+	if _rng.randf() > profile.warehouse_appetite:
+		return
+	var price: float = SupplyManager.warehouse_price()
+	if company.cash - price < _cash_reserve_floor():
+		return
+	var buildable: Array[Dictionary] = SupplyManager.purchasable_warehouse_buildings()
+	if buildable.is_empty():
+		return
+	var target: Dictionary = buildable[_rng.randi_range(0, buildable.size() - 1)]
+	_enqueue(&"buy_warehouse", {"building_id": int(target["id"])}, "opens a central warehouse")
+	_record("strategic", "buy warehouse #%d" % int(target["id"]), [],
+		"warehouse_appetite %.2f" % profile.warehouse_appetite)
+	_cooldown_until[&"warehouse"] = now + 12 * MINUTES_PER_DAY
 
 
 ## Fresh branch defaults: dine-in only, standard hours; staff arrive via the

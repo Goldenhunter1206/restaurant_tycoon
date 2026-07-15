@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="InventoryItemDef" format=3 uid="uid://ve5fa00vvt7j"]
+
+[ext_resource type="Script" uid="uid://dktppjuijulbq" path="res://scripts/data/inventory_item_def.gd" id="1_x215t"]
+
+[resource]
+script = ExtResource("1_x215t")
+id = &"jalapeno"
+storage_class = &"chilled"
+substitutes = Array[StringName]([&"chili_flakes"])

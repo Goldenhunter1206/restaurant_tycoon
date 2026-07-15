@@ -27,6 +27,7 @@ static func save_game() -> bool:
 	for company: CompanyState in CompanyManager.companies:
 		save.companies.append(company)
 	MarketingManager.write_save(save)
+	SupplyManager.write_save(save)
 	for cand: JobCandidate in RestaurantManager.job_market:
 		save.job_market.append(cand)
 	save.next_candidate_uid = RestaurantManager._next_candidate_uid

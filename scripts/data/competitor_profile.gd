@@ -22,6 +22,14 @@ extends Resource
 @export_range(0.0, 1.0) var operational_skill: float = 0.6
 @export_range(0.0, 1.0) var aggression: float = 0.5
 @export var target_demographics: Array[StringName] = []
+## 0 = always the cheapest supplier, 1 = always the highest quality.
+@export_range(0.0, 1.0) var procurement_style: float = 0.5
+## Scales reorder targets: higher carries more safety stock (fewer stockouts,
+## more cash tied up + spoilage).
+@export_range(0.5, 2.0) var safety_stock_bias: float = 1.0
+## Chance per strategic day the rival considers opening a warehouse once it
+## qualifies (2+ branches).
+@export_range(0.0, 1.0) var warehouse_appetite: float = 0.4
 
 @export_group("Difficulty knobs")
 ## Lower means noisier forecasts and worse rival estimates.

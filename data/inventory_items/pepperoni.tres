@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="InventoryItemDef" format=3 uid="uid://d2ualyesw3l3y"]
+
+[ext_resource type="Script" uid="uid://dktppjuijulbq" path="res://scripts/data/inventory_item_def.gd" id="1_ef6b5"]
+
+[resource]
+script = ExtResource("1_ef6b5")
+id = &"pepperoni"
+storage_class = &"chilled"
+shelf_life_minutes = 30240
+substitutes = Array[StringName]([&"salami"])

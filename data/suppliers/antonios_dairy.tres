@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SupplierDef" format=3 uid="uid://c4trlmy58udy"]
+
+[ext_resource type="Script" uid="uid://dg5tpsous4s0n" path="res://scripts/data/supplier_def.gd" id="1_4ml35"]
+
+[resource]
+script = ExtResource("1_4ml35")
+id = &"antonios_dairy"
+display_name = "Antonio's Cheese & Dairy"
+icon = "pizza"
+blurb = "Third-generation cheesemakers. The mozzarella arrives still humming."
+categories = Array[StringName]([&"cheese"])
+catalog = Array[StringName]([&"egg", &"garlic_cream", &"ranch"])
+price_mult = 1.2
+base_quality = 0.85
+lead_time_minutes = 720
+min_order_value = 60.0

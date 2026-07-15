@@ -22,6 +22,10 @@ const DEFAULTS: Dictionary = {
 		"hint": "Open a 2nd restaurant to hire an interior designer.",
 	},
 	&"interior.expansion": {"min_restaurants": 0, "hint": ""},
+	&"supply.warehouses": {
+		"min_restaurants": 2,
+		"hint": "Open a 2nd restaurant to unlock warehouses.",
+	},
 }
 
 ## Simultaneous campaigns: one, plus one per two restaurants.

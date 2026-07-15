@@ -10,7 +10,7 @@ var SCREENS: Dictionary = {
 	&"deliveries": preload("res://scripts/ui/screens/delivery_screen.gd"),
 	&"build": preload("res://scripts/ui/screens/purchase_screen.gd"),
 	&"marketing": load("res://scripts/ui/screens/marketing_screen.gd"),
-	&"suppliers": preload("res://scripts/ui/screens/stub_screen.gd"),
+	&"suppliers": load("res://scripts/ui/screens/suppliers_screen.gd"),
 	&"reports": preload("res://scripts/ui/screens/stub_screen.gd"),
 	&"rankings": load("res://scripts/ui/screens/rankings_screen.gd"),
 }

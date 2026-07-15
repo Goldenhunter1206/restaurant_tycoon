@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="InventoryItemDef" format=3 uid="uid://b2c3aho2rw57"]
+
+[ext_resource type="Script" uid="uid://dktppjuijulbq" path="res://scripts/data/inventory_item_def.gd" id="1_7jaxd"]
+
+[resource]
+script = ExtResource("1_7jaxd")
+id = &"gorgonzola"
+storage_class = &"chilled"

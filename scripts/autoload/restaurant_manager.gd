@@ -585,6 +585,11 @@ func place_delivery_order(order: FoodOrder) -> bool:
 		return false
 	if rest.staff_on_shift(&"cook", GameClock.game_hours) <= 0:
 		return false
+	# Reserve the bill of materials now; the shortage policy may reject the
+	# order outright instead of letting the kitchen start something it can't cook.
+	if not SupplyManager.reserve_for_order(rest, order).ok:
+		rest.today["stockouts"] = int(rest.today.get("stockouts", 0)) + 1
+		return false
 	order.state = FoodOrder.State.QUEUED
 	rest.cook_backlog.append(order)
 	rest.active_deliveries += 1
@@ -817,11 +822,9 @@ func menu_upkeep_for(rest: RestaurantState) -> float:
 func upkeep_for_id(dish_id: StringName, tier_id: StringName) -> float:
 	if not RecipeManager.is_recipe(dish_id):
 		return dish_upkeep(dishes.get(dish_id), tier_id)
-	var base: float = float(EconomyManager.tuning_value("menu.daily_upkeep_per_dish", 8.0))
-	var factor: float = float(EconomyManager.tuning_value("menu.upkeep_ingredient_factor", 1.5))
-	var tier: QualityTier = RecipeManager.tier_for(dish_id, tier_id)
-	var cost: float = tier.ingredient_cost if tier != null else 2.0
-	return base + cost * factor
+	# Recipe dishes draw real inventory now — carrying cost and spoilage are
+	# charged by SupplyManager, so daily upkeep keeps only the prep-labor share.
+	return float(EconomyManager.tuning_value("menu.daily_upkeep_per_dish", 8.0))
 
 
 func set_hours(building_id: int, open_hour: float, close_hour: float) -> void:
@@ -881,8 +884,13 @@ func _tick_restaurant(rest: RestaurantState, now: int, dm: int, _hour: int) -> v
 		var slot: Dictionary = cook_slots[rest.cooking.size()]
 		order.state = FoodOrder.State.COOKING
 		order.cook_consistency = float(slot.get("consistency", 0.5))
-		rest.company().transact(&"ingredients", -order.ingredient_cost)
-		rest.today["expenses"] = float(rest.today.get("expenses", 0.0)) + order.ingredient_cost
+		# Consume reserved stock lots; the actual lot cost (not the recipe's
+		# cached estimate) is what lands on the ledger.
+		var consume_result: CommandResult = SupplyManager.consume_for_order(rest, order)
+		var ingredient_charge: float = order.ingredient_cost
+		if consume_result.ok and consume_result.payload is Dictionary:
+			ingredient_charge = float(consume_result.payload.get("cost", order.ingredient_cost))
+		rest.today["expenses"] = float(rest.today.get("expenses", 0.0)) + ingredient_charge
 		rest.cooking.append({
 			"order": order,
 			"minutes_left": order.prep_minutes,
@@ -986,6 +994,9 @@ func _try_seat(rest: RestaurantState, citizen: Node, dish_id: StringName) -> boo
 		citizen_id = int((data as Dictionary).get("id", -1))
 	var order: FoodOrder = make_order(rest.building_id, citizen_id, dish_id, false)
 	if order == null:
+		return false
+	if not SupplyManager.reserve_for_order(rest, order).ok:
+		rest.today["stockouts"] = int(rest.today.get("stockouts", 0)) + 1
 		return false
 	rest.tables_occupied += 1
 	rest.waiter_credits -= 1.0
@@ -1180,6 +1191,23 @@ func _bottleneck_for(rest: RestaurantState, snapshot: Dictionary) -> Dictionary:
 		return {"severity": "critical", "title": "No cook on shift", "evidence": "Orders cannot enter the kitchen.", "action": "Schedule or hire a cook", "screen": &"staff"}
 	if rest.dine_in_enabled and int(snapshot["waiters_on_shift"]) <= 0:
 		return {"severity": "critical", "title": "No waiter on shift", "evidence": "Guests cannot be seated or served.", "action": "Schedule or hire a waiter", "screen": &"staff"}
+	var stockout_risks: Array[StringName] = SupplyManager.stockout_risks(rest)
+	if not stockout_risks.is_empty():
+		var inv: InventoryState = SupplyManager.inventory_for_restaurant(rest)
+		var worst: StringName = stockout_risks[0]
+		var empty_now: bool = false
+		for risk: StringName in stockout_risks:
+			if inv.available(risk) <= 0.0:
+				worst = risk
+				empty_now = true
+				break
+		var ing_def: IngredientDef = RecipeManager.ingredient(worst)
+		var worst_name: String = ing_def.display_name if ing_def != null else String(worst)
+		var evidence: String = "%s is out of stock." % worst_name if empty_now else \
+			"%s holds under a day of stock." % worst_name
+		if stockout_risks.size() > 1:
+			evidence += " %d ingredients at risk." % stockout_risks.size()
+		return {"severity": "critical" if empty_now else "warning", "title": "Ingredients running out", "evidence": evidence, "action": "Order stock", "screen": &"suppliers"}
 	if int(snapshot["oldest_queue_wait"]) >= int(float(queue_limit) * 0.75):
 		return {"severity": "critical", "title": "Guests may leave", "evidence": "Oldest table wait: %d of %d min." % [snapshot["oldest_queue_wait"], queue_limit], "action": "Add waiter coverage or another location", "screen": &"staff"}
 	if int(snapshot["oldest_kitchen_wait"]) >= int(float(food_limit) * 0.75):

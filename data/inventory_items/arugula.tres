@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="InventoryItemDef" format=3 uid="uid://brt0ehepoxidv"]
+
+[ext_resource type="Script" uid="uid://dktppjuijulbq" path="res://scripts/data/inventory_item_def.gd" id="1_v6no4"]
+
+[resource]
+script = ExtResource("1_v6no4")
+id = &"arugula"
+storage_class = &"chilled"
+shelf_life_minutes = 4320
+substitutes = Array[StringName]([&"basil", &"lettuce"])

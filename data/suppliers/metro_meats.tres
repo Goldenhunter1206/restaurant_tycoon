@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="SupplierDef" format=3 uid="uid://b6hnk653s5tda"]
+
+[ext_resource type="Script" uid="uid://dg5tpsous4s0n" path="res://scripts/data/supplier_def.gd" id="1_p4t2j"]
+
+[resource]
+script = ExtResource("1_p4t2j")
+id = &"metro_meats"
+display_name = "Metro Meats"
+icon = "dining"
+blurb = "Solid cuts, honest prices, cold-chain trucks."
+categories = Array[StringName]([&"meat"])
+price_mult = 1.1
+base_quality = 0.7
+reliability = 0.85
+delivery_fee = 30.0
+min_order_value = 80.0
+disruption_profile = {
+"outage": 0.02
+}

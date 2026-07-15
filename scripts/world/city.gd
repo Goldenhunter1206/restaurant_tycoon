@@ -14,6 +14,7 @@ func _ready() -> void:
 	CompanyManager.initialize.call_deferred()
 	MarketingManager.initialize.call_deferred()
 	RestaurantManager.initialize.call_deferred()
+	SupplyManager.initialize.call_deferred()
 	DemandManager.initialize.call_deferred()
 	DeliveryManager.initialize.call_deferred()
 	CompanyManager.start_ai.call_deferred()

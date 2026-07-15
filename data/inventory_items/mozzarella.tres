@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="InventoryItemDef" format=3 uid="uid://cph6ftceocsro"]
+
+[ext_resource type="Script" uid="uid://dktppjuijulbq" path="res://scripts/data/inventory_item_def.gd" id="1_r84ra"]
+
+[resource]
+script = ExtResource("1_r84ra")
+id = &"mozzarella"
+storage_class = &"chilled"
+substitutes = Array[StringName]([&"cheddar"])

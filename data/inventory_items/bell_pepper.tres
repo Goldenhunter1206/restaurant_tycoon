@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="InventoryItemDef" format=3 uid="uid://d3h3pap7spe55"]
+
+[ext_resource type="Script" uid="uid://dktppjuijulbq" path="res://scripts/data/inventory_item_def.gd" id="1_k1o2p"]
+
+[resource]
+script = ExtResource("1_k1o2p")
+id = &"bell_pepper"
+storage_class = &"chilled"

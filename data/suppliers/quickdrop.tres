@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SupplierDef" format=3 uid="uid://cb11y7g37tmvf"]
+
+[ext_resource type="Script" uid="uid://dg5tpsous4s0n" path="res://scripts/data/supplier_def.gd" id="1_63mee"]
+
+[resource]
+script = ExtResource("1_63mee")
+id = &"quickdrop"
+display_name = "QuickDrop Express"
+icon = "scooter"
+blurb = "Order by lunch, cooking by dinner. Speed costs extra."
+catalog = Array[StringName]([&"mozzarella", &"cheddar", &"tomato_sauce", &"tomato", &"lettuce", &"onion", &"mushroom", &"pepperoni", &"ham", &"beef_patty", &"basil", &"mayo", &"egg", &"bacon"])
+price_mult = 1.5
+base_quality = 0.55
+reliability = 0.95
+lead_time_minutes = 360
+delivery_fee = 45.0

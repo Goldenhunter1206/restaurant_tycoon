@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SupplierDef" format=3 uid="uid://c23gt8buunrx5"]
+
+[ext_resource type="Script" uid="uid://dg5tpsous4s0n" path="res://scripts/data/supplier_def.gd" id="1_efay4"]
+
+[resource]
+script = ExtResource("1_efay4")
+id = &"global_sundries"
+display_name = "Global Sundries Co."
+icon = "layers"
+blurb = "Container-ship bargains on sauces and specialty goods. Sometimes the ship is late."
+categories = Array[StringName]([&"sauce", &"extra"])
+base_quality = 0.6
+reliability = 0.72
+lead_time_minutes = 4320
+delivery_fee = 15.0
+min_order_value = 100.0
+disruption_profile = {
+"outage": 0.05,
+"price_spike": 0.03
+}

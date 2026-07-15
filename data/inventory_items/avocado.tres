@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="InventoryItemDef" format=3 uid="uid://b7l5rs3js2t6y"]
+
+[ext_resource type="Script" uid="uid://dktppjuijulbq" path="res://scripts/data/inventory_item_def.gd" id="1_lpt8n"]
+
+[resource]
+script = ExtResource("1_lpt8n")
+id = &"avocado"
+storage_class = &"chilled"
+shelf_life_minutes = 5760

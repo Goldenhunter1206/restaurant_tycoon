@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SupplierDef" format=3 uid="uid://c0are1pidpclv"]
+
+[ext_resource type="Script" uid="uid://dg5tpsous4s0n" path="res://scripts/data/supplier_def.gd" id="1_d3s5i"]
+
+[resource]
+script = ExtResource("1_d3s5i")
+id = &"valuemart"
+display_name = "ValueMart Wholesale"
+blurb = "Everything under one roof at rock-bottom prices. Quality is... flexible."
+price_mult = 0.85
+base_quality = 0.4
+lead_time_minutes = 2880
+delivery_fee = 20.0
+min_order_value = 150.0
+disruption_profile = {
+"delay": 0.03
+}
