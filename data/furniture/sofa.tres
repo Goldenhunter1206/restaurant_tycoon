@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://bgisfc47psmgm"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_c3v35"]
+
+[resource]
+script = ExtResource("1_c3v35")
+id = &"sofa"
+display_name = "Sofa"
+icon = &"people"
+blurb = "Booth-style comfort for two."
+price = 330.0
+footprint_w = 2
+footprint_d = 2
+seats = 2
+comfort = 3.0
+style_tags = Array[StringName]([&"cozy"])
+segment_appeal = {
+"families": 0.4,
+"teens": 0.3
+}
+scene_path = "res://RestaurantAssets/gLTF/Furniture/Sofa_1_A.glb"
+variant_scenes = {
+"plum": "res://RestaurantAssets/gLTF/Furniture/Sofa_1_E.glb",
+"teal": "res://RestaurantAssets/gLTF/Furniture/Sofa_1_C.glb"
+}

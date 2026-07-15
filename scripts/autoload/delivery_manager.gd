@@ -71,6 +71,7 @@ func complete_delivery(order: FoodOrder) -> void:
 		RestaurantManager.record_recipe_sale(rest, order)
 		rest.active_deliveries = maxi(0, rest.active_deliveries - 1)
 		rest.company().transact(&"delivery_sales", order.price)
+		MarketingManager.attribute_sale(order.restaurant_id, order.citizen_id, order.price)
 	DemandManager.charge_citizen(order.citizen_id, order.price)
 	RestaurantManager.award_service_reputation(order)
 	total_delivered += 1

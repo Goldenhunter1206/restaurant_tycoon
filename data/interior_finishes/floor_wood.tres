@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="InteriorFinishDef" format=3 uid="uid://7t7rjslcbfxu"]
+
+[ext_resource type="Script" uid="uid://cwlvl140s5tqn" path="res://scripts/data/interior_finish_def.gd" id="1_h46ud"]
+
+[resource]
+script = ExtResource("1_h46ud")
+id = &"floor_wood"
+display_name = "Wood Planks"
+price = 600.0
+comfort = 0.5
+style_tags = Array[StringName]([&"rustic"])
+segment_appeal = {
+"families": 0.2,
+"seniors": 0.3
+}
+tile_scene = "res://RestaurantAssets/gLTF/Other/Floor_1_2.glb"
+floor_tint = Color(0.85, 0.62, 0.38, 1)

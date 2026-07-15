@@ -8,7 +8,7 @@ extends Control
 ## Management layers are pure _draw() overlays over the baked texture —
 ## never rebaked per frame (the static city is the perf ceiling).
 
-enum Layer { NONE, DEMAND, COVERAGE, ROUTES, ZONING }
+enum Layer { NONE, DEMAND, COVERAGE, ROUTES, ZONING, MARKETING }
 
 const BAKE_SIZE: int = 512
 const PIN_COLOR: Color = Color("#d8452e")
@@ -68,6 +68,8 @@ func legend_text() -> String:
 			return "Live delivery routes (blue scooter · orange car)"
 		Layer.ZONING:
 			return "Zoning: purple downtown · blue commercial · grey industrial · green suburbs"
+		Layer.MARKETING:
+			return "Ads: orange = your campaigns · squares = billboard sites (green yours, grey vacant)"
 	return ""
 
 
@@ -91,6 +93,8 @@ func _draw() -> void:
 			_draw_coverage()
 		Layer.ROUTES:
 			_draw_routes()
+		Layer.MARKETING:
+			_draw_marketing()
 	# Camera position indicator.
 	var rig: Node3D = _camera_rig()
 	if rig != null:
@@ -141,6 +145,37 @@ func _draw_coverage() -> void:
 		var center: Vector2 = _world_to_map(rest.door_pos)
 		draw_circle(center, radius_px, Color(0.25, 0.61, 0.27, 0.16))
 		draw_arc(center, radius_px, 0.0, TAU, 48, Color("#3f9b45"), 1.5, true)
+
+
+## Ad coverage: campaign reach circles (player orange, rivals in their brand
+## color) + billboard sites as squares. Radii use the same campaign radius the
+## awareness tick uses, so the preview matches measured exposure.
+func _draw_marketing() -> void:
+	var rect: Rect2 = _display_rect()
+	var span: Vector2 = _bounds_max - _bounds_min
+	for campaign: MarketingCampaign in MarketingManager.campaigns:
+		var def: MarketingChannelDef = MarketingManager.channel(campaign.channel_id)
+		if def != null and def.reach_shape == &"city":
+			continue
+		var company: CompanyState = CompanyManager.company(campaign.company_id)
+		var mine: bool = campaign.company_id == &"player"
+		var color: Color = Color("#F99A1C") if mine \
+			else (company.brand_color if company != null else Color("#888888"))
+		var radius_px: float = campaign.radius / span.x * rect.size.x
+		for center: Vector3 in MarketingManager._campaign_centers(campaign):
+			var p: Vector2 = _world_to_map(center)
+			draw_circle(p, radius_px, Color(color, 0.14 if mine else 0.08))
+			draw_arc(p, radius_px, 0.0, TAU, 48, Color(color, 0.9 if mine else 0.55), 1.5, true)
+	for site: AdPlacement in MarketingManager.placements:
+		var p: Vector2 = _world_to_map(site.world_pos)
+		var fill: Color = Color("#9a9a8a")
+		if site.owner_company == &"player":
+			fill = Color("#3f9b45")
+		elif not site.vacant():
+			var owner: CompanyState = CompanyManager.company(site.owner_company)
+			fill = owner.brand_color if owner != null else Color("#d8452e")
+		draw_rect(Rect2(p - Vector2(3.5, 3.5), Vector2(7, 7)), Color("#3A2010"))
+		draw_rect(Rect2(p - Vector2(2.5, 2.5), Vector2(5, 5)), fill)
 
 
 func _draw_routes() -> void:

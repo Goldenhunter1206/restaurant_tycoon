@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://ctn1opts0mw63"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_lp1i6"]
+
+[resource]
+script = ExtResource("1_lp1i6")
+id = &"pickup_counter"
+display_name = "Pickup Counter"
+category = &"service"
+icon = &"basket"
+blurb = "Where hot bags wait for fast scooters."
+price = 240.0
+maintenance_cost = 1.0
+pickup_slots = 1
+style_tags = Array[StringName]([&"modern"])
+scene_path = "res://RestaurantAssets/gLTF/Furniture/StationTable_1_B.glb"
+variant_scenes = {
+"green": "res://RestaurantAssets/gLTF/Furniture/StationTable_1_C.glb"
+}

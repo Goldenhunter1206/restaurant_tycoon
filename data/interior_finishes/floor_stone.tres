@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="InteriorFinishDef" format=3 uid="uid://d3dw5t2qvts8r"]
+
+[ext_resource type="Script" uid="uid://cwlvl140s5tqn" path="res://scripts/data/interior_finish_def.gd" id="1_owqy8"]
+
+[resource]
+script = ExtResource("1_owqy8")
+id = &"floor_stone"
+display_name = "Stone Slabs"
+price = 800.0
+comfort = 0.3
+style_tags = Array[StringName]([&"modern"])
+segment_appeal = {
+"students": 0.2,
+"workers": 0.2
+}
+tile_scene = "res://RestaurantAssets/gLTF/Other/Floor_2_1.glb"
+floor_tint = Color(0.62, 0.64, 0.66, 1)

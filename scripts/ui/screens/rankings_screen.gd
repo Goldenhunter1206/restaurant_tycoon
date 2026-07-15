@@ -195,6 +195,8 @@ func _render_profile(company: CompanyState) -> void:
 	_head_to_head(grid, "Treasury", "$%.0f" % player.cash, "?  unknown")
 	_head_to_head(grid, "Ad campaigns", str(RivalIntel.spotted_campaigns(player)),
 		"%d (spotted)" % RivalIntel.spotted_campaigns(company))
+	_head_to_head(grid, "Share of voice", "%d%%" % roundi(RivalIntel.share_of_voice(player, true) * 100.0),
+		"~%d%% (estimated)" % roundi(RivalIntel.share_of_voice(company, false) * 100.0))
 
 	var note: PanelContainer = PanelContainer.new()
 	var note_box: StyleBoxFlat = StyleBoxFlat.new()

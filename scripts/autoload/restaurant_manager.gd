@@ -16,6 +16,9 @@ signal job_market_changed
 const DISH_DIR: String = "res://data/dishes"
 const STAFF_TYPE_DIR: String = "res://data/staff_types"
 
+## Editable-interior brain: furniture catalog, layout evaluation, validation.
+var interior: InteriorLayoutService = null
+
 var dishes: Dictionary = {}
 var staff_types: Dictionary = {}
 ## The player's branches. Legacy alias kept for the many UI call sites; the
@@ -40,6 +43,8 @@ func initialize() -> void:
 		return
 	_initialized = true
 	_load_catalogs()
+	interior = InteriorLayoutService.new()
+	interior.load_catalog()
 	RecipeManager.book_changed.connect(_sync_recipe_menu_entries)
 	GameClock.minute_ticked.connect(_on_minute)
 	GameClock.day_changed.connect(_on_day_changed)
@@ -399,23 +404,115 @@ func set_delivery_cap_cmd(company_id: StringName, building_id: int, cap: int) ->
 	return CommandResult.good(rest)
 
 
-func buy_menu_slot_cmd(company_id: StringName, building_id: int) -> CommandResult:
+## Deprecated since editable interiors: menu capacity now derives from placed
+## kitchen furniture (prep counters, shelves). Kept for AI compatibility.
+func buy_menu_slot_cmd(_company_id: StringName, _building_id: int) -> CommandResult:
+	return CommandResult.fail(&"deprecated", "Kitchen capacity now comes from prep counters and shelves placed in the interior.")
+
+
+## Commits an edited interior draft: validates, charges/refunds the money
+## delta, swaps the live layout and refreshes every derived capacity cache.
+## The single mutation entry point for player editor AND AI templates.
+func edit_interior_cmd(company_id: StringName, building_id: int, draft: InteriorLayoutState) -> CommandResult:
 	var check: CommandResult = _owned_branch(company_id, building_id)
 	if not check.ok:
 		return check
 	var rest: RestaurantState = check.payload
+	if draft == null:
+		return CommandResult.fail(&"no_layout", "Nothing to apply.")
 	var company: CompanyState = CompanyManager.company(company_id)
-	var max_slots: int = int(EconomyManager.tuning_value("menu.max_slots", 8))
-	if rest.menu_slots >= max_slots:
-		return CommandResult.fail(&"cap_reached", "The kitchen has no room for more stations.")
-	var price: float = menu_slot_price(rest)
-	if not company.can_afford(price):
-		return CommandResult.fail(&"insufficient_cash", "A new station costs $%.0f." % price)
-	company.transact(&"kitchen_stations", -price)
-	rest.menu_slots += 1
-	rest.today["expenses"] = float(rest.today.get("expenses", 0.0)) + price
+	var ev: InteriorEvaluation = interior.evaluate(draft)
+	if not ev.is_valid():
+		var first: Dictionary = ev.blocking_issues()[0]
+		return CommandResult.fail(&"invalid_layout", String(first.get("message", "The layout is invalid.")))
+	var diff: Dictionary = interior.price_diff(rest.interior_layout, draft)
+	var net: float = float(diff["net"])
+	if net > 0.0 and not company.can_afford(net):
+		return CommandResult.fail(&"insufficient_cash", "This layout needs $%.0f more." % net)
+	if float(diff["buy"]) > 0.0:
+		company.transact(&"furniture", -float(diff["buy"]))
+		rest.today["expenses"] = float(rest.today.get("expenses", 0.0)) + float(diff["buy"])
+	if float(diff["refund"]) > 0.0:
+		company.transact(&"furniture_resale", float(diff["refund"]))
+	draft.revision = rest.interior_layout.revision + 1 if rest.interior_layout != null else 1
+	rest.interior_layout = draft
+	interior.apply_to_restaurant(rest, ev)
 	restaurant_updated.emit(building_id)
 	return CommandResult.good(rest)
+
+
+## Applies a designer template wholesale: everything not in the template is
+## sold, the template's furniture is bought, plus a one-off design fee.
+func apply_template_cmd(company_id: StringName, building_id: int, template_id: StringName) -> CommandResult:
+	var check: CommandResult = _owned_branch(company_id, building_id)
+	if not check.ok:
+		return check
+	var rest: RestaurantState = check.payload
+	var template: InteriorTemplateDef = interior.template_for(template_id)
+	if template == null:
+		return CommandResult.fail(&"not_found", "Unknown interior set %s." % template_id)
+	if template.prereq_cap != &"" and not CapabilityRegistry.has(company_id, template.prereq_cap):
+		return CommandResult.fail(&"locked", CapabilityRegistry.explain(company_id, template.prereq_cap))
+	var company: CompanyState = CompanyManager.company(company_id)
+	var draft: InteriorLayoutState = template.build_layout()
+	draft.expansion_level = rest.interior_layout.expansion_level
+	draft.grid_rows = rest.interior_layout.grid_rows
+	draft.grid_cols = rest.interior_layout.grid_cols
+	var diff: Dictionary = interior.price_diff(rest.interior_layout, draft)
+	if not company.can_afford(float(diff["net"]) + template.design_fee):
+		return CommandResult.fail(&"insufficient_cash", "%s costs $%.0f all-in." % [template.display_name, float(diff["net"]) + template.design_fee])
+	var result: CommandResult = edit_interior_cmd(company_id, building_id, draft)
+	if result.ok and template.design_fee > 0.0:
+		company.transact(&"furniture", -template.design_fee)
+		rest.today["expenses"] = float(rest.today.get("expenses", 0.0)) + template.design_fee
+	return result
+
+
+## Pushes the front wall out, adding floor rows on the door side. Placements
+## keep their coordinates because the grid origin sits at the kitchen corner.
+func expand_interior_cmd(company_id: StringName, building_id: int) -> CommandResult:
+	var check: CommandResult = _owned_branch(company_id, building_id)
+	if not check.ok:
+		return check
+	var rest: RestaurantState = check.payload
+	var layout: InteriorLayoutState = rest.interior_layout
+	if layout.expansion_level >= 2:
+		return CommandResult.fail(&"cap_reached", "The property cannot grow any further.")
+	var company: CompanyState = CompanyManager.company(company_id)
+	var cost: float = maxf(2000.0, rest.property_value * 0.25) * float(layout.expansion_level + 1)
+	if not company.can_afford(cost):
+		return CommandResult.fail(&"insufficient_cash", "Expanding costs $%.0f." % cost)
+	company.transact(&"expansion", -cost)
+	rest.today["expenses"] = float(rest.today.get("expenses", 0.0)) + cost
+	layout.expansion_level += 1
+	layout.grid_rows += InteriorLayoutState.EXPAND_STEP
+	layout.revision += 1
+	var ev: InteriorEvaluation = interior.evaluate(layout)
+	interior.apply_to_restaurant(rest, ev)
+	restaurant_updated.emit(building_id)
+	return CommandResult.good(rest)
+
+
+func set_repair_policy_cmd(company_id: StringName, building_id: int, policy: StringName, threshold: float) -> CommandResult:
+	var check: CommandResult = _owned_branch(company_id, building_id)
+	if not check.ok:
+		return check
+	var rest: RestaurantState = check.payload
+	rest.repair_policy = policy
+	rest.repair_threshold = clampf(threshold, 0.05, 0.95)
+	restaurant_updated.emit(building_id)
+	return CommandResult.good(rest)
+
+
+## Player wrapper for the interior editor's Save button.
+func edit_interior(building_id: int, draft: InteriorLayoutState) -> CommandResult:
+	var result: CommandResult = edit_interior_cmd(&"player", building_id, draft)
+	if result.ok:
+		var rest: RestaurantState = result.payload
+		EconomyManager.post_message("good", "%s: new interior layout applied — %d tables, %d stations." % [rest.restaurant_name, rest.table_count, rest.cook_station_cap])
+	else:
+		EconomyManager.post_message("alert", result.message)
+	return result
 
 
 ## Resolves a branch and validates that `company_id` owns it.
@@ -773,7 +870,8 @@ func _tick_restaurant(rest: RestaurantState, now: int, dm: int, _hour: int) -> v
 		serve_per_hour += wdef.waiter_customers_per_hour * (1.0 + (member.attr(&"service") - 0.5) * waiter_span)
 	if waiters > 0:
 		var cap: float = maxf(2.0, float(waiters) * 2.0)
-		rest.waiter_credits = minf(rest.waiter_credits + serve_per_hour / 60.0 * float(dm), cap)
+		# Layout flow: long walks and crowded aisles slow every serve.
+		rest.waiter_credits = minf(rest.waiter_credits + serve_per_hour / 60.0 * float(dm) * rest.interior_throughput_mod, cap)
 	# Kitchen: assign each live cook slot so the UI can show who owns every dish.
 	var cook_slots: Array[Dictionary] = _cook_slot_descriptors(rest, hourf)
 	while rest.cooking.size() < cook_slots.size() and not rest.cook_backlog.is_empty():
@@ -859,7 +957,10 @@ func _tick_dining(rest: RestaurantState, now: int) -> void:
 
 
 func _tick_dine_queue(rest: RestaurantState, now: int) -> void:
-	var leave_after: int = int(EconomyManager.tuning_value("dinein.queue_leave_minutes", 25))
+	# Comfortable interiors buy patience: up to +40% wait tolerance at max
+	# comfort, less when the room is in poor shape.
+	var patience_mod: float = 1.0 + clampf(rest.interior_comfort, 0.0, 5.0) * 0.08
+	var leave_after: int = int(float(EconomyManager.tuning_value("dinein.queue_leave_minutes", 25)) * patience_mod)
 	for i: int in range(rest.dine_queue.size() - 1, -1, -1):
 		var waiting: Dictionary = rest.dine_queue[i]
 		var citizen: Node = waiting["citizen"]
@@ -902,6 +1003,7 @@ func _complete_dine_in(rest: RestaurantState, citizen: Node, order: FoodOrder) -
 	rest.record_sale(order.price)
 	record_category_sale(rest, order.dish_id)
 	record_recipe_sale(rest, order)
+	MarketingManager.attribute_sale(rest.building_id, order.citizen_id, order.price)
 	DemandManager.charge_citizen(order.citizen_id, order.price)
 	award_service_reputation(order)
 	_award_charm_reputation(rest)
@@ -976,6 +1078,10 @@ func _cook_slot_descriptors(rest: RestaurantState, hourf: float) -> Array[Dictio
 				"speed_mult": 1.0 + (member.attr(&"speed") - 0.5) * prep_span,
 				"consistency": member.attr(&"consistency"),
 			})
+	# Physical kitchen stations (ovens) cap concurrent cooking: a cook with
+	# two slots still needs two ovens to use them.
+	if slots.size() > rest.cook_station_cap:
+		slots.resize(rest.cook_station_cap)
 	return slots
 
 
@@ -1047,6 +1153,8 @@ func operations_snapshot(building_id: int) -> Dictionary:
 		"oldest_kitchen_wait": oldest_kitchen_wait,
 		"cooking": cooking_rows,
 		"cook_slots": _cook_slot_descriptors(rest, hourf).size(),
+		"cook_station_cap": rest.cook_station_cap,
+		"interior_revision": rest.interior_layout.revision if rest.interior_layout != null else 0,
 		"cooks_on_shift": rest.staff_on_shift(&"cook", hourf),
 		"waiters_on_shift": rest.staff_on_shift(&"waiter", hourf),
 		"drivers_on_shift": rest.staff_on_shift(&"driver", hourf),
@@ -1099,9 +1207,93 @@ func _on_day_changed(day: int) -> void:
 		rest.expense_history.append(float(rest.today.get("expenses", 0.0)))
 		if rest.expense_history.size() > 14:
 			rest.expense_history.remove_at(0)
+		_decay_interior(rest)
 		rest.reset_today()
 		restaurant_updated.emit(rest.building_id)
 	_refresh_job_market(day)
+
+
+## Nightly wear pass: yesterday's traffic grinds down furniture and dirties
+## the room; the closed hours (and sinks) claw cleanliness back. Derived
+## caches refresh afterwards so appeal reflects the new condition.
+func _decay_interior(rest: RestaurantState) -> void:
+	var layout: InteriorLayoutState = rest.interior_layout
+	if layout == null or interior == null:
+		return
+	var guests: float = float(rest.today.get("guests", 0))
+	var orders: float = float(rest.today.get("orders", 0))
+	var seats: float = maxf(1.0, float(rest.table_count))
+	var stations: float = maxf(1.0, float(rest.cook_station_cap))
+	var clean_bonus: float = 0.35  # Overnight scrub-down.
+	var dirt: float = clampf((guests + orders) * 0.004, 0.0, 0.5)
+	for item: PlacedFurnitureState in layout.placed:
+		var def: FurnitureDef = interior.def_for(item.def_id)
+		if def == null:
+			continue
+		if def.cleanliness_impact > 0.0:
+			clean_bonus += def.cleanliness_impact * 0.1
+	for item: PlacedFurnitureState in layout.placed:
+		var def: FurnitureDef = interior.def_for(item.def_id)
+		if def == null or not item.enabled:
+			continue
+		var uses: float = 0.0
+		if def.is_table or def.seats > 0:
+			uses = guests / seats
+		elif def.cook_slots > 0:
+			uses = orders / stations
+		elif def.pickup_slots > 0 or def.throughput > 0.0:
+			uses = orders / maxf(1.0, stations)
+		if uses > 0.0:
+			item.durability = clampf(item.durability - def.wear_per_use * uses, 5.0, def.durability_max)
+		item.cleanliness = clampf(item.cleanliness - dirt + clean_bonus - maxf(0.0, -def.cleanliness_impact) * 0.05, 0.05, 1.0)
+	# Manager policy: auto-repair anything below the owner's threshold.
+	if rest.repair_policy == &"auto":
+		var worn: Array[int] = []
+		for item: PlacedFurnitureState in layout.placed:
+			if item.condition() < rest.repair_threshold:
+				worn.append(item.instance_id)
+		if not worn.is_empty():
+			var repair: CommandResult = repair_furniture_cmd(rest.company_id, rest.building_id, worn)
+			if repair.ok:
+				EconomyManager.post_message("info", "%s: manager repaired %d worn items ($%.0f)." % [rest.restaurant_name, int(repair.payload["count"]), float(repair.payload["cost"])])
+	var ev: InteriorEvaluation = interior.evaluate(layout)
+	interior.apply_to_restaurant(rest, ev)
+
+
+## Repairs (and cleans) the given placed items back to factory condition.
+func repair_furniture_cmd(company_id: StringName, building_id: int, instance_ids: Array[int]) -> CommandResult:
+	var check: CommandResult = _owned_branch(company_id, building_id)
+	if not check.ok:
+		return check
+	var rest: RestaurantState = check.payload
+	var company: CompanyState = CompanyManager.company(company_id)
+	var cost: float = 0.0
+	var targets: Array[PlacedFurnitureState] = []
+	for id: int in instance_ids:
+		var item: PlacedFurnitureState = rest.interior_layout.find(id)
+		if item == null:
+			continue
+		var def: FurnitureDef = interior.def_for(item.def_id)
+		if def == null:
+			continue
+		var damage: float = 1.0 - item.durability / def.durability_max
+		if damage > 0.01 or item.cleanliness < 0.95:
+			cost += def.price * 0.3 * damage + 5.0
+			targets.append(item)
+	if targets.is_empty():
+		return CommandResult.fail(&"nothing_to_repair", "Everything is already in good shape.")
+	if not company.can_afford(cost):
+		return CommandResult.fail(&"insufficient_cash", "Repairs cost $%.0f." % cost)
+	company.transact(&"maintenance", -cost)
+	rest.today["expenses"] = float(rest.today.get("expenses", 0.0)) + cost
+	for item: PlacedFurnitureState in targets:
+		var def: FurnitureDef = interior.def_for(item.def_id)
+		item.durability = def.durability_max
+		item.cleanliness = 1.0
+	var ev: InteriorEvaluation = interior.evaluate(rest.interior_layout)
+	interior.apply_to_restaurant(rest, ev)
+	restaurant_updated.emit(building_id)
+	return CommandResult.good({"cost": cost, "count": targets.size()})
 
 
 ## Registered with EconomyManager.daily_cost_providers; CompanyManager calls
@@ -1123,7 +1315,19 @@ func _charge_daily_costs(company: CompanyState, _day: int) -> void:
 		var upkeep: float = menu_upkeep_for(rest)
 		if upkeep > 0.0:
 			company.transact(&"menu_upkeep", -upkeep)
-		rest.today["expenses"] = float(rest.today.get("expenses", 0.0)) + wages + rent + upkeep
+		# Interior running costs: per-item maintenance plus the music service.
+		var interior_cost: float = 0.0
+		if rest.interior_layout != null and interior != null:
+			for item: PlacedFurnitureState in rest.interior_layout.placed:
+				var fdef: FurnitureDef = interior.def_for(item.def_id)
+				if fdef != null and item.enabled:
+					interior_cost += fdef.maintenance_cost
+			var music: InteriorFinishDef = interior.finish_for(rest.interior_layout.music)
+			if music != null:
+				interior_cost += music.daily_cost
+		if interior_cost > 0.0:
+			company.transact(&"maintenance", -interior_cost)
+		rest.today["expenses"] = float(rest.today.get("expenses", 0.0)) + wages + rent + upkeep + interior_cost
 
 
 # --- Setup -------------------------------------------------------------------
@@ -1164,6 +1368,7 @@ func _restore_from_save(save: SaveGame) -> void:
 			rest.door_pos = info.get("door_pos", Vector3.ZERO)
 			rest.curb_pos = info.get("position", Vector3.ZERO)
 			rest.reset_today()
+			_ensure_interior(rest)
 			by_building[rest.building_id] = rest
 			_spawn_marker(rest)
 			for member: StaffMember in rest.staff:
@@ -1250,10 +1455,26 @@ func _add_restaurant(building_id: int, restaurant_name: String, fee: float, valu
 			enabled_count += 1
 		rest.menu.append(entry)
 	company.restaurants.append(rest)
+	_ensure_interior(rest)
 	by_building[building_id] = rest
 	_spawn_marker(rest)
 	restaurant_purchased.emit(rest)
 	return rest
+
+
+## Guarantees a furniture layout exists (legacy saves have none) and refreshes
+## the capacity/appeal caches derived from it.
+func _ensure_interior(rest: RestaurantState) -> void:
+	if rest.interior_layout == null:
+		rest.interior_layout = interior.default_layout_for(rest)
+	else:
+		# Content updates may retire furniture defs: scrap orphans for cash.
+		var fixed: Dictionary = interior.reconcile_catalog(rest.interior_layout)
+		if int(fixed["removed"]) > 0:
+			rest.company().transact(&"furniture_resale", float(fixed["refund"]))
+			push_warning("%s: %d discontinued furniture items scrapped for $%.0f" % [rest.restaurant_name, fixed["removed"], fixed["refund"]])
+	var ev: InteriorEvaluation = interior.evaluate(rest.interior_layout)
+	interior.apply_to_restaurant(rest, ev)
 
 
 func _spawn_marker(rest: RestaurantState) -> void:

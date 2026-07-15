@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="InteriorFinishDef" format=3 uid="uid://d3u3df5cvf76h"]
+
+[ext_resource type="Script" uid="uid://cwlvl140s5tqn" path="res://scripts/data/interior_finish_def.gd" id="1_2226m"]
+
+[resource]
+script = ExtResource("1_2226m")
+id = &"music_radio_pop"
+display_name = "Radio Pop"
+kind = &"music"
+daily_cost = 18.0
+comfort = 0.3
+style_tags = Array[StringName]([&"modern"])
+segment_appeal = {
+"students": 0.3,
+"teens": 0.5
+}

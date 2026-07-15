@@ -1,0 +1,238 @@
+[gd_resource type="Resource" script_class="InteriorTemplateDef" format=3 uid="uid://d3jkse8tm8244"]
+
+[ext_resource type="Script" uid="uid://yr66v1jjj1af" path="res://scripts/data/interior_template_def.gd" id="1_gx4j8"]
+
+[resource]
+script = ExtResource("1_gx4j8")
+id = &"fast_flow_diner"
+display_name = "Fast Flow Diner"
+blurb = "Short walks, quick turns: stools, tight rows and a wall of pickup counters."
+design_fee = 500.0
+prereq_cap = &"interior.designer"
+style = &"modern"
+floor_finish = &"floor_stone"
+wall_finish = &"wall_charcoal"
+music = &"music_radio_pop"
+items = Array[Dictionary]([{
+"cell": Vector2i(4, 0),
+"def_id": &"oven"
+}, {
+"cell": Vector2i(4, 0),
+"def_id": &"range_hood"
+}, {
+"cell": Vector2i(5, 0),
+"def_id": &"prep_table"
+}, {
+"cell": Vector2i(8, 0),
+"def_id": &"oven"
+}, {
+"cell": Vector2i(8, 0),
+"def_id": &"range_hood"
+}, {
+"cell": Vector2i(9, 0),
+"def_id": &"prep_table"
+}, {
+"cell": Vector2i(12, 0),
+"def_id": &"oven"
+}, {
+"cell": Vector2i(12, 0),
+"def_id": &"range_hood"
+}, {
+"cell": Vector2i(13, 0),
+"def_id": &"prep_table"
+}, {
+"cell": Vector2i(16, 0),
+"def_id": &"oven"
+}, {
+"cell": Vector2i(16, 0),
+"def_id": &"range_hood"
+}, {
+"cell": Vector2i(17, 0),
+"def_id": &"prep_table"
+}, {
+"cell": Vector2i(20, 0),
+"def_id": &"sink"
+}, {
+"cell": Vector2i(1, 0),
+"def_id": &"coffee_machine"
+}, {
+"cell": Vector2i(5, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(6, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(7, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(8, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(9, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(10, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(11, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(12, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(13, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(14, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(15, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(3, 6),
+"def_id": &"table_bistro"
+}, {
+"cell": Vector2i(3, 7),
+"def_id": &"stool_bar",
+"rotation": 180
+}, {
+"cell": Vector2i(3, 5),
+"def_id": &"stool_bar"
+}, {
+"cell": Vector2i(3, 9),
+"def_id": &"table_bistro"
+}, {
+"cell": Vector2i(3, 10),
+"def_id": &"stool_bar",
+"rotation": 180
+}, {
+"cell": Vector2i(3, 8),
+"def_id": &"stool_bar"
+}, {
+"cell": Vector2i(6, 6),
+"def_id": &"table_bistro"
+}, {
+"cell": Vector2i(6, 7),
+"def_id": &"stool_bar",
+"rotation": 180
+}, {
+"cell": Vector2i(6, 5),
+"def_id": &"stool_bar"
+}, {
+"cell": Vector2i(6, 9),
+"def_id": &"table_bistro"
+}, {
+"cell": Vector2i(6, 10),
+"def_id": &"stool_bar",
+"rotation": 180
+}, {
+"cell": Vector2i(6, 8),
+"def_id": &"stool_bar"
+}, {
+"cell": Vector2i(9, 6),
+"def_id": &"table_bistro"
+}, {
+"cell": Vector2i(9, 7),
+"def_id": &"stool_bar",
+"rotation": 180
+}, {
+"cell": Vector2i(9, 5),
+"def_id": &"stool_bar"
+}, {
+"cell": Vector2i(9, 9),
+"def_id": &"table_bistro"
+}, {
+"cell": Vector2i(9, 10),
+"def_id": &"stool_bar",
+"rotation": 180
+}, {
+"cell": Vector2i(9, 8),
+"def_id": &"stool_bar"
+}, {
+"cell": Vector2i(12, 6),
+"def_id": &"table_bistro"
+}, {
+"cell": Vector2i(12, 7),
+"def_id": &"stool_bar",
+"rotation": 180
+}, {
+"cell": Vector2i(12, 5),
+"def_id": &"stool_bar"
+}, {
+"cell": Vector2i(12, 9),
+"def_id": &"table_bistro"
+}, {
+"cell": Vector2i(12, 10),
+"def_id": &"stool_bar",
+"rotation": 180
+}, {
+"cell": Vector2i(12, 8),
+"def_id": &"stool_bar"
+}, {
+"cell": Vector2i(15, 6),
+"def_id": &"table_bistro"
+}, {
+"cell": Vector2i(15, 7),
+"def_id": &"stool_bar",
+"rotation": 180
+}, {
+"cell": Vector2i(15, 5),
+"def_id": &"stool_bar"
+}, {
+"cell": Vector2i(15, 9),
+"def_id": &"table_bistro"
+}, {
+"cell": Vector2i(15, 10),
+"def_id": &"stool_bar",
+"rotation": 180
+}, {
+"cell": Vector2i(15, 8),
+"def_id": &"stool_bar"
+}, {
+"cell": Vector2i(18, 6),
+"def_id": &"table_bistro"
+}, {
+"cell": Vector2i(18, 7),
+"def_id": &"stool_bar",
+"rotation": 180
+}, {
+"cell": Vector2i(18, 5),
+"def_id": &"stool_bar"
+}, {
+"cell": Vector2i(18, 9),
+"def_id": &"table_bistro"
+}, {
+"cell": Vector2i(18, 10),
+"def_id": &"stool_bar",
+"rotation": 180
+}, {
+"cell": Vector2i(18, 8),
+"def_id": &"stool_bar"
+}, {
+"cell": Vector2i(13, 16),
+"def_id": &"pickup_counter"
+}, {
+"cell": Vector2i(14, 16),
+"def_id": &"pickup_counter"
+}, {
+"cell": Vector2i(18, 0),
+"def_id": &"microwave"
+}, {
+"cell": Vector2i(3, 15),
+"def_id": &"divider"
+}, {
+"cell": Vector2i(3, 14),
+"def_id": &"divider"
+}, {
+"cell": Vector2i(15, 16),
+"def_id": &"pickup_counter"
+}, {
+"cell": Vector2i(16, 16),
+"def_id": &"pickup_counter"
+}, {
+"cell": Vector2i(17, 16),
+"def_id": &"pickup_counter"
+}, {
+"cell": Vector2i(18, 16),
+"def_id": &"pickup_counter"
+}])

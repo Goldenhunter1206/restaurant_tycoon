@@ -1,0 +1,187 @@
+[gd_resource type="Resource" script_class="InteriorTemplateDef" format=3 uid="uid://ca6groivj8y0e"]
+
+[ext_resource type="Script" uid="uid://yr66v1jjj1af" path="res://scripts/data/interior_template_def.gd" id="1_xbiey"]
+
+[resource]
+script = ExtResource("1_xbiey")
+id = &"cozy_lounge"
+display_name = "Cozy Lounge"
+blurb = "Sofas, armchairs and ferns. Guests stay for one more coffee."
+design_fee = 700.0
+prereq_cap = &"interior.designer"
+style = &"cozy"
+floor_finish = &"floor_wood"
+wall_finish = &"wall_sage"
+music = &"music_swing"
+items = Array[Dictionary]([{
+"cell": Vector2i(4, 0),
+"def_id": &"oven"
+}, {
+"cell": Vector2i(4, 0),
+"def_id": &"range_hood"
+}, {
+"cell": Vector2i(5, 0),
+"def_id": &"prep_table"
+}, {
+"cell": Vector2i(8, 0),
+"def_id": &"oven"
+}, {
+"cell": Vector2i(8, 0),
+"def_id": &"range_hood"
+}, {
+"cell": Vector2i(9, 0),
+"def_id": &"prep_table"
+}, {
+"cell": Vector2i(12, 0),
+"def_id": &"oven"
+}, {
+"cell": Vector2i(12, 0),
+"def_id": &"range_hood"
+}, {
+"cell": Vector2i(13, 0),
+"def_id": &"prep_table"
+}, {
+"cell": Vector2i(16, 0),
+"def_id": &"oven"
+}, {
+"cell": Vector2i(16, 0),
+"def_id": &"range_hood"
+}, {
+"cell": Vector2i(17, 0),
+"def_id": &"prep_table"
+}, {
+"cell": Vector2i(20, 0),
+"def_id": &"sink"
+}, {
+"cell": Vector2i(1, 0),
+"def_id": &"coffee_machine"
+}, {
+"cell": Vector2i(5, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(6, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(7, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(8, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(9, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(10, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(11, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(12, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(13, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(14, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(15, 3),
+"def_id": &"counter"
+}, {
+"cell": Vector2i(3, 7),
+"def_id": &"sofa"
+}, {
+"cell": Vector2i(3, 9),
+"def_id": &"table_long"
+}, {
+"cell": Vector2i(3, 11),
+"def_id": &"chair_padded",
+"rotation": 180
+}, {
+"cell": Vector2i(13, 7),
+"def_id": &"sofa"
+}, {
+"cell": Vector2i(13, 9),
+"def_id": &"table_long"
+}, {
+"cell": Vector2i(13, 11),
+"def_id": &"chair_padded",
+"rotation": 180
+}, {
+"cell": Vector2i(7, 8),
+"def_id": &"table_cafe"
+}, {
+"cell": Vector2i(7, 9),
+"def_id": &"armchair",
+"rotation": 180
+}, {
+"cell": Vector2i(7, 7),
+"def_id": &"armchair"
+}, {
+"cell": Vector2i(9, 12),
+"def_id": &"table_cafe"
+}, {
+"cell": Vector2i(9, 13),
+"def_id": &"armchair",
+"rotation": 180
+}, {
+"cell": Vector2i(9, 11),
+"def_id": &"armchair"
+}, {
+"cell": Vector2i(17, 8),
+"def_id": &"table_cafe"
+}, {
+"cell": Vector2i(17, 9),
+"def_id": &"armchair",
+"rotation": 180
+}, {
+"cell": Vector2i(17, 7),
+"def_id": &"armchair"
+}, {
+"cell": Vector2i(18, 12),
+"def_id": &"table_cafe"
+}, {
+"cell": Vector2i(18, 13),
+"def_id": &"armchair",
+"rotation": 180
+}, {
+"cell": Vector2i(18, 11),
+"def_id": &"armchair"
+}, {
+"cell": Vector2i(1, 14),
+"def_id": &"plant"
+}, {
+"cell": Vector2i(20, 14),
+"def_id": &"plant"
+}, {
+"cell": Vector2i(1, 6),
+"def_id": &"plant"
+}, {
+"cell": Vector2i(20, 10),
+"def_id": &"plant"
+}, {
+"cell": Vector2i(11, 15),
+"def_id": &"gramophone"
+}, {
+"cell": Vector2i(6, 15),
+"def_id": &"cabinet"
+}, {
+"cell": Vector2i(0, 8),
+"def_id": &"curtains"
+}, {
+"cell": Vector2i(19, 8),
+"def_id": &"curtains"
+}, {
+"cell": Vector2i(15, 16),
+"def_id": &"pickup_counter"
+}, {
+"cell": Vector2i(16, 16),
+"def_id": &"pickup_counter"
+}, {
+"cell": Vector2i(17, 16),
+"def_id": &"pickup_counter"
+}, {
+"cell": Vector2i(18, 16),
+"def_id": &"pickup_counter"
+}])

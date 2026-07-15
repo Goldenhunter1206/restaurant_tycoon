@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="InteriorFinishDef" format=3 uid="uid://dkqcavk5mdfsa"]
+
+[ext_resource type="Script" uid="uid://cwlvl140s5tqn" path="res://scripts/data/interior_finish_def.gd" id="1_kg4xf"]
+
+[resource]
+script = ExtResource("1_kg4xf")
+id = &"floor_checker"
+display_name = "Checker Tiles"
+comfort = 0.2
+style_tags = Array[StringName]([&"classic"])
+tile_scene = "res://RestaurantAssets/gLTF/Other/Floor_1_1.glb"

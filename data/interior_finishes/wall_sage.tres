@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="InteriorFinishDef" format=3 uid="uid://c0fudttyaql2c"]
+
+[ext_resource type="Script" uid="uid://cwlvl140s5tqn" path="res://scripts/data/interior_finish_def.gd" id="1_kg73b"]
+
+[resource]
+script = ExtResource("1_kg73b")
+id = &"wall_sage"
+display_name = "Sage Green"
+kind = &"wall"
+price = 400.0
+comfort = 0.4
+style_tags = Array[StringName]([&"cozy"])
+segment_appeal = {
+"families": 0.3
+}
+wall_tint = Color(0.72, 0.85, 0.66, 1)

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://btooxgiuctteo"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_dxnat"]
+
+[resource]
+script = ExtResource("1_dxnat")
+id = &"table_grand"
+display_name = "Grand Table"
+icon = &"family"
+blurb = "A heavy farmhouse table with room to spare."
+price = 360.0
+footprint_d = 2
+is_table = true
+style_tags = Array[StringName]([&"rustic"])
+segment_appeal = {
+"families": 0.4,
+"seniors": 0.4
+}
+scene_path = "res://RestaurantAssets/gLTF/Furniture/Table_5_A.glb"
+variant_scenes = {
+"aged": "res://RestaurantAssets/gLTF/Furniture/Table_5_C.glb"
+}

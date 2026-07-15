@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://cmsktncsrkl5s"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_80qcg"]
+
+[resource]
+script = ExtResource("1_80qcg")
+id = &"plant"
+display_name = "Potted Plant"
+category = &"decor"
+icon = &"house"
+blurb = "A little green goes a long way."
+price = 60.0
+comfort = 0.4
+style_tags = Array[StringName]([&"cozy"])
+segment_appeal = {
+"families": 0.2,
+"seniors": 0.3
+}
+scene_path = "res://RestaurantAssets/gLTF/Other/Vines_1_1.glb"
+variant_scenes = {
+"fern": "res://RestaurantAssets/gLTF/Other/Vines_3_1.glb",
+"ivy": "res://RestaurantAssets/gLTF/Other/Vines_5_1.glb"
+}

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://dwivhla8lifhw"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_8unx8"]
+
+[resource]
+script = ExtResource("1_8unx8")
+id = &"cabinet"
+display_name = "Display Cabinet"
+category = &"decor"
+icon = &"layers"
+blurb = "Trophies, bottles, grandma's plates."
+price = 250.0
+footprint_w = 2
+comfort = 0.4
+style_tags = Array[StringName]([&"classic"])
+segment_appeal = {
+"seniors": 0.3
+}
+scene_path = "res://RestaurantAssets/gLTF/Furniture/Furnit_C_5.glb"
+variant_scenes = {
+"dark": "res://RestaurantAssets/gLTF/Furniture/Furnit_C_10.glb"
+}

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="MarketingChannelDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/marketing_channel_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"poster"
+display_name = "Posters"
+icon = "pin"
+blurb = "Paste posters through nearby streets. Steady local presence."
+scope = &"local"
+required_capability = &"marketing.billboards"
+reach_shape = &"radius"
+base_radius = 550.0
+reach_weight = 0.35
+frequency = 1.2
+setup_cost = 200.0
+cost_per_day = 180.0
+min_days = 5
+max_days = 28
+needs_placement = false
+world_prop = &""

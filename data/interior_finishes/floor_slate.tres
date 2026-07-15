@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="InteriorFinishDef" format=3 uid="uid://4m2r1ha6trmx"]
+
+[ext_resource type="Script" uid="uid://cwlvl140s5tqn" path="res://scripts/data/interior_finish_def.gd" id="1_g8264"]
+
+[resource]
+script = ExtResource("1_g8264")
+id = &"floor_slate"
+display_name = "Dark Slate"
+price = 900.0
+comfort = 0.4
+style_tags = Array[StringName]([&"modern"])
+segment_appeal = {
+"teens": 0.3
+}
+tile_scene = "res://RestaurantAssets/gLTF/Other/Floor_S_1.glb"
+floor_tint = Color(0.35, 0.36, 0.42, 1)

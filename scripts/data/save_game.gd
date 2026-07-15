@@ -11,6 +11,11 @@ extends Resource
 ## pre-v4 saves are not migrated and load as "incompatible".
 @export var companies: Array[CompanyState] = []
 @export var active_campaigns: Array[MarketingCampaign] = []
+## Billboard sites (vacant + rented); regenerated from seed when empty.
+@export var ad_placements: Array[AdPlacement] = []
+## company_id -> district -> segment -> awareness (0-1).
+@export var marketing_awareness: Dictionary = {}
+@export var city_trends: Array[CityTrend] = []
 @export var job_market: Array[JobCandidate] = []
 @export var next_candidate_uid: int = 1
 ## citizen_id -> wealth (tastes/wages regenerate deterministically).

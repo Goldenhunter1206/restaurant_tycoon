@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="MarketingChannelDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/marketing_channel_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"local_event"
+display_name = "Local Event"
+icon = "people"
+blurb = "Host a tasting day. Short, intense buzz around one restaurant."
+scope = &"local"
+required_capability = &"marketing.local_campaigns"
+reach_shape = &"radius"
+base_radius = 600.0
+reach_weight = 0.5
+frequency = 0.8
+setup_cost = 400.0
+cost_per_day = 250.0
+min_days = 1
+max_days = 3
+needs_placement = false
+world_prop = &""

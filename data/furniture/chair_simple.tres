@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://bbu71htsdfbeu"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_uvkb6"]
+
+[resource]
+script = ExtResource("1_uvkb6")
+id = &"chair_simple"
+display_name = "Wooden Chair"
+icon = &"people"
+blurb = "Honest wood. Does the job."
+price = 40.0
+seats = 1
+comfort = 1.0
+style_tags = Array[StringName]([&"classic"])
+scene_path = "res://RestaurantAssets/gLTF/Furniture/Chair_1_A.glb"
+variant_scenes = {
+"cherry": "res://RestaurantAssets/gLTF/Furniture/Chair_1_B.glb",
+"cream": "res://RestaurantAssets/gLTF/Furniture/Chair_1_F.glb",
+"slate": "res://RestaurantAssets/gLTF/Furniture/Chair_1_D.glb"
+}

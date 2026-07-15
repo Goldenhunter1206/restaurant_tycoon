@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://8caa66cybaev"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_2un8l"]
+
+[resource]
+script = ExtResource("1_2un8l")
+id = &"shelf_wall"
+display_name = "Wall Shelf"
+category = &"kitchen"
+icon = &"layers"
+blurb = "Storage up top, room to move below."
+price = 130.0
+blocks_walk = false
+is_wall_item = true
+mount_y = 1.6
+menu_capacity = 1
+style_tags = Array[StringName]([&"rustic"])
+scene_path = "res://RestaurantAssets/gLTF/Furniture/HangShelf_1_A.glb"
+variant_scenes = {
+"dark": "res://RestaurantAssets/gLTF/Furniture/HangShelf_2_A.glb"
+}

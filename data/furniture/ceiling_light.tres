@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://dnrxbufb1vtlr"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_wo5r4"]
+
+[resource]
+script = ExtResource("1_wo5r4")
+id = &"ceiling_light"
+display_name = "Ceiling Lamp"
+category = &"utility"
+icon = &"gear"
+blurb = "Guests read menus better when they can see them."
+price = 95.0
+footprint_d = 2
+blocks_walk = false
+mount_y = 2.4
+comfort = 0.3
+style_tags = Array[StringName]([&"modern"])
+scene_path = "res://RestaurantAssets/gLTF/Other/Lights_1_A.glb"
+variant_scenes = {
+"warm": "res://RestaurantAssets/gLTF/Other/Lights_2_A.glb"
+}

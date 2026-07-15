@@ -350,6 +350,10 @@ func _best_offer(entry: Dictionary, budget: float, origin: Vector3,
 		var dist: float = origin.distance_to(rest.door_pos)
 		if dist > max_dist:
 			continue
+		# Marketing terms: per-restaurant awareness/coverage bump hoisted out of
+		# the menu loop; per-dish promotion/trend uplift added per entry.
+		var segment: StringName = entry.get("demographic", &"workers")
+		var ad_bonus: float = MarketingManager.bonus_for(rest, segment, origin)
 		for menu_entry: MenuEntry in rest.enabled_menu():
 			if menu_entry.price > budget:
 				continue
@@ -368,7 +372,10 @@ func _best_offer(entry: Dictionary, budget: float, origin: Vector3,
 				+ rest.star_rating / 5.0 * rw \
 				- menu_entry.price / budget * pw * 0.5 \
 				- dist / max_dist * dw * 0.5 \
-				+ MarketingManager.bonus_for(rest, entry.get("demographic", &"workers"), origin)
+				+ ad_bonus \
+				+ MarketingManager.dish_bonus_for(rest, menu_entry.dish_id, segment) \
+				+ clampf(float(rest.interior_appeal.get(segment, 0.0)), -0.5, 3.5) \
+					* float(EconomyManager.tuning_value("demand.interior_weight", 0.12))
 			if utility > best_utility:
 				best_utility = utility
 				best = {"rest": rest, "dish_id": menu_entry.dish_id, "utility": utility}

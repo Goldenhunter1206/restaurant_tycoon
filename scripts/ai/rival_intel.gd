@@ -48,6 +48,15 @@ static func spotted_campaigns(company: CompanyState) -> int:
 	return MarketingManager.campaigns_for(company.id).size()
 
 
+## Active exposure share vs everyone advertising. Exact for the player,
+## blurred for rivals (you can see their ads, not their spend).
+static func share_of_voice(company: CompanyState, exact: bool) -> float:
+	var real: float = MarketingManager.share_of_voice(company.id)
+	if exact:
+		return real
+	return clampf(real * _noise_factor(company, 0.3), 0.0, 1.0)
+
+
 ## Weekly revenue GUESS: real revenue blurred by stable per-company noise.
 ## Never exact; re-rolls once per in-game week.
 static func estimated_revenue(company: CompanyState, days: int = 7) -> float:

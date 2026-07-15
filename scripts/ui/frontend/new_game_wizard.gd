@@ -516,7 +516,7 @@ func _difficulty_pill(level: StringName) -> PanelContainer:
 
 
 func _trait_pills(prof: CompetitorProfile) -> Array[String]:
-	var pills: Array[String] = []
+	var pills: Array[String] = [_archetype(prof)]
 	if prof.aggression >= 0.7:
 		pills.append("Aggressive")
 	elif prof.aggression <= 0.35:
@@ -529,9 +529,32 @@ func _trait_pills(prof: CompetitorProfile) -> Array[String]:
 		pills.append("Premium")
 	if prof.quality_bias >= 0.8:
 		pills.append("Quality-first")
-	if pills.is_empty():
-		pills.append("Balanced")
+	pills.append(_marketing_hint(prof))
 	return pills
+
+
+## One prominent personality label per rival, first pill on the card.
+func _archetype(prof: CompetitorProfile) -> String:
+	if prof.marketing_style >= 0.6:
+		return "MARKETER"
+	if prof.aggression >= 0.7:
+		return "AGGRESSIVE"
+	if prof.aggression <= 0.35:
+		return "DEFENSIVE"
+	if prof.price_bias >= 0.7:
+		return "PREMIUM"
+	if prof.price_bias <= 0.3:
+		return "BUDGET"
+	return "BALANCED"
+
+
+## How loudly this rival advertises — sets expectations for the ad war.
+func _marketing_hint(prof: CompetitorProfile) -> String:
+	if prof.marketing_style >= 0.6:
+		return "Heavy advertiser"
+	if prof.marketing_style >= 0.35:
+		return "Occasional ads"
+	return "Rarely advertises"
 
 
 # --- Rail & shared widgets ---------------------------------------------------

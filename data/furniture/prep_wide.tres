@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://dwoiblkvby5ww"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_1b7jl"]
+
+[resource]
+script = ExtResource("1_1b7jl")
+id = &"prep_wide"
+display_name = "Wide Prep Counter"
+category = &"kitchen"
+placement_zone = &"kitchen"
+icon = &"hammer"
+blurb = "Twice the counter, twice the mise en place."
+price = 490.0
+maintenance_cost = 2.0
+footprint_w = 2
+throughput = 1.0
+menu_capacity = 2
+style_tags = Array[StringName]([&"modern"])
+scene_path = "res://RestaurantAssets/gLTF/Furniture/StationTable_3_A.glb"
+variant_scenes = {
+"blue": "res://RestaurantAssets/gLTF/Furniture/StationTable_3_B.glb"
+}

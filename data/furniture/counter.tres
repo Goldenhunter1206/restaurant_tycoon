@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://deulfgw36eegn"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_bw0e5"]
+
+[resource]
+script = ExtResource("1_bw0e5")
+id = &"counter"
+display_name = "Counter"
+category = &"service"
+icon = &"store"
+blurb = "A plain counter run. Divides rooms, holds nothing fancy."
+price = 200.0
+throughput = 0.1
+style_tags = Array[StringName]([&"modern"])
+scene_path = "res://RestaurantAssets/gLTF/Furniture/StationTable_1_A.glb"
+variant_scenes = {
+"blue": "res://RestaurantAssets/gLTF/Furniture/StationTable_1_B.glb",
+"green": "res://RestaurantAssets/gLTF/Furniture/StationTable_1_C.glb"
+}

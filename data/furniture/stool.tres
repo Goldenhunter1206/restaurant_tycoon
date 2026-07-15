@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://kws5k7u255mo"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_ytqw2"]
+
+[resource]
+script = ExtResource("1_ytqw2")
+id = &"stool"
+display_name = "Stool"
+icon = &"people"
+blurb = "Cheap seating. Nobody lingers."
+price = 25.0
+seats = 1
+comfort = 0.5
+style_tags = Array[StringName]([&"rustic"])
+scene_path = "res://RestaurantAssets/gLTF/Furniture/Stool_1_A.glb"
+variant_scenes = {
+"dark": "res://RestaurantAssets/gLTF/Furniture/Stool_1_C.glb"
+}

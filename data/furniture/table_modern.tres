@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://dy86pnbjh4ywb"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_8kmy8"]
+
+[resource]
+script = ExtResource("1_8kmy8")
+id = &"table_modern"
+display_name = "Modern Table"
+blurb = "Clean lines for a clean look."
+price = 190.0
+is_table = true
+style_tags = Array[StringName]([&"modern"])
+segment_appeal = {
+"students": 0.4,
+"teens": 0.4
+}
+scene_path = "res://RestaurantAssets/gLTF/Furniture/Table_3_A.glb"
+variant_scenes = {
+"black": "res://RestaurantAssets/gLTF/Furniture/Table_3_E.glb",
+"white": "res://RestaurantAssets/gLTF/Furniture/Table_3_C.glb"
+}

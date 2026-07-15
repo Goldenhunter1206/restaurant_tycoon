@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://bgqrkdxvbsykd"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_51oyk"]
+
+[resource]
+script = ExtResource("1_51oyk")
+id = &"table_bistro"
+display_name = "Bistro Table"
+blurb = "A small square two-top. The backbone of any pizzeria."
+price = 120.0
+is_table = true
+style_tags = Array[StringName]([&"classic"])
+scene_path = "res://RestaurantAssets/gLTF/Furniture/Table_1_A.glb"
+variant_scenes = {
+"honey": "res://RestaurantAssets/gLTF/Furniture/Table_1_B.glb",
+"walnut": "res://RestaurantAssets/gLTF/Furniture/Table_1_C.glb"
+}

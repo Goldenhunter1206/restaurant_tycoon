@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="MarketingChannelDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/marketing_channel_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"flyer"
+display_name = "Flyers"
+icon = "receipt"
+blurb = "Hand out flyers around one restaurant. Cheap, quick, local."
+scope = &"local"
+required_capability = &"marketing.local_campaigns"
+reach_shape = &"radius"
+base_radius = 450.0
+reach_weight = 0.3
+frequency = 1.0
+setup_cost = 0.0
+cost_per_day = 150.0
+min_days = 3
+max_days = 14
+needs_placement = false
+world_prop = &""

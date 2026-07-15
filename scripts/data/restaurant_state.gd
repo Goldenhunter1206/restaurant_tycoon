@@ -28,6 +28,12 @@ extends Resource
 @export var recipe_sales: Dictionary = {}
 @export var staff: Array[StaffMember] = []
 @export var star_rating: float = 3.0
+## Furniture layout of the interior (save v4 additive; null on legacy saves
+## and regenerated as the classic default layout on load).
+@export var interior_layout: InteriorLayoutState = null
+## Manager auto-repair: &"off" or &"auto" (repairs below repair_threshold).
+@export var repair_policy: StringName = &"off"
+@export_range(0.0, 1.0) var repair_threshold: float = 0.4
 @export var sales_history: Array[float] = []
 ## Daily expense totals, parallel to sales_history.
 @export var expense_history: Array[float] = []
@@ -48,6 +54,14 @@ var dining: Array[Dictionary] = []
 var waiter_credits: float = 0.0
 var today: Dictionary = {}
 var active_deliveries: int = 0
+# Derived from the interior layout on load/commit (never saved):
+## Physical cook stations; caps concurrent cooking together with staff.
+var cook_station_cap: int = 4
+## Per-segment appeal deltas fed into demand scoring.
+var interior_appeal: Dictionary = {}
+var interior_comfort: float = 0.0
+## Service-speed multiplier from layout flow (crowding, walk distances).
+var interior_throughput_mod: float = 1.0
 
 
 ## Returns the owning CompanyState. Typed loosely on purpose: a hard

@@ -440,9 +440,8 @@ func _build_restaurant_menu_tab() -> void:
 	_slots_label.add_theme_color_override("font_color", Color("#8a5a2b"))
 	slots_row.add_child(_slots_label)
 	_buy_button = Button.new()
-	_buy_button.pressed.connect(func() -> void:
-		RestaurantManager.buy_menu_slot(building_id)
-		refresh())
+	_buy_button.disabled = true
+	_buy_button.tooltip_text = "Kitchen capacity now comes from the interior: place prep counters and shelves in Edit Interior."
 	slots_row.add_child(_buy_button)
 	tab.add_child(slots_row)
 	var scroll: ScrollContainer = ScrollContainer.new()
@@ -531,13 +530,8 @@ func _refresh_menu_tab() -> void:
 		return
 	_slots_label.text = "Kitchen stations: %d/%d used · menu upkeep $%.0f/day" % [
 		rest.enabled_dish_count(), rest.menu_slots, RestaurantManager.menu_upkeep_for(rest)]
-	var max_slots: int = int(EconomyManager.tuning_value("menu.max_slots", 8))
-	if rest.menu_slots >= max_slots:
-		_buy_button.text = "Kitchen full"
-		_buy_button.disabled = true
-	else:
-		_buy_button.text = "Add station ($%.0f)" % RestaurantManager.menu_slot_price(rest)
-		_buy_button.disabled = false
+	_buy_button.text = "Build prep counters in Edit Interior"
+	_buy_button.disabled = true
 	# New book entries (fresh saves from the workshop) need new rows.
 	var expected: int = 0
 	for entry: MenuEntry in rest.menu:

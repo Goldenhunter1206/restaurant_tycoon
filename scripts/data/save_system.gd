@@ -26,8 +26,7 @@ static func save_game() -> bool:
 	CompanyManager.player.recipe_book = RecipeManager.export_book()
 	for company: CompanyState in CompanyManager.companies:
 		save.companies.append(company)
-	for campaign: MarketingCampaign in MarketingManager.campaigns:
-		save.active_campaigns.append(campaign)
+	MarketingManager.write_save(save)
 	for cand: JobCandidate in RestaurantManager.job_market:
 		save.job_market.append(cand)
 	save.next_candidate_uid = RestaurantManager._next_candidate_uid

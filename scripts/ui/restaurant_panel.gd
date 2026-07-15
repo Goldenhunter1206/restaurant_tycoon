@@ -101,7 +101,7 @@ func _ready() -> void:
 	for entry: Array in [
 		["City", Minimap.Layer.NONE], ["Demand", Minimap.Layer.DEMAND],
 		["Coverage", Minimap.Layer.COVERAGE], ["Routes", Minimap.Layer.ROUTES],
-		["Zoning", Minimap.Layer.ZONING],
+		["Zoning", Minimap.Layer.ZONING], ["Marketing", Minimap.Layer.MARKETING],
 	]:
 		_layer_menu.add_radio_check_item(entry[0], entry[1])
 	_layer_menu.set_item_checked(0, true)

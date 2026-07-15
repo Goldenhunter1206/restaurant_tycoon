@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="MarketingChannelDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/marketing_channel_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"radio"
+display_name = "Radio Spots"
+icon = "megaphone"
+blurb = "Citywide airtime. Reaches every district, lighter per block."
+scope = &"citywide"
+required_capability = &"marketing.citywide"
+reach_shape = &"city"
+base_radius = 0.0
+reach_weight = 0.25
+frequency = 2.0
+setup_cost = 800.0
+cost_per_day = 600.0
+min_days = 5
+max_days = 28
+needs_placement = false
+world_prop = &""

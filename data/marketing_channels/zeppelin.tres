@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="MarketingChannelDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/marketing_channel_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"zeppelin"
+display_name = "Zeppelin"
+icon = "star"
+blurb = "A branded zeppelin over the skyline. The whole city looks up."
+scope = &"citywide"
+required_capability = &"marketing.citywide"
+reach_shape = &"city"
+base_radius = 0.0
+reach_weight = 0.35
+frequency = 1.0
+setup_cost = 2500.0
+cost_per_day = 1200.0
+min_days = 3
+max_days = 14
+needs_placement = false
+world_prop = &"zeppelin"

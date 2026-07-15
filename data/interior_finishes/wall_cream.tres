@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="InteriorFinishDef" format=3 uid="uid://diurnrromx1hd"]
+
+[ext_resource type="Script" uid="uid://cwlvl140s5tqn" path="res://scripts/data/interior_finish_def.gd" id="1_glq7y"]
+
+[resource]
+script = ExtResource("1_glq7y")
+id = &"wall_cream"
+display_name = "Cream Plaster"
+kind = &"wall"
+comfort = 0.2
+style_tags = Array[StringName]([&"classic"])

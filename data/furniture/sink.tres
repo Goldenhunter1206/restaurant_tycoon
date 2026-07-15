@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://cqj2rw1sh22uc"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_x8b8s"]
+
+[resource]
+script = ExtResource("1_x8b8s")
+id = &"sink"
+display_name = "Sink"
+category = &"kitchen"
+placement_zone = &"kitchen"
+icon = &"gear"
+blurb = "Clean hands, clean plates, clean record."
+price = 320.0
+maintenance_cost = 1.5
+cleanliness_impact = 0.8
+style_tags = Array[StringName]([&"modern"])
+scene_path = "res://RestaurantAssets/gLTF/Furniture/Sink_A.glb"
+variant_scenes = {
+"steel": "res://RestaurantAssets/gLTF/Furniture/Sink_C.glb"
+}

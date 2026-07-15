@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://cdvu1owjg52xm"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_cwqlu"]
+
+[resource]
+script = ExtResource("1_cwqlu")
+id = &"table_long"
+display_name = "Family Table"
+icon = &"family"
+blurb = "Seats a whole family along both sides."
+price = 280.0
+footprint_d = 2
+is_table = true
+style_tags = Array[StringName]([&"classic"])
+segment_appeal = {
+"families": 0.6
+}
+scene_path = "res://RestaurantAssets/gLTF/Furniture/Table_4_A.glb"
+variant_scenes = {
+"dark": "res://RestaurantAssets/gLTF/Furniture/Table_4_E.glb",
+"oak": "res://RestaurantAssets/gLTF/Furniture/Table_4_C.glb"
+}

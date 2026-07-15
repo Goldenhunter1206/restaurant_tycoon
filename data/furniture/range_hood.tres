@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://bpvw2446eddii"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_asbqf"]
+
+[resource]
+script = ExtResource("1_asbqf")
+id = &"range_hood"
+display_name = "Range Hood"
+category = &"kitchen"
+placement_zone = &"kitchen"
+icon = &"gear"
+blurb = "Keeps the smoke off the ceiling and the inspector happy."
+price = 160.0
+blocks_walk = false
+is_wall_item = true
+mount_y = 1.9
+cleanliness_impact = 0.4
+style_tags = Array[StringName]([&"modern"])
+scene_path = "res://RestaurantAssets/gLTF/Furniture/RangeHood_A.glb"
+variant_scenes = {
+"steel": "res://RestaurantAssets/gLTF/Furniture/RangeHood_B.glb"
+}

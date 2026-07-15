@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://bfe2t1t0a0kqq"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_x1lsl"]
+
+[resource]
+script = ExtResource("1_x1lsl")
+id = &"host_stand"
+display_name = "Host Stand"
+category = &"service"
+icon = &"bell"
+blurb = "A friendly face keeps the line patient."
+price = 190.0
+queue_capacity = 2
+style_tags = Array[StringName]([&"classic"])
+scene_path = "res://RestaurantAssets/gLTF/Furniture/Furnit_A_1.glb"
+variant_scenes = {
+"dark": "res://RestaurantAssets/gLTF/Furniture/Furnit_B_1.glb"
+}

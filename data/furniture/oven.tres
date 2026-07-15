@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://ffjonyygq6fq"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_4uw0c"]
+
+[resource]
+script = ExtResource("1_4uw0c")
+id = &"oven"
+display_name = "Pizza Oven"
+category = &"kitchen"
+placement_zone = &"kitchen"
+icon = &"chef_hat"
+blurb = "One oven, one cook, endless pizzas."
+price = 950.0
+maintenance_cost = 6.0
+cook_slots = 1
+cleanliness_impact = -0.5
+style_tags = Array[StringName]([&"classic"])
+wear_per_use = 0.08
+scene_path = "res://RestaurantAssets/gLTF/Furniture/Owen_A.glb"
+variant_scenes = {
+"black": "res://RestaurantAssets/gLTF/Furniture/Owen_E.glb",
+"brick": "res://RestaurantAssets/gLTF/Furniture/Owen_G.glb",
+"steel": "res://RestaurantAssets/gLTF/Furniture/Owen_C.glb"
+}

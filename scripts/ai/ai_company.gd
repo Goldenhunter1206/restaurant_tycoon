@@ -141,6 +141,35 @@ func _plan_tactical(day: int) -> void:
 		_tune_menu(rest, day)
 		_ensure_channels(rest)
 		_consider_marketing(rest)
+		_consider_interior(rest, day)
+
+
+## Rivals invest in their rooms too: keep furniture repaired via policy, and
+## once cash allows, upgrade to a better designer set. Runs headlessly —
+## evaluation never touches the 3D scene.
+func _consider_interior(rest: RestaurantState, day: int) -> void:
+	if rest.repair_policy != &"auto":
+		RestaurantManager.set_repair_policy_cmd(company.id, rest.building_id, &"auto", 0.5)
+	# Weekly (staggered per branch) look at a richer template.
+	if (day + rest.building_id) % 7 != 0 or company.cash < 6000.0:
+		return
+	var pick: InteriorTemplateDef = RestaurantManager.interior.choose_template_for(rest, company.cash * 0.35)
+	if pick == null:
+		return
+	# Skip when the room already scores at least as well as the candidate.
+	var current: InteriorEvaluation = RestaurantManager.interior.evaluate(rest.interior_layout)
+	var candidate: InteriorEvaluation = RestaurantManager.interior.evaluate(pick.build_layout())
+	var current_sum: float = 0.0
+	var candidate_sum: float = 0.0
+	for value: float in current.segment_appeal.values():
+		current_sum += value
+	for value: float in candidate.segment_appeal.values():
+		candidate_sum += value
+	if candidate_sum <= current_sum + 0.5 or candidate.table_seats.size() < current.table_seats.size():
+		return
+	var result: CommandResult = RestaurantManager.apply_template_cmd(company.id, rest.building_id, pick.id)
+	if result.ok:
+		_record("interior", String(pick.id), [], "appeal %.1f -> %.1f" % [current_sum, candidate_sum])
 
 
 ## Keeps the baseline crew: two cook/waiter pairs covering lunch + dinner,
@@ -260,27 +289,130 @@ func _wants_delivery(_rest: RestaurantState) -> bool:
 	return company.cash > 5000.0
 
 
-## Marketing-minded companies buy local ad pushes when cash allows.
+## Marketing-minded companies buy ad pushes when cash allows: channel scale
+## follows marketing_style + unlocked capabilities, claims are only made when
+## true, and the decision uses the same preview as the player — degraded by
+## the profile's forecast accuracy.
 func _consider_marketing(rest: RestaurantState) -> void:
 	if company.cash < 4000.0:
 		return
 	if _rng.randf() > profile.marketing_style * 0.35:
 		return
+	var campaign: MarketingCampaign = _design_campaign(rest)
+	var def: MarketingChannelDef = MarketingManager.channel(campaign.channel_id)
+	# Judge estimated cost per reached person with imperfect information.
+	var preview: Dictionary = MarketingManager.preview(campaign, _forecast_noise())
+	var people: int = int(preview.get("people", 0))
+	if people <= 0:
+		return
+	var cost_per_head: float = float(preview.get("total_cost", 0.0)) / people
+	if cost_per_head > 15.0 + 25.0 * profile.risk_tolerance:
+		return
+	if float(preview.get("total_cost", 0.0)) > company.cash * 0.35:
+		return
+	if def != null and def.needs_placement:
+		var site: AdPlacement = _pick_billboard_site(rest)
+		if site == null:
+			return
+		var rent: CommandResult = MarketingManager.rent_placement(company.id, site.id, campaign.days_left + 7)
+		if not rent.ok:
+			return
+		campaign.placement_ids = [site.id] as Array[int]
+	var result: CommandResult = MarketingManager.start_campaign(campaign)
+	if result.ok:
+		_record("tactical", "%s campaign at %s" % [campaign.channel_id, rest.restaurant_name], [],
+			"$%.0f/day for %d days" % [campaign.cost_per_day, campaign.days_left])
+		_news("%s launched a %s campaign around %s." % [company.display_name,
+			String(campaign.channel_id).replace("_", " "),
+			DISTRICT_NAMES.get(rest.district, "town")])
+
+
+## Build the campaign the profile would want: biggest unlocked channel it can
+## fund (scaled by marketing_style), truthful claim matching its identity.
+func _design_campaign(rest: RestaurantState) -> MarketingCampaign:
 	var campaign: MarketingCampaign = MarketingCampaign.new()
 	campaign.company_id = company.id
 	campaign.building_id = rest.building_id
-	if not profile.target_demographics.is_empty():
-		campaign.demographic = profile.target_demographics[_rng.randi_range(0, profile.target_demographics.size() - 1)]
-	campaign.radius = 450.0
+	campaign.channel_id = &"flyer"
+	if profile.marketing_style > 0.65 and company.cash > 25000.0 \
+			and CapabilityRegistry.has(company.id, &"marketing.citywide") \
+			and MarketingManager.channel(&"radio") != null:
+		campaign.channel_id = &"radio"
+		campaign.building_id = -1
+	elif profile.marketing_style > 0.45 and company.cash > 10000.0 \
+			and CapabilityRegistry.has(company.id, &"marketing.billboards") \
+			and MarketingManager.channel(&"billboard") != null:
+		campaign.channel_id = &"billboard"
+		campaign.building_id = -1
+	elif profile.marketing_style > 0.55 and company.cash > 8000.0 \
+			and MarketingManager.channel(&"poster") != null \
+			and CapabilityRegistry.has(company.id, &"marketing.billboards"):
+		campaign.channel_id = &"poster"
+	campaign.target_segments = profile.target_demographics.duplicate()
 	campaign.utility_bonus = 0.1 + 0.1 * profile.marketing_style
-	campaign.cost_per_day = snappedf(100.0 + 140.0 * profile.marketing_style, 5.0)
-	campaign.days_left = 5
-	var result: CommandResult = MarketingManager.start_campaign(campaign)
-	if result.ok:
-		_record("tactical", "ad campaign at %s" % rest.restaurant_name, [],
-			"$%.0f/day for %d days" % [campaign.cost_per_day, campaign.days_left])
-		_news("%s launched an ad campaign around %s." % [company.display_name,
-			DISTRICT_NAMES.get(rest.district, "town")])
+	campaign.intensity = clampf(0.75 + 0.75 * profile.marketing_style, 0.5, 2.0)
+	campaign.days_left = 5 + int(profile.marketing_style * 9.0)
+	var def: MarketingChannelDef = MarketingManager.channel(campaign.channel_id)
+	if def != null:
+		campaign.radius = def.base_radius
+		campaign.days_left = clampi(campaign.days_left, def.min_days, def.max_days)
+	campaign.claim = _pick_truthful_claim()
+	return campaign
+
+
+## Claims consistent with the profile's identity — and only when actually
+## true today, so credibility holds.
+func _pick_truthful_claim() -> StringName:
+	var wanted: Array[StringName] = []
+	if profile.price_bias < 0.35:
+		wanted.append(&"lowest_price")
+	if profile.quality_bias > 0.6:
+		wanted.append(&"highest_quality")
+	if profile.operational_skill > 0.7:
+		wanted.append(&"best_staff")
+	for claim: StringName in wanted:
+		if MarketingManager.claim_check(company.id, claim):
+			return claim
+	return &""
+
+
+## Prefer a vacant site near our branch; marketers also grab sites in
+## districts where a competitor operates (contention).
+func _pick_billboard_site(rest: RestaurantState) -> AdPlacement:
+	var vacant: Array[AdPlacement] = MarketingManager.vacant_placements()
+	if vacant.is_empty():
+		return null
+	var best: AdPlacement = null
+	var best_score: float = -INF
+	for site: AdPlacement in vacant:
+		var score: float = -site.rent_per_day * 0.01
+		score -= site.world_pos.distance_to(rest.door_pos) * 0.002
+		if profile.aggression > 0.55:
+			for other: CompanyState in CompanyManager.companies:
+				if other.id == company.id:
+					continue
+				for other_rest: RestaurantState in other.restaurants:
+					if other_rest.district == site.district:
+						score += 0.5
+		score += _rng.randf() * profile.planning_noise * 2.0
+		if score > best_score:
+			best_score = score
+			best = site
+	return best
+
+
+## A competitor named us in a comparison ad — marketers answer with their own
+## campaign, everyone remembers it in the log.
+func on_rival_comparison(campaign: MarketingCampaign) -> void:
+	if company.is_bankrupt or company.restaurants.is_empty():
+		return
+	var now: int = GameClock.total_minutes()
+	if int(_cooldown_until.get(&"comparison_reply", 0)) > now:
+		return
+	_cooldown_until[&"comparison_reply"] = now + 2 * MINUTES_PER_DAY
+	_record("incident", "named in a comparison ad by %s" % campaign.company_id, [], "")
+	if profile.marketing_style > 0.4 and company.cash > 4000.0:
+		_consider_marketing(company.restaurants[0])
 
 
 ## Incident response to a competitor (player included) opening near one of
@@ -402,6 +534,13 @@ func _setup_new_branch(rest: RestaurantState) -> void:
 	RestaurantManager.set_hours_cmd(company.id, rest.building_id, open_hour, 22.0)
 	RestaurantManager.set_channels_cmd(company.id, rest.building_id, true, false)
 	_menu_review_day.erase(rest.building_id)
+	RestaurantManager.set_repair_policy_cmd(company.id, rest.building_id, &"auto", 0.5)
+	# Fit the branch with the best designer set the war chest allows.
+	var pick: InteriorTemplateDef = RestaurantManager.interior.choose_template_for(rest, company.cash * 0.35)
+	if pick != null:
+		var result: CommandResult = RestaurantManager.apply_template_cmd(company.id, rest.building_id, pick.id)
+		if result.ok:
+			_record("interior", String(pick.id), [], "furnished new branch")
 
 
 # --- Journal & helpers ---------------------------------------------------------

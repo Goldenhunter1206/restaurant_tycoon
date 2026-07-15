@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://dwg0ehpy3qy81"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_ghb84"]
+
+[resource]
+script = ExtResource("1_ghb84")
+id = &"armchair"
+display_name = "Armchair"
+icon = &"people"
+blurb = "Sink in. The pizza can wait."
+price = 150.0
+seats = 1
+comfort = 2.6
+style_tags = Array[StringName]([&"cozy"])
+segment_appeal = {
+"seniors": 0.5
+}
+scene_path = "res://RestaurantAssets/gLTF/Furniture/Armchair_1_A.glb"
+variant_scenes = {
+"plum": "res://RestaurantAssets/gLTF/Furniture/Armchair_1_E.glb",
+"teal": "res://RestaurantAssets/gLTF/Furniture/Armchair_1_C.glb"
+}

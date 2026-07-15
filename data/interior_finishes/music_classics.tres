@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="InteriorFinishDef" format=3 uid="uid://cddh02l2t4yxb"]
+
+[ext_resource type="Script" uid="uid://cwlvl140s5tqn" path="res://scripts/data/interior_finish_def.gd" id="1_6opkp"]
+
+[resource]
+script = ExtResource("1_6opkp")
+id = &"music_classics"
+display_name = "Italian Classics"
+kind = &"music"
+daily_cost = 12.0
+comfort = 0.4
+style_tags = Array[StringName]([&"classic"])
+segment_appeal = {
+"families": 0.2,
+"seniors": 0.4
+}

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://dpjpnh0jixmw4"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_gx8m3"]
+
+[resource]
+script = ExtResource("1_gx8m3")
+id = &"chair_modern"
+display_name = "Modern Chair"
+icon = &"people"
+blurb = "Molded to look fast even standing still."
+price = 55.0
+seats = 1
+comfort = 1.2
+style_tags = Array[StringName]([&"modern"])
+segment_appeal = {
+"students": 0.3,
+"teens": 0.3
+}
+scene_path = "res://RestaurantAssets/gLTF/Furniture/Chair_3_A.glb"
+variant_scenes = {
+"black": "res://RestaurantAssets/gLTF/Furniture/Chair_3_E.glb",
+"red": "res://RestaurantAssets/gLTF/Furniture/Chair_3_G.glb",
+"white": "res://RestaurantAssets/gLTF/Furniture/Chair_3_C.glb"
+}

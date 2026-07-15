@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://bwrpi10uvbkom"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_rscd2"]
+
+[resource]
+script = ExtResource("1_rscd2")
+id = &"curtains"
+display_name = "Curtains"
+category = &"decor"
+icon = &"house"
+blurb = "Softens the light and the room."
+price = 140.0
+footprint_w = 2
+blocks_walk = false
+is_wall_item = true
+mount_y = 1.2
+comfort = 0.5
+style_tags = Array[StringName]([&"classic"])
+segment_appeal = {
+"seniors": 0.4
+}
+scene_path = "res://RestaurantAssets/gLTF/Walls/Curtains_Short_1_A_A.glb"
+variant_scenes = {
+"red": "res://RestaurantAssets/gLTF/Walls/Curtains_Short_1_A_C.glb"
+}

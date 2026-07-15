@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://dekx01dysfd5j"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_xvig1"]
+
+[resource]
+script = ExtResource("1_xvig1")
+id = &"coffee_machine"
+display_name = "Coffee Machine"
+category = &"kitchen"
+icon = &"gear"
+blurb = "Espresso after the pizza. Very continental."
+price = 420.0
+maintenance_cost = 2.0
+mount_y = 1.0
+entertainment = 0.5
+style_tags = Array[StringName]([&"modern"])
+segment_appeal = {
+"students": 0.4,
+"workers": 0.5
+}
+scene_path = "res://RestaurantAssets/gLTF/Other/CoffeeMachine_1_A.glb"
+variant_scenes = {
+"red": "res://RestaurantAssets/gLTF/Other/CoffeeMachine_1_D.glb"
+}
+base_scene = "res://RestaurantAssets/gLTF/Furniture/StationTable_1_A.glb"

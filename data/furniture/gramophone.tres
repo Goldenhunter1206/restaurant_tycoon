@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://usph3dc1xm5"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_wn2vc"]
+
+[resource]
+script = ExtResource("1_wn2vc")
+id = &"gramophone"
+display_name = "Gramophone"
+category = &"entertainment"
+icon = &"megaphone"
+blurb = "Crackly classics while the dough rests."
+price = 520.0
+maintenance_cost = 2.0
+mount_y = 1.0
+entertainment = 2.0
+style_tags = Array[StringName]([&"classic"])
+segment_appeal = {
+"families": 0.3,
+"seniors": 0.6
+}
+scene_path = "res://RestaurantAssets/gLTF/Other/Gramophone.glb"
+base_scene = "res://RestaurantAssets/gLTF/Furniture/Furnit_A_3.glb"

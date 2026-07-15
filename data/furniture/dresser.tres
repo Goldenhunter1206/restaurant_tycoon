@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://drg0yf6om75x0"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_88p71"]
+
+[resource]
+script = ExtResource("1_88p71")
+id = &"dresser"
+display_name = "Rustic Dresser"
+category = &"decor"
+icon = &"house"
+blurb = "Old wood, good stories."
+price = 160.0
+comfort = 0.3
+style_tags = Array[StringName]([&"rustic"])
+scene_path = "res://RestaurantAssets/gLTF/Furniture/Furnit_A_2.glb"
+variant_scenes = {
+"dark": "res://RestaurantAssets/gLTF/Furniture/Furnit_B_2.glb"
+}

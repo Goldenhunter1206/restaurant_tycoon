@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="InteriorFinishDef" format=3 uid="uid://dkkx7e2ui05cr"]
+
+[ext_resource type="Script" uid="uid://cwlvl140s5tqn" path="res://scripts/data/interior_finish_def.gd" id="1_n5hfv"]
+
+[resource]
+script = ExtResource("1_n5hfv")
+id = &"wall_terracotta"
+display_name = "Terracotta"
+kind = &"wall"
+price = 400.0
+comfort = 0.4
+style_tags = Array[StringName]([&"rustic"])
+segment_appeal = {
+"families": 0.2,
+"seniors": 0.2
+}
+wall_tint = Color(0.95, 0.72, 0.55, 1)

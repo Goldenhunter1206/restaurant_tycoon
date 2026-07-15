@@ -42,6 +42,7 @@
 [ext_resource type="PackedScene" uid="uid://mwem3r8qv6g" path="res://Cartoon City Massive Megapack/gLTF/Construction Site/Other/Container_1_4.glb" id="35_ugmlg"]
 [ext_resource type="Texture2D" uid="uid://km8iwdh0xsan" path="res://Cartoon City Massive Megapack/gLTF/Construction Site/Other/Container_1_4_City Atlas Map.png" id="36_qd1pt"]
 [ext_resource type="Script" uid="uid://bdn35onssc0qh" path="res://scripts/ui/tycoon_hud.gd" id="40_pdwbg"]
+[ext_resource type="Script" uid="uid://ln3cylphieaq" path="res://scripts/world/ad_props.gd" id="43_5grtr"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tr7q8"]
 resource_name = "City Metal"
@@ -2044,3 +2045,6 @@ script = ExtResource("5_jlsqs")
 
 [node name="AmbientLife" type="Node" parent="." unique_id=1097464537]
 script = ExtResource("6_c01mt")
+
+[node name="AdProps" type="Node3D" parent="." unique_id=1858966510]
+script = ExtResource("43_5grtr")

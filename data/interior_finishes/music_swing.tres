@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="InteriorFinishDef" format=3 uid="uid://dndltri84r1cn"]
+
+[ext_resource type="Script" uid="uid://cwlvl140s5tqn" path="res://scripts/data/interior_finish_def.gd" id="1_pgetb"]
+
+[resource]
+script = ExtResource("1_pgetb")
+id = &"music_swing"
+display_name = "Gramophone Swing"
+kind = &"music"
+daily_cost = 15.0
+comfort = 0.4
+style_tags = Array[StringName]([&"cozy"])
+segment_appeal = {
+"seniors": 0.3,
+"workers": 0.2
+}

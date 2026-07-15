@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="FurnitureDef" format=3 uid="uid://ddbnunldshux6"]
+
+[ext_resource type="Script" uid="uid://bkga7cet0mjq2" path="res://scripts/data/furniture_def.gd" id="1_0mm2u"]
+
+[resource]
+script = ExtResource("1_0mm2u")
+id = &"stool_bar"
+display_name = "Bar Stool"
+icon = &"people"
+blurb = "Perch, eat, back to work."
+price = 38.0
+seats = 1
+comfort = 0.8
+style_tags = Array[StringName]([&"modern"])
+segment_appeal = {
+"workers": 0.3
+}
+scene_path = "res://RestaurantAssets/gLTF/Furniture/Stool_3B_A.glb"
+variant_scenes = {
+"dark": "res://RestaurantAssets/gLTF/Furniture/Stool_3B_C.glb"
+}

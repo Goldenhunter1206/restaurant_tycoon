@@ -31,6 +31,7 @@ RecipeManager="*res://scripts/autoload/recipe_manager.gd"
 GameSetup="*res://scripts/autoload/game_setup.gd"
 CompanyManager="*res://scripts/autoload/company_manager.gd"
 MarketingManager="*res://scripts/autoload/marketing_manager.gd"
+CapabilityRegistry="*res://scripts/autoload/capability_registry.gd"
 
 [display]
 

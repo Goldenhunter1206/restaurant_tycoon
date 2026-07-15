@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="InteriorFinishDef" format=3 uid="uid://3phcjrtr8abf"]
+
+[ext_resource type="Script" uid="uid://cwlvl140s5tqn" path="res://scripts/data/interior_finish_def.gd" id="1_7wdn4"]
+
+[resource]
+script = ExtResource("1_7wdn4")
+id = &"wall_charcoal"
+display_name = "Charcoal"
+kind = &"wall"
+price = 500.0
+comfort = 0.3
+style_tags = Array[StringName]([&"modern"])
+segment_appeal = {
+"students": 0.2,
+"teens": 0.3
+}
+wall_tint = Color(0.42, 0.42, 0.47, 1)
