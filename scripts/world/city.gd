@@ -12,6 +12,7 @@ func _ready() -> void:
 	# before restaurant history rolls over.
 	EconomyManager.initialize.call_deferred()
 	CompanyManager.initialize.call_deferred()
+	get_node("/root/HeadquartersManager").call_deferred("initialize")
 	MarketingManager.initialize.call_deferred()
 	RestaurantManager.initialize.call_deferred()
 	SupplyManager.initialize.call_deferred()

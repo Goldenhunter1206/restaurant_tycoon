@@ -66,6 +66,7 @@ func on_day(day: int) -> void:
 	_plan_liquidity(day)
 	_plan_expansion(day)
 	_plan_procurement(day)
+	_consider_headquarters(day)
 
 
 # --- Strategic planner ---------------------------------------------------------
@@ -631,6 +632,61 @@ func _record_outcome(item: Dictionary, result: CommandResult) -> void:
 func _news(text: String) -> void:
 	company.log_move(GameClock.day, "news", text)
 	company.message.emit("news", text)
+
+
+func _consider_headquarters(day: int) -> void:
+	# Strategic construction is intentionally staggered so rivals do not all buy
+	# offices on the same tick. Every action still goes through the player commands.
+	if (day + absi(hash(company.id))) % 7 != 0:
+		return
+	var manager: Node = Engine.get_main_loop().root.get_node_or_null("HeadquartersManager")
+	if not is_instance_valid(manager):
+		return
+	var state: HeadquartersState = manager.call("state_for", company.id) as HeadquartersState
+	if state == null or state.has_active_project():
+		return
+	var current_upkeep: float = float(manager.call("upkeep_for", company.id))
+	var reserve: float = _cash_reserve_floor() + current_upkeep * 7.0
+	if state.tier == 0:
+		var offices: Array = manager.call("eligible_buildings", company.id)
+		if offices.is_empty() or company.cash - 6000.0 < reserve + 560.0:
+			return
+		var office: Dictionary = offices[_rng.randi_range(0, offices.size() - 1)]
+		var acquisition: CommandResult = manager.call("start_acquisition_cmd", company.id, int(office.get("id", -1))) as CommandResult
+		if acquisition != null and acquisition.ok:
+			_news("%s secured an office for its new headquarters." % company.name)
+		return
+
+	var next_tier: HeadquartersTierDef = manager.call("tier_def", state.tier + 1) as HeadquartersTierDef
+	if next_tier != null:
+		var tier_reserve: float = _cash_reserve_floor() + next_tier.base_upkeep * 7.0
+		if company.cash - next_tier.cost >= tier_reserve:
+			var tier_result: CommandResult = manager.call("start_tier_upgrade_cmd", company.id) as CommandResult
+			if tier_result != null and tier_result.ok:
+				_news("%s began expanding its headquarters." % company.name)
+				return
+
+	var choices: Array[Dictionary] = [
+		{"id": &"marketing", "score": profile.marketing_style},
+		{"id": &"operations", "score": profile.operational_skill},
+		{"id": &"analytics", "score": profile.forecast_accuracy},
+		{"id": &"procurement", "score": (profile.procurement_style + profile.warehouse_appetite) * 0.5},
+	]
+	choices.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a["score"]) > float(b["score"]))
+	for choice: Dictionary in choices:
+		var definition: DepartmentDef = manager.call("department_def", choice["id"]) as DepartmentDef
+		if definition == null:
+			continue
+		var next_level: int = state.department_level(definition.id) + 1
+		if next_level > definition.max_level() or state.tier < definition.required_tier_for(next_level):
+			continue
+		var projected_upkeep: float = current_upkeep + definition.upkeep_for(next_level) - definition.upkeep_for(next_level - 1)
+		var cost: float = definition.cost_for(next_level)
+		if company.cash - cost < _cash_reserve_floor() + projected_upkeep * 7.0:
+			continue
+		var result: CommandResult = manager.call("start_department_project_cmd", company.id, definition.id) as CommandResult
+		if result != null and result.ok:
+			return
 
 
 func _cash_reserve_floor() -> float:

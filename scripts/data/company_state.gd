@@ -23,6 +23,8 @@ signal went_bankrupt
 @export var history: Array[Dictionary] = []
 @export var is_bankrupt: bool = false
 @export var restaurants: Array[RestaurantState] = []
+## One company-wide headquarters; null only while migrating pre-v6 saves.
+@export var headquarters: HeadquartersState
 ## Only the player carries a mutable book; rivals cook from the shared
 ## starter catalog until per-company books land.
 @export var recipe_book: RecipeBookState = null

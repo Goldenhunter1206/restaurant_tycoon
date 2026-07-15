@@ -1,12 +1,12 @@
 class_name SaveGame
 extends Resource
-## Serializable snapshot of a play session (format v5: multi-company +
-## supply chain). In-flight orders are not saved — kitchens restart empty on
+## Serializable snapshot of a play session (format v6: headquarters +
+## source-aware capabilities). In-flight orders are not saved — kitchens restart empty on
 ## load, and inventory lot reservations are cleared on restore.
 ## v4 saves load fine: supply fields default empty and SupplyManager seeds
 ## starter stock into any restaurant without an inventory.
 
-@export var save_version: int = 5
+@export var save_version: int = 6
 @export var day: int = 1
 @export var game_hours: float = 7.0
 ## Every competing company (player + rivals), each carrying its own finances,
@@ -26,6 +26,8 @@ extends Resource
 ## World seed chosen in the New Game Wizard (drives AI determinism).
 @export var world_seed: int = 0
 @export var difficulty: StringName = &"medium"
+## Persistent scenario/award capability sources; HQ sources are derived.
+@export var capability_sources: Array[CapabilitySourceState] = []
 ## Supply chain (v5+). Per-restaurant stock rides inside companies via
 ## RestaurantState.inventory; the rest is manager-owned global state.
 @export var warehouses: Array[WarehouseState] = []

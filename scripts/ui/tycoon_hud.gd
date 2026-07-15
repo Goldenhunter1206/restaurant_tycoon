@@ -71,6 +71,7 @@ func _ready() -> void:
 
 	screens = SubScreenManager.new()
 	add_child(screens)
+	SelectionManager.entity_selected.connect(_on_hq_entity_selected)
 
 	GameClock.minute_ticked.connect(_on_minute)
 	GameClock.speed_changed.connect(_on_speed_changed)
@@ -106,6 +107,10 @@ func _build_top_bar() -> void:
 	bar.add_child(logo)
 
 	var company_chip: HBoxContainer = _chip(bar)
+	company_chip.mouse_filter = Control.MOUSE_FILTER_STOP
+	company_chip.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	company_chip.tooltip_text = "Open company headquarters"
+	company_chip.gui_input.connect(_on_company_chip_input)
 	_company_label = _chip_label(company_chip, "…", 20)
 	var level_icon: TextureRect = _assets.icon_rect(&"star", 18)
 	company_chip.add_child(level_icon)
@@ -283,6 +288,7 @@ func _build_bottom_bar() -> void:
 		["STAFF", &"staff", &"people", false],
 		["RECIPES", &"recipes", &"pizza", false],
 		["FINANCES", &"finances", &"coin", false],
+		["HQ", &"headquarters", &"store", false],
 		["RANKINGS", &"rankings", &"trophy", false],
 	]:
 		var btn: Button = Button.new()
@@ -362,6 +368,24 @@ func _chip_label(chip_row: HBoxContainer, text: String, font_size: int = 15) -> 
 
 
 # --- Signal handlers ----------------------------------------------------------
+
+
+func _on_company_chip_input(event: InputEvent) -> void:
+	var click: InputEventMouseButton = event as InputEventMouseButton
+	if click != null and click.pressed and click.button_index == MOUSE_BUTTON_LEFT:
+		var state: HeadquartersState = CompanyManager.player.headquarters
+		screens.open(&"headquarters", state.building_id if state != null else -1)
+
+
+func _on_hq_entity_selected(info: Dictionary, _entity: Node) -> void:
+	if String(info.get("kind", "")) != "building":
+		return
+	var selected_id: int = int(info.get("id", -1))
+	for company: CompanyState in CompanyManager.companies:
+		var state: HeadquartersState = company.headquarters
+		if state != null and state.building_id == selected_id and company.is_player:
+			screens.open(&"headquarters", selected_id)
+			return
 
 
 func _on_action(screen_id: StringName, building_id: int) -> void:

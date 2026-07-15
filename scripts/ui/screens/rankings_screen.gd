@@ -168,7 +168,9 @@ func _render_profile(company: CompanyState) -> void:
 	name_label.add_theme_color_override("font_color", INK)
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(name_label)
-	header.add_child(BellaUi.pill("Intel: public only", INK_SOFT, Color("#F6E4B0"), Color("#EAD59B")))
+	var depth: int = _analytics_depth()
+	var intel_label: String = "Intel: public only" if depth == 0 else ("Intel: modeled" if depth == 1 else "Intel: verified")
+	header.add_child(BellaUi.pill(intel_label, INK_SOFT, Color("#F6E4B0"), Color("#EAD59B")))
 
 	if company.profile != null:
 		var tagline: Label = Label.new()
@@ -192,7 +194,7 @@ func _render_profile(company: CompanyState) -> void:
 		"~$%s (estimated)" % _fmt_thousands(RivalIntel.estimated_revenue(company)))
 	_head_to_head(grid, "Avg menu price", "$%.2f" % RivalIntel.avg_menu_price(player),
 		"$%.2f (posted)" % RivalIntel.avg_menu_price(company))
-	_head_to_head(grid, "Treasury", "$%.0f" % player.cash, "?  unknown")
+	_head_to_head(grid, "Treasury", "$%.0f" % player.cash, _intel_treasury(company))
 	_head_to_head(grid, "Ad campaigns", str(RivalIntel.spotted_campaigns(player)),
 		"%d (spotted)" % RivalIntel.spotted_campaigns(company))
 	_head_to_head(grid, "Share of voice", "%d%%" % roundi(RivalIntel.share_of_voice(player, true) * 100.0),
@@ -208,7 +210,7 @@ func _render_profile(company: CompanyState) -> void:
 	note_box.content_margin_bottom = 6.0
 	note.add_theme_stylebox_override("panel", note_box)
 	var note_label: Label = Label.new()
-	note_label.text = "Private finances, recipes and staffing stay hidden until you have an intelligence source."
+	note_label.text = "Build Analytics at HQ to model rival treasury." if depth == 0 else ("Analytics L1 models treasury in $5,000 bands; upgrade to L2 for verified figures." if depth == 1 else "Analytics L2 verifies rival treasury; recipes and staffing remain private.")
 	note_label.add_theme_font_size_override("font_size", 12)
 	note_label.add_theme_color_override("font_color", INK_MUTED)
 	note_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -289,6 +291,21 @@ func _swatch(color: Color, size_px: int) -> PanelContainer:
 	swatch.add_theme_stylebox_override("panel", box)
 	swatch.custom_minimum_size = Vector2(size_px, size_px)
 	return swatch
+
+
+func _analytics_depth() -> int:
+	if CompanyManager.player == null:
+		return 0
+	return CapabilityRegistry.level(CompanyManager.player.id, &"analytics.report_depth")
+
+
+func _intel_treasury(company: CompanyState) -> String:
+	var depth: int = _analytics_depth()
+	if depth >= 2:
+		return "$%s (verified)" % _fmt_thousands(company.cash)
+	if depth == 1:
+		return "~$%s (modeled)" % _fmt_thousands(snappedf(company.cash, 5000.0))
+	return "?  unknown"
 
 
 func _fmt_thousands(value: float) -> String:

@@ -342,6 +342,16 @@ func buy_warehouse_cmd(company_id: StringName, building_id: int) -> CommandResul
 	var company: CompanyState = CompanyManager.company(company_id)
 	if company == null:
 		return CommandResult.fail(&"unknown_company", "No such company.")
+	var hq_manager: Node = Engine.get_main_loop().root.get_node_or_null("HeadquartersManager")
+	if hq_manager != null:
+		var owned_count: int = 0
+		for owned_warehouse: WarehouseState in warehouses:
+			if owned_warehouse.company_id == company_id:
+				owned_count += 1
+		var limit: int = int(hq_manager.warehouse_limit(company_id))
+		if owned_count >= limit:
+			return CommandResult.fail(&"capacity_full",
+				"Warehouse capacity is full (%d/%d). Build or upgrade Procurement." % [owned_count, limit])
 	var price: float = warehouse_price()
 	if not company.can_afford(price):
 		return CommandResult.fail(&"cant_afford", "The warehouse costs $%.0f." % price)

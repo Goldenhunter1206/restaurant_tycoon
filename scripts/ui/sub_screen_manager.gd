@@ -13,6 +13,7 @@ var SCREENS: Dictionary = {
 	&"suppliers": load("res://scripts/ui/screens/suppliers_screen.gd"),
 	&"reports": preload("res://scripts/ui/screens/stub_screen.gd"),
 	&"rankings": load("res://scripts/ui/screens/rankings_screen.gd"),
+	&"headquarters": load("res://scenes/ui/HeadquartersScreen.tscn"),
 }
 
 var _active: TycoonScreen
@@ -32,10 +33,14 @@ func _ready() -> void:
 
 func open(screen_id: StringName, building_id: int) -> void:
 	close()
-	var script: GDScript = SCREENS.get(screen_id)
-	if script == null:
+	var source: Variant = SCREENS.get(screen_id)
+	if source == null:
 		return
-	_active = script.new()
+	var instance: Node = source.instantiate() if source is PackedScene else source.new()
+	_active = instance as TycoonScreen
+	if _active == null:
+		instance.queue_free()
+		return
 	if _active.has_method("set_screen_id"):
 		_active.set_screen_id(screen_id)
 	_dimmer.visible = true
@@ -45,6 +50,8 @@ func open(screen_id: StringName, building_id: int) -> void:
 	_active.closed.connect(close)
 	if _active.has_signal("open_workshop_requested"):
 		_active.connect("open_workshop_requested", _on_workshop_requested)
+	if _active.has_signal("request_screen"):
+		_active.connect("request_screen", _on_screen_requested)
 	_active.set_anchors_preset(Control.PRESET_CENTER)
 	_active.reset_size.call_deferred()
 	_center_active.call_deferred()
@@ -75,15 +82,22 @@ func _on_workshop_requested(recipe_id: StringName, product_type: StringName) -> 
 		hud._open_workshop(bid, recipe, product_type)
 
 
+func _on_screen_requested(screen_id: StringName) -> void:
+	var target_building: int = _active.building_id if is_instance_valid(_active) else -1
+	open.call_deferred(screen_id, target_building)
+
+
 func _animate_open() -> void:
 	if not is_instance_valid(_active):
 		return
+	var spring_open: bool = _active.has_method("wants_spring_open") and bool(_active.call("wants_spring_open"))
+	var duration: float = 0.24 if spring_open else 0.16
 	_active.pivot_offset = _active.size * 0.5
-	_active.scale = Vector2(0.92, 0.92)
+	_active.scale = Vector2(0.86, 0.86) if spring_open else Vector2(0.92, 0.92)
 	_active.modulate = Color(1, 1, 1, 0)
 	_dimmer.modulate = Color(1, 1, 1, 0)
 	var tween: Tween = create_tween().set_parallel(true)
-	tween.tween_property(_active, "scale", Vector2.ONE, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(_active, "scale", Vector2.ONE, duration).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.tween_property(_active, "modulate:a", 1.0, 0.12)
 	tween.tween_property(_dimmer, "modulate:a", 1.0, 0.12)
 

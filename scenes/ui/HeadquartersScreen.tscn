@@ -1,0 +1,102 @@
+[gd_scene format=3 uid="uid://c1blwjww2lxac"]
+
+[ext_resource type="Script" uid="uid://b36pylyoeop82" path="res://scripts/ui/screens/headquarters_screen.gd" id="1_wov71"]
+
+[node name="HeadquartersScreen" type="PanelContainer" unique_id=748328093]
+script = ExtResource("1_wov71")
+
+[node name="Paper" type="PanelContainer" parent="." unique_id=419785266]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Workspace" type="MarginContainer" parent="Paper" unique_id=684036708]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Root" type="VBoxContainer" parent="Paper/Workspace" unique_id=1633158557]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="Header" type="HBoxContainer" parent="Paper/Workspace/Root" unique_id=944747918]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="CompanyTitle" type="Label" parent="Paper/Workspace/Root/Header" unique_id=931330321]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.22745098, 0.1254902, 0.0627451, 1)
+theme_override_font_sizes/font_size = 30
+text = "Company Headquarters"
+vertical_alignment = 1
+
+[node name="TierPill" type="PanelContainer" parent="Paper/Workspace/Root/Header" unique_id=761366929]
+layout_mode = 2
+
+[node name="TierLabel" type="Label" parent="Paper/Workspace/Root/Header/TierPill" unique_id=1873060432]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.22745098, 0.1254902, 0.0627451, 1)
+theme_override_font_sizes/font_size = 14
+text = "TIER 0  ·  FOUNDER"
+vertical_alignment = 1
+
+[node name="UpkeepPill" type="PanelContainer" parent="Paper/Workspace/Root/Header" unique_id=1000820778]
+layout_mode = 2
+
+[node name="UpkeepLabel" type="Label" parent="Paper/Workspace/Root/Header/UpkeepPill" unique_id=1778639467]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.43137255, 0.2627451, 0.14901961, 1)
+theme_override_font_sizes/font_size = 14
+text = "$0 / DAY"
+vertical_alignment = 1
+
+[node name="CloseButton" type="Button" parent="Paper/Workspace/Root/Header" unique_id=462119176]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+tooltip_text = "Close"
+text = "✕"
+
+[node name="TabScroll" type="ScrollContainer" parent="Paper/Workspace/Root" unique_id=912449688]
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+vertical_scroll_mode = 0
+
+[node name="TabRow" type="HBoxContainer" parent="Paper/Workspace/Root/TabScroll" unique_id=1250022870]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="BodyPanel" type="PanelContainer" parent="Paper/Workspace/Root" unique_id=483954497]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="BodyMargin" type="MarginContainer" parent="Paper/Workspace/Root/BodyPanel" unique_id=154068245]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="BodyScroll" type="ScrollContainer" parent="Paper/Workspace/Root/BodyPanel/BodyMargin" unique_id=955161594]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Body" type="VBoxContainer" parent="Paper/Workspace/Root/BodyPanel/BodyMargin/BodyScroll" unique_id=1458355377]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="Status" type="Label" parent="Paper/Workspace/Root" unique_id=1701351457]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78039217, 0.2, 0.10980392, 1)
+theme_override_font_sizes/font_size = 13
+vertical_alignment = 1
+
+[node name="Confirm" type="ConfirmationDialog" parent="." unique_id=2064479683]
+title = "Confirm headquarters action"

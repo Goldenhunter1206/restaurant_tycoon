@@ -93,6 +93,11 @@ func _render(info: Dictionary) -> void:
 			continue
 		var label: String = FIELD_LABELS.get(key, String(key).capitalize())
 		lines.append("[color=#8a5a2b]%s:[/color] %s" % [label, str(info[key])])
+	var hq_company: CompanyState = _hq_company_for_building(_current_building)
+	if hq_company != null:
+		lines.insert(0, "[color=#8a5a2b]Departments:[/color] Private")
+		lines.insert(0, "[color=#8a5a2b]Public tier:[/color] %d" % hq_company.headquarters.tier)
+		lines.insert(0, "[color=#8a5a2b]Headquarters:[/color] %s" % hq_company.display_name)
 	_body.text = "\n".join(lines)
 	_update_action(kind)
 
@@ -108,6 +113,9 @@ func _title_for(kind: String, info: Dictionary) -> String:
 		"delivery driver":
 			return "Driver %s" % info.get("name", "")
 		"building":
+			var hq_company: CompanyState = _hq_company_for_building(_current_building)
+			if hq_company != null:
+				return "%s Headquarters · Tier %d" % [hq_company.display_name, hq_company.headquarters.tier]
 			var b_type: String = String(info.get("type", ""))
 			if RestaurantManager.by_building.has(_current_building):
 				return "Restaurant · Building #%d" % _current_building
@@ -131,6 +139,14 @@ func _update_action(kind: String) -> void:
 		assets_buy.icon_button(_action_btn, &"hammer", 18)
 		_action_btn.disabled = not EconomyManager.can_afford(fee)
 		_action_btn.visible = true
+
+
+func _hq_company_for_building(building_id: int) -> CompanyState:
+	for company: CompanyState in CompanyManager.companies:
+		var state: HeadquartersState = company.headquarters
+		if state != null and state.building_id == building_id:
+			return company
+	return null
 
 
 func _on_action() -> void:
