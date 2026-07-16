@@ -83,6 +83,12 @@
 		"wage_attr_span": 0.8,
 		"wage_noise": 0.06
 	},
+	"analytics": {
+		"event_retention_days": 45,
+		"daily_retention_days": 120,
+		"rank_news_threshold": 1,
+		"market_share_window_days": 7
+	},
 	"objectives": [
 		{ "id": "cash_30k", "text": "Grow the treasury to $30,000", "type": "cash", "target": 30000 },
 		{ "id": "second_restaurant", "text": "Open a 2nd restaurant", "type": "restaurants", "target": 2 },

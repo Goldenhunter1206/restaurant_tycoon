@@ -14,6 +14,10 @@ func _ready() -> void:
 	CompanyManager.initialize.call_deferred()
 	get_node("/root/HeadquartersManager").call_deferred("initialize")
 	MarketingManager.initialize.call_deferred()
+	# Analytics closes daily buckets AFTER CompanyManager's day handler (books
+	# closed, ranks snapshotted) but BEFORE RestaurantManager resets rest.today,
+	# so it must connect day_changed between the two.
+	get_node("/root/AnalyticsManager").call_deferred("initialize")
 	RestaurantManager.initialize.call_deferred()
 	SupplyManager.initialize.call_deferred()
 	DemandManager.initialize.call_deferred()

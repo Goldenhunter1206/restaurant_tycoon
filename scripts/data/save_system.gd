@@ -29,6 +29,7 @@ static func save_game() -> bool:
 	_write_service_save("/root/StaffManager", save)
 	_write_service_save("/root/BranchCommandRouter", save)
 	_write_service_save("/root/ManagementManager", save)
+	_write_service_save("/root/AnalyticsManager", save)
 	for candidate: JobCandidate in RestaurantManager.job_market:
 		save.job_market.append(candidate)
 	save.next_candidate_uid = RestaurantManager._next_candidate_uid
@@ -54,6 +55,8 @@ static func load_game() -> SaveGame:
 		_migrate_v7(save)
 	if save.save_version < 8:
 		_migrate_v8(save)
+	if save.save_version < 9:
+		_migrate_v9(save)
 	return save
 
 
@@ -69,6 +72,32 @@ static func _write_service_save(node_path: String, save: SaveGame) -> void:
 	var service := tree.root.get_node_or_null(node_path)
 	if service != null and service.has_method("write_save"):
 		service.call("write_save", save)
+
+
+## v9: seed analytics buckets from the unbounded CompanyState.history so loaded
+## games show company trends immediately. Restaurant buckets and weekly/quarterly
+## rollups accrue forward from the next day close.
+static func _migrate_v9(save: SaveGame) -> void:
+	var daily: Array[Dictionary] = []
+	for company: CompanyState in save.companies:
+		for summary: Dictionary in company.history:
+			var stamp: int = int(summary.get("day", 0))
+			var ledger: Dictionary = summary.get("ledger", {})
+			daily.append({
+				"grain": &"day", "period": stamp, "scope_kind": &"company",
+				"scope_id": String(company.id), "day": stamp, "company_id": String(company.id),
+				"metrics": {
+					"revenue": float(summary.get("income", 0.0)),
+					"expenses": -float(summary.get("expenses", 0.0)),
+					"profit": float(summary.get("profit", 0.0)),
+					"cash": float(summary.get("cash", 0.0)),
+					"restaurant_count": float(company.restaurants.size()),
+				},
+				"ledger": (ledger as Dictionary).duplicate(),
+			})
+	save.analytics_daily = daily
+	save.analytics_schema_version = 1
+	save.save_version = 9
 
 
 static func _migrate_v7(save: SaveGame) -> void:

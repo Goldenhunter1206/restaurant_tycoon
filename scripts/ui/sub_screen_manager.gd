@@ -11,7 +11,7 @@ var SCREENS: Dictionary = {
 	&"build": preload("res://scripts/ui/screens/purchase_screen.gd"),
 	&"marketing": load("res://scripts/ui/screens/marketing_screen.gd"),
 	&"suppliers": load("res://scripts/ui/screens/suppliers_screen.gd"),
-	&"reports": preload("res://scripts/ui/screens/stub_screen.gd"),
+	&"reports": load("res://scripts/ui/screens/reports_screen.gd"),
 	&"rankings": load("res://scripts/ui/screens/rankings_screen.gd"),
 	&"headquarters": load("res://scenes/ui/HeadquartersScreen.tscn"),
 	&"company.managers": load("res://scripts/ui/screens/managers_screen.gd"),

@@ -2,7 +2,7 @@ class_name SaveGame
 extends Resource
 ## Serializable snapshot (v8: workforce depth, training, labor events).
 
-@export var save_version: int = 8
+@export var save_version: int = 9
 @export var day: int = 1
 @export var game_hours: float = 7.0
 ## Every competing company carries its own finances, restaurants, and workforce.
@@ -49,3 +49,9 @@ extends Resource
 @export var manager_observations: Array[BranchObservationSnapshot] = []
 @export var manager_processed_windows: Dictionary = {}
 @export var manager_next_uid: int = 1
+## Analytics / reporting section (v9).
+@export var analytics_schema_version: int = 1
+@export var analytics_daily: Array[Dictionary] = []
+@export var analytics_weekly: Array[Dictionary] = []
+@export var analytics_quarterly: Array[Dictionary] = []
+@export var analytics_events: Array[Dictionary] = []

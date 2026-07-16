@@ -37,6 +37,7 @@ HeadquartersManager="*res://scripts/autoload/headquarters_manager.gd"
 StaffManager="*res://scripts/autoload/staff_manager.gd"
 BranchCommandRouter="*res://scripts/autoload/branch_command_router.gd"
 ManagementManager="*res://scripts/autoload/management_manager.gd"
+AnalyticsManager="*res://scripts/autoload/analytics_manager.gd"
 
 [display]
 
