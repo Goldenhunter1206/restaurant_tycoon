@@ -155,8 +155,10 @@ func _configure_player() -> void:
 	else:
 		player.display_name = String(EconomyManager.tuning_value("company.name", "Pizza Co."))
 	player.brand_color = GameSetup.player_color
-	player.cash = float(EconomyManager.tuning_value("company.starting_cash", 20000.0))
-	player.reputation = float(EconomyManager.tuning_value("reputation.start", 3.0))
+	player.cash = GameSetup.starting_cash(
+		float(EconomyManager.tuning_value("company.starting_cash", 20000.0)))
+	player.reputation = GameSetup.starting_reputation(
+		float(EconomyManager.tuning_value("reputation.start", 3.0)))
 	EconomyManager.announce_state()
 
 
@@ -186,8 +188,10 @@ func _spawn_rivals() -> void:
 		rival.id = rival_id
 		rival.display_name = prof.display_name
 		rival.brand_color = prof.brand_color
-		rival.cash = prof.starting_cash
-		rival.reputation = float(EconomyManager.tuning_value("reputation.start", 3.0))
+		var scenario_setup: Dictionary = GameSetup.rival_setup(rival_id)
+		rival.cash = float(scenario_setup.get("starting_cash", prof.starting_cash))
+		rival.reputation = float(scenario_setup.get(
+			"starting_reputation", EconomyManager.tuning_value("reputation.start", 3.0)))
 		rival.profile = prof
 		register(rival)
 

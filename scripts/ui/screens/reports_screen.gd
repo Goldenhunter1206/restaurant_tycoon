@@ -59,6 +59,7 @@ func _analytics() -> Node:
 
 
 func _build() -> void:
+	GameSetup.observe_action(&"daily_report_opened")
 	custom_minimum_size = Vector2(940, 640)
 
 	var controls: HBoxContainer = HBoxContainer.new()

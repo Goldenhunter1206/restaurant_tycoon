@@ -1,6 +1,6 @@
 class_name SaveSystem
 extends RefCounted
-## Static v7 save/load for companies, supply, workforce, and management.
+## Static v11 save/load for companies plus rollback-able scenario sessions.
 
 const SAVE_PATH: String = "user://savegame.tres"
 
@@ -38,6 +38,7 @@ static func save_game() -> bool:
 		save.citizen_wealth[citizen_id] = float(DemandManager.econ[citizen_id]["wealth"])
 	save.world_seed = GameSetup.world_seed
 	save.difficulty = GameSetup.difficulty
+	GameSetup.write_save(save)
 	var error := ResourceSaver.save(save, SAVE_PATH)
 	if error == OK:
 		EconomyManager.post_message("good", "Game saved.")
@@ -60,6 +61,8 @@ static func load_game() -> SaveGame:
 		_migrate_v9(save)
 	if save.save_version < 10:
 		_migrate_v10(save)
+	if save.save_version < 11:
+		_migrate_v11(save)
 	return save
 
 
@@ -75,6 +78,16 @@ static func _write_service_save(node_path: String, save: SaveGame) -> void:
 	var service := tree.root.get_node_or_null(node_path)
 	if service != null and service.has_method("write_save"):
 		service.call("write_save", save)
+
+
+## v11: legacy saves remain valid free-play sessions. Their empty session
+## section is hydrated by GameSetup after every gameplay manager has restored.
+static func _migrate_v11(save: SaveGame) -> void:
+	save.session_schema_version = 0
+	save.session_config = {}
+	save.scenario_state = {}
+	save.scenario_result = {}
+	save.save_version = 11
 
 
 ## v10: mark the awards section present. Rating states are seeded by

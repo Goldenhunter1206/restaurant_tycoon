@@ -1,0 +1,1446 @@
+{
+  "schema_version": 1,
+  "supported_objective_metrics": [
+    "cash",
+    "profit_today",
+    "reputation",
+    "restaurant_count",
+    "deliveries",
+    "awards",
+    "day",
+    "action"
+  ],
+  "scenarios": [
+    {
+      "schema_version": 1,
+      "id": "campaign_riverside_opening",
+      "mode": "campaign",
+      "campaign_id": "bella_vista_rise",
+      "chapter_id": "riverside_roots",
+      "chapter": 1,
+      "city_id": "riverside",
+      "title": "Opening Night",
+      "subtitle": "Turn a riverside storefront into a neighborhood favorite.",
+      "description": "Build the first Bella Vista branch, earn the neighborhood's trust, and save enough to take the company beyond Riverside.",
+      "intro": {
+        "headline": "A worn storefront. A real chance.",
+        "briefing": "The old corner restaurant is yours. The sign is faded, the kitchen is small, and Pronto Pizza already owns the lunch rush. Open the doors and give Riverside a reason to remember Bella Vista."
+      },
+      "difficulty": "easy",
+      "expected_duration_minutes": 75,
+      "time_limit_days": 15,
+      "next_scenario": {
+        "scenario_id": "campaign_harbor_rush",
+        "label": "Continue to Harbor Quarter"
+      },
+      "starting_state": {
+        "seed": "bella-vista-riverside-v1",
+        "cash": 12000,
+        "profit_today": 0,
+        "reputation": 1.5,
+        "restaurant_count": 1,
+        "deliveries": 0,
+        "awards": 0,
+        "day": 1,
+        "locations": ["riverside_corner"],
+        "unlocked_recipes": ["margherita", "pepperoni"]
+      },
+      "rivals": [
+        {
+          "id": "pronto",
+          "difficulty": "easy",
+          "starting_restaurant_count": 1,
+          "starting_cash": 10000,
+          "behavior": "balanced"
+        }
+      ],
+      "restrictions": {
+        "enabled_systems": ["restaurants", "deliveries", "staff", "marketing", "reports"],
+        "disabled_systems": ["suppliers", "inventory", "headquarters", "managers", "government", "crime"],
+        "rules": [
+          {
+            "id": "starter_menu",
+            "description": "Only starter recipes are available."
+          },
+          {
+            "id": "single_rival",
+            "description": "Pronto Pizza is the only active rival."
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "riverside_build_reserve",
+          "kind": "required",
+          "text": "Grow the treasury to $25,000",
+          "metric": "cash",
+          "operator": ">=",
+          "target": 25000,
+          "filters": {},
+          "deadline": {
+            "metric": "day",
+            "operator": "<=",
+            "target": 15,
+            "description": "Before the end of day 15"
+          },
+          "prerequisites": [],
+          "initial_state": "active",
+          "hidden": false,
+          "revealed": true,
+          "active": true,
+          "reward": {
+            "cash": 2500,
+            "reputation": 0.2,
+            "unlocks": []
+          },
+          "failure_consequence": {
+            "cash": 0,
+            "reputation": -0.2,
+            "message": "The harbor expansion fund falls through."
+          }
+        },
+        {
+          "id": "riverside_second_branch",
+          "kind": "required",
+          "text": "Operate 2 restaurants",
+          "metric": "restaurant_count",
+          "operator": ">=",
+          "target": 2,
+          "filters": {},
+          "deadline": {
+            "metric": "day",
+            "operator": "<=",
+            "target": 15,
+            "description": "Before the end of day 15"
+          },
+          "prerequisites": ["riverside_build_reserve"],
+          "initial_state": "hidden",
+          "hidden": true,
+          "revealed": false,
+          "active": false,
+          "reward": {
+            "cash": 1500,
+            "reputation": 0.25,
+            "unlocks": []
+          },
+          "failure_consequence": {
+            "cash": -1000,
+            "reputation": 0,
+            "message": "The second lease is awarded to Pronto Pizza."
+          }
+        },
+        {
+          "id": "riverside_neighborhood_name",
+          "kind": "required",
+          "text": "Reach 3.0 reputation",
+          "metric": "reputation",
+          "operator": ">=",
+          "target": 3.0,
+          "filters": {},
+          "deadline": {
+            "metric": "day",
+            "operator": "<=",
+            "target": 15,
+            "description": "Before the end of day 15"
+          },
+          "prerequisites": ["riverside_second_branch"],
+          "initial_state": "hidden",
+          "hidden": true,
+          "revealed": false,
+          "active": false,
+          "reward": {
+            "cash": 0,
+            "reputation": 0.5,
+            "unlocks": ["city:harbor_quarter"]
+          },
+          "failure_consequence": {
+            "cash": 0,
+            "reputation": -0.5,
+            "message": "Bella Vista leaves Riverside without a loyal following."
+          }
+        }
+      ],
+      "side_missions": [
+        {
+          "id": "riverside_school_run",
+          "kind": "optional",
+          "text": "Complete 20 deliveries for the school fundraiser",
+          "metric": "deliveries",
+          "operator": ">=",
+          "target": 20,
+          "filters": {},
+          "deadline": {
+            "metric": "day",
+            "operator": "<=",
+            "target": 10,
+            "description": "Before the end of day 10"
+          },
+          "prerequisites": [],
+          "offer_day": 4,
+          "accept_required": true,
+          "initial_state": "revealed",
+          "hidden": false,
+          "revealed": true,
+          "active": false,
+          "reward": {
+            "cash": 2000,
+            "reputation": 0.35,
+            "unlocks": []
+          },
+          "failure_consequence": {
+            "cash": 0,
+            "reputation": -0.1,
+            "message": "The fundraiser orders go to another restaurant."
+          }
+        }
+      ],
+      "score_components": [
+        {
+          "id": "riverside_cash_score",
+          "label": "Treasury",
+          "metric": "cash",
+          "operator": ">=",
+          "target": 25000,
+          "points": 3000
+        },
+        {
+          "id": "riverside_reputation_score",
+          "label": "Neighborhood reputation",
+          "metric": "reputation",
+          "operator": ">=",
+          "target": 3.5,
+          "points": 2500
+        },
+        {
+          "id": "riverside_speed_score",
+          "label": "Early finish",
+          "metric": "day",
+          "operator": "<=",
+          "target": 12,
+          "points": 1500
+        }
+      ],
+      "scripted_events": [
+        {
+          "id": "riverside_welcome",
+          "trigger": {"metric": "day", "operator": "==", "target": 1},
+          "once": true,
+          "action": "message",
+          "payload": {"title": "Welcome to Riverside", "body": "Open carefully, watch the lunch rush, and build a cash reserve."}
+        },
+        {
+          "id": "riverside_school_offer",
+          "trigger": {"metric": "day", "operator": "==", "target": 4},
+          "once": true,
+          "action": "offer_side_mission",
+          "payload": {"side_mission_id": "riverside_school_run"}
+        },
+        {
+          "id": "riverside_pronto_push",
+          "trigger": {"metric": "day", "operator": "==", "target": 9},
+          "once": true,
+          "action": "rival_modifier",
+          "payload": {"rival_id": "pronto", "modifier": "demand_boost", "duration_days": 2}
+        }
+      ],
+      "outcomes": {
+        "success": {
+          "title": "Riverside Remembers",
+          "summary": "Bella Vista has a loyal home crowd and a route to the harbor.",
+          "rewards": [
+            {"type": "unlock_city", "id": "harbor_quarter"},
+            {"type": "unlock_scenario", "id": "campaign_harbor_rush"},
+            {"type": "profile_cash", "amount": 3000}
+          ],
+          "allow_continue_free_play": true
+        },
+        "failure": [
+          {
+            "id": "riverside_bankruptcy",
+            "condition": {"metric": "cash", "operator": "<=", "target": -1000},
+            "title": "The First Shop Closes",
+            "summary": "Bella Vista can no longer cover its Riverside debts."
+          },
+          {
+            "id": "riverside_deadline",
+            "condition": {"metric": "day", "operator": ">=", "target": 16},
+            "title": "The Harbor Deal Expires",
+            "summary": "The expansion window closes before Bella Vista is ready."
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": 1,
+      "id": "campaign_harbor_rush",
+      "mode": "campaign",
+      "campaign_id": "bella_vista_rise",
+      "chapter_id": "harbor_hustle",
+      "chapter": 2,
+      "city_id": "harbor_quarter",
+      "title": "Rush at the Docks",
+      "subtitle": "Win the harbor with speed, stock, and consistency.",
+      "description": "Build a delivery network that can survive tourist surges while keeping the harbor branch profitable and well regarded.",
+      "intro": {
+        "headline": "The harbor never waits.",
+        "briefing": "Harbor Quarter never waits. Ferries unload hungry visitors, rents arrive on time, and Swift Eats owns the fastest scooters in town. Bella Vista must become quicker without becoming careless."
+      },
+      "difficulty": "medium",
+      "expected_duration_minutes": 105,
+      "time_limit_days": 18,
+      "next_scenario": {
+        "scenario_id": "campaign_bella_heights_finale",
+        "label": "Continue to Bella Heights"
+      },
+      "starting_state": {
+        "seed": "bella-vista-harbor-v1",
+        "cash": 18000,
+        "profit_today": 0,
+        "reputation": 2.5,
+        "restaurant_count": 1,
+        "deliveries": 0,
+        "awards": 0,
+        "day": 1,
+        "locations": ["harbor_market_hall"],
+        "unlocked_recipes": ["margherita", "pepperoni", "cheeseburger"]
+      },
+      "rivals": [
+        {
+          "id": "swift",
+          "difficulty": "medium",
+          "starting_restaurant_count": 2,
+          "starting_cash": 22000,
+          "behavior": "delivery_first"
+        },
+        {
+          "id": "slice",
+          "difficulty": "easy",
+          "starting_restaurant_count": 1,
+          "starting_cash": 14000,
+          "behavior": "value"
+        }
+      ],
+      "restrictions": {
+        "enabled_systems": ["restaurants", "deliveries", "staff", "marketing", "reports", "suppliers", "inventory", "managers"],
+        "disabled_systems": ["headquarters", "government", "crime"],
+        "rules": [
+          {
+            "id": "harbor_rent_pressure",
+            "description": "Harbor leases are charged at the high-rent city rate."
+          },
+          {
+            "id": "delivery_required",
+            "description": "At least one active delivery route must be maintained."
+          }
+        ]
+      },
+      "objectives": [
+        {
+          "id": "harbor_delivery_volume",
+          "kind": "required",
+          "text": "Complete 55 deliveries",
+          "metric": "deliveries",
+          "operator": ">=",
+          "target": 55,
+          "filters": {},
+          "deadline": {"metric": "day", "operator": "<=", "target": 18, "description": "Before the end of day 18"},
+          "prerequisites": [],
+          "initial_state": "active",
+          "hidden": false,
+          "revealed": true,
+          "active": true,
+          "reward": {"cash": 3000, "reputation": 0.2, "unlocks": []},
+          "failure_consequence": {"cash": -1500, "reputation": -0.2, "message": "Swift Eats claims the harbor delivery contract."}
+        },
+        {
+          "id": "harbor_profitable_shift",
+          "kind": "required",
+          "text": "Earn $1,200 profit in one day",
+          "metric": "profit_today",
+          "operator": ">=",
+          "target": 1200,
+          "filters": {},
+          "deadline": {"metric": "day", "operator": "<=", "target": 18, "description": "Before the end of day 18"},
+          "prerequisites": ["harbor_delivery_volume"],
+          "initial_state": "hidden",
+          "hidden": true,
+          "revealed": false,
+          "active": false,
+          "reward": {"cash": 2500, "reputation": 0.25, "unlocks": []},
+          "failure_consequence": {"cash": -2000, "reputation": 0, "message": "High harbor rent consumes the expansion budget."}
+        },
+        {
+          "id": "harbor_trusted_name",
+          "kind": "required",
+          "text": "Reach 3.8 reputation",
+          "metric": "reputation",
+          "operator": ">=",
+          "target": 3.8,
+          "filters": {},
+          "deadline": {"metric": "day", "operator": "<=", "target": 18, "description": "Before the end of day 18"},
+          "prerequisites": ["harbor_profitable_shift"],
+          "initial_state": "hidden",
+          "hidden": true,
+          "revealed": false,
+          "active": false,
+          "reward": {"cash": 0, "reputation": 0.4, "unlocks": ["city:bella_heights"]},
+          "failure_consequence": {"cash": 0, "reputation": -0.4, "message": "The harbor remembers late orders more than good food."}
+        }
+      ],
+      "side_missions": [
+        {
+          "id": "harbor_captains_table",
+          "kind": "optional",
+          "text": "Earn 1 award before the harbor gala",
+          "metric": "awards",
+          "operator": ">=",
+          "target": 1,
+          "filters": {},
+          "deadline": {"metric": "day", "operator": "<=", "target": 14, "description": "Before the end of day 14"},
+          "prerequisites": ["harbor_delivery_volume"],
+          "offer_day": 8,
+          "accept_required": true,
+          "initial_state": "revealed",
+          "hidden": false,
+          "revealed": true,
+          "active": false,
+          "reward": {"cash": 3500, "reputation": 0.4, "unlocks": []},
+          "failure_consequence": {"cash": 0, "reputation": -0.1, "message": "The gala chooses a rival caterer."}
+        }
+      ],
+      "score_components": [
+        {"id": "harbor_delivery_score", "label": "Delivery volume", "metric": "deliveries", "operator": ">=", "target": 70, "points": 3500},
+        {"id": "harbor_profit_score", "label": "Best daily profit", "metric": "profit_today", "operator": ">=", "target": 1600, "points": 3000},
+        {"id": "harbor_speed_score", "label": "Early finish", "metric": "day", "operator": "<=", "target": 15, "points": 1500}
+      ],
+      "scripted_events": [
+        {
+          "id": "harbor_arrival",
+          "trigger": {"metric": "day", "operator": "==", "target": 1},
+          "once": true,
+          "action": "message",
+          "payload": {"title": "Welcome to Harbor Quarter", "body": "Routes, stock, and staffing will decide this city."}
+        },
+        {
+          "id": "harbor_ferry_surge",
+          "trigger": {"metric": "day", "operator": "==", "target": 6},
+          "once": true,
+          "action": "demand_modifier",
+          "payload": {"modifier": "tourist_surge", "duration_days": 3}
+        },
+        {
+          "id": "harbor_gala_offer",
+          "trigger": {"metric": "day", "operator": "==", "target": 8},
+          "once": true,
+          "action": "offer_side_mission",
+          "payload": {"side_mission_id": "harbor_captains_table"}
+        }
+      ],
+      "outcomes": {
+        "success": {
+          "title": "Master of the Rush",
+          "summary": "Bella Vista is fast enough for the docks and polished enough for the Heights.",
+          "rewards": [
+            {"type": "unlock_city", "id": "bella_heights"},
+            {"type": "unlock_scenario", "id": "campaign_bella_heights_finale"},
+            {"type": "unlock_system", "id": "headquarters"}
+          ],
+          "allow_continue_free_play": true
+        },
+        "failure": [
+          {
+            "id": "harbor_bankruptcy",
+            "condition": {"metric": "cash", "operator": "<=", "target": -1500},
+            "title": "Sunk by Rent",
+            "summary": "The harbor lease drains Bella Vista's final reserve."
+          },
+          {
+            "id": "harbor_deadline",
+            "condition": {"metric": "day", "operator": ">=", "target": 19},
+            "title": "The Season Moves On",
+            "summary": "Tourist season ends before Bella Vista secures its place."
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": 1,
+      "id": "campaign_bella_heights_finale",
+      "mode": "campaign",
+      "campaign_id": "bella_vista_rise",
+      "chapter_id": "heights_legacy",
+      "chapter": 3,
+      "city_id": "bella_heights",
+      "title": "A Seat at the Top",
+      "subtitle": "Build a celebrated company without losing its soul.",
+      "description": "Face entrenched rivals, public scrutiny, and the city awards while establishing Bella Vista as a profitable three-branch institution.",
+      "intro": {
+        "headline": "Every table is watching.",
+        "briefing": "Bella Heights knows every famous chef and every failed opening. Alto Dining has the critics, Bella Due has the money, and the city gala is twenty days away. This is Bella Vista's chance to become an institution."
+      },
+      "difficulty": "hard",
+      "expected_duration_minutes": 140,
+      "time_limit_days": 22,
+      "next_scenario": {},
+      "starting_state": {
+        "seed": "bella-vista-heights-v1",
+        "cash": 30000,
+        "profit_today": 0,
+        "reputation": 3.0,
+        "restaurant_count": 1,
+        "deliveries": 0,
+        "awards": 0,
+        "day": 1,
+        "locations": ["heights_terrace"],
+        "unlocked_recipes": ["margherita", "pepperoni", "cheeseburger", "classic_burger"]
+      },
+      "rivals": [
+        {
+          "id": "alto",
+          "difficulty": "hard",
+          "starting_restaurant_count": 2,
+          "starting_cash": 38000,
+          "behavior": "premium"
+        },
+        {
+          "id": "bella2",
+          "difficulty": "hard",
+          "starting_restaurant_count": 3,
+          "starting_cash": 45000,
+          "behavior": "growth"
+        }
+      ],
+      "restrictions": {
+        "enabled_systems": ["restaurants", "deliveries", "staff", "marketing", "reports", "awards", "suppliers", "inventory", "headquarters", "managers", "government"],
+        "disabled_systems": ["crime"],
+        "rules": [
+          {"id": "award_required", "description": "At least one city award is required for victory."},
+          {"id": "public_pricing", "description": "Major price changes can trigger reputation events."}
+        ]
+      },
+      "objectives": [
+        {
+          "id": "heights_three_branches",
+          "kind": "required",
+          "text": "Operate 3 restaurants",
+          "metric": "restaurant_count",
+          "operator": ">=",
+          "target": 3,
+          "filters": {},
+          "deadline": {"metric": "day", "operator": "<=", "target": 22, "description": "Before the end of day 22"},
+          "prerequisites": [],
+          "initial_state": "active",
+          "hidden": false,
+          "revealed": true,
+          "active": true,
+          "reward": {"cash": 4000, "reputation": 0.2, "unlocks": []},
+          "failure_consequence": {"cash": -2500, "reputation": -0.2, "message": "Bella Due captures the remaining premium leases."}
+        },
+        {
+          "id": "heights_city_award",
+          "kind": "required",
+          "text": "Win 1 city award",
+          "metric": "awards",
+          "operator": ">=",
+          "target": 1,
+          "filters": {},
+          "deadline": {"metric": "day", "operator": "<=", "target": 22, "description": "Before the end of day 22"},
+          "prerequisites": ["heights_three_branches"],
+          "initial_state": "hidden",
+          "hidden": true,
+          "revealed": false,
+          "active": false,
+          "reward": {"cash": 5000, "reputation": 0.5, "unlocks": []},
+          "failure_consequence": {"cash": 0, "reputation": -0.4, "message": "Alto Dining takes the gala spotlight."}
+        },
+        {
+          "id": "heights_bella_vista_legacy",
+          "kind": "required",
+          "text": "Reach 4.5 reputation",
+          "metric": "reputation",
+          "operator": ">=",
+          "target": 4.5,
+          "filters": {},
+          "deadline": {"metric": "day", "operator": "<=", "target": 22, "description": "Before the end of day 22"},
+          "prerequisites": ["heights_city_award"],
+          "initial_state": "hidden",
+          "hidden": true,
+          "revealed": false,
+          "active": false,
+          "reward": {"cash": 0, "reputation": 0.5, "unlocks": ["mode:campaign_plus"]},
+          "failure_consequence": {"cash": 0, "reputation": -0.5, "message": "Bella Vista remains a promising newcomer, not a city institution."}
+        }
+      ],
+      "side_missions": [
+        {
+          "id": "heights_rooftop_opening",
+          "kind": "optional",
+          "text": "Finish with at least $50,000 cash",
+          "metric": "cash",
+          "operator": ">=",
+          "target": 50000,
+          "filters": {},
+          "deadline": {"metric": "day", "operator": "<=", "target": 22, "description": "Measured at scenario completion"},
+          "prerequisites": ["heights_three_branches"],
+          "offer_day": 12,
+          "accept_required": true,
+          "initial_state": "revealed",
+          "hidden": false,
+          "revealed": true,
+          "active": false,
+          "reward": {"cash": 7500, "reputation": 0.3, "unlocks": ["cosmetic:rooftop_badge"]},
+          "failure_consequence": {"cash": 0, "reputation": 0, "message": "The rooftop celebration is scaled back."}
+        }
+      ],
+      "score_components": [
+        {"id": "heights_cash_score", "label": "Company value", "metric": "cash", "operator": ">=", "target": 60000, "points": 4000},
+        {"id": "heights_reputation_score", "label": "City reputation", "metric": "reputation", "operator": ">=", "target": 4.75, "points": 3500},
+        {"id": "heights_awards_score", "label": "Awards", "metric": "awards", "operator": ">=", "target": 2, "points": 2500},
+        {"id": "heights_speed_score", "label": "Early finish", "metric": "day", "operator": "<=", "target": 18, "points": 1500}
+      ],
+      "scripted_events": [
+        {
+          "id": "heights_arrival",
+          "trigger": {"metric": "day", "operator": "==", "target": 1},
+          "once": true,
+          "action": "message",
+          "payload": {"title": "A Seat at the Top", "body": "The gala is coming. Grow carefully and protect the Bella Vista name."}
+        },
+        {
+          "id": "heights_price_scrutiny",
+          "trigger": {"metric": "day", "operator": "==", "target": 7},
+          "once": true,
+          "action": "economy_modifier",
+          "payload": {"modifier": "public_price_scrutiny", "duration_days": 4}
+        },
+        {
+          "id": "heights_rooftop_offer",
+          "trigger": {"metric": "day", "operator": "==", "target": 12},
+          "once": true,
+          "action": "offer_side_mission",
+          "payload": {"side_mission_id": "heights_rooftop_opening"}
+        },
+        {
+          "id": "heights_gala",
+          "trigger": {"metric": "day", "operator": "==", "target": 20},
+          "once": true,
+          "action": "competition",
+          "payload": {"competition_id": "gourmet_cup"}
+        }
+      ],
+      "outcomes": {
+        "success": {
+          "title": "Bella Vista, At Last",
+          "summary": "Three cities now know the Bella Vista name, and the company has earned its place among the greats.",
+          "rewards": [
+            {"type": "complete_campaign", "id": "bella_vista_rise"},
+            {"type": "unlock_mode", "id": "campaign_plus"},
+            {"type": "unlock_cosmetic", "id": "founders_badge"}
+          ],
+          "allow_continue_free_play": true
+        },
+        "failure": [
+          {
+            "id": "heights_bankruptcy",
+            "condition": {"metric": "cash", "operator": "<=", "target": -2500},
+            "title": "The Heights Prove Too Costly",
+            "summary": "Premium rents overwhelm the Bella Vista expansion."
+          },
+          {
+            "id": "heights_deadline",
+            "condition": {"metric": "day", "operator": ">=", "target": 23},
+            "title": "The Gala Passes",
+            "summary": "Bella Vista misses its moment to become a city institution."
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": 1,
+      "id": "tutorial_first_shift",
+      "mode": "tutorial",
+      "campaign_id": "",
+      "chapter_id": "",
+      "city_id": "riverside",
+      "title": "Your First Shift",
+      "subtitle": "Learn by running a real Bella Vista service.",
+      "description": "A contextual task chain that observes player actions without taking control. Every step can be skipped, reset, or resumed after loading.",
+      "intro": {
+        "headline": "The keys are in your hand.",
+        "briefing": "The lunch crowd is on its way. Explore Riverside, prepare the restaurant, and open for your first guests.",
+        "expected_controls": ["camera", "selection", "management", "time_controls"]
+      },
+      "difficulty": "tutorial",
+      "expected_duration_minutes": 25,
+      "time_limit_days": 3,
+      "next_scenario": {
+        "scenario_id": "campaign_riverside_opening",
+        "label": "Start Opening Night"
+      },
+      "starting_state": {
+        "seed": "tutorial-first-shift-v1",
+        "cash": 15000,
+        "profit_today": 0,
+        "reputation": 2.0,
+        "restaurant_count": 0,
+        "deliveries": 0,
+        "awards": 0,
+        "day": 1,
+        "locations": [],
+        "unlocked_recipes": ["margherita", "pepperoni"]
+      },
+      "rivals": [],
+      "restrictions": {
+        "enabled_systems": ["restaurants", "staff", "reports"],
+        "disabled_systems": ["deliveries", "marketing", "awards", "suppliers", "inventory", "headquarters", "managers", "government", "crime"],
+        "rules": [
+          {"id": "tutorial_observes_actions", "description": "Tutorial steps observe actions and never seize player control."},
+          {"id": "tutorial_skip_reset", "description": "Every step supports skip and the tutorial supports a full reset."}
+        ]
+      },
+      "objectives": [
+        {
+          "id": "tutorial_move_camera",
+          "kind": "required",
+          "text": "Pan or zoom the city camera",
+          "metric": "action",
+          "operator": ">=",
+          "target": 1,
+          "filters": {"action_id": "camera_moved"},
+          "deadline": {"metric": "day", "operator": "<=", "target": 3, "description": "Before the tutorial ends"},
+          "prerequisites": [],
+          "initial_state": "active",
+          "hidden": false,
+          "revealed": true,
+          "active": true,
+          "reward": {"cash": 0, "reputation": 0, "unlocks": []},
+          "failure_consequence": {"cash": 0, "reputation": 0, "message": "This step can be retried or skipped."}
+        },
+        {
+          "id": "tutorial_buy_location",
+          "kind": "required",
+          "text": "Buy or lease your first location",
+          "metric": "action",
+          "operator": "==",
+          "target": 1,
+          "filters": {"action_id": "location_acquired"},
+          "deadline": {"metric": "day", "operator": "<=", "target": 3, "description": "Before the tutorial ends"},
+          "prerequisites": ["tutorial_move_camera"],
+          "initial_state": "hidden",
+          "hidden": true,
+          "revealed": false,
+          "active": false,
+          "reward": {"cash": 2000, "reputation": 0, "unlocks": []},
+          "failure_consequence": {"cash": 0, "reputation": 0, "message": "This step can be retried or skipped."}
+        },
+        {
+          "id": "tutorial_price_menu",
+          "kind": "required",
+          "text": "Set a menu price",
+          "metric": "action",
+          "operator": "==",
+          "target": 1,
+          "filters": {"action_id": "menu_price_changed"},
+          "deadline": {"metric": "day", "operator": "<=", "target": 3, "description": "Before the tutorial ends"},
+          "prerequisites": ["tutorial_buy_location"],
+          "initial_state": "hidden",
+          "hidden": true,
+          "revealed": false,
+          "active": false,
+          "reward": {"cash": 0, "reputation": 0, "unlocks": []},
+          "failure_consequence": {"cash": 0, "reputation": 0, "message": "This step can be retried or skipped."}
+        },
+        {
+          "id": "tutorial_schedule_staff",
+          "kind": "required",
+          "text": "Set a staff schedule",
+          "metric": "action",
+          "operator": "==",
+          "target": 1,
+          "filters": {"action_id": "staff_schedule_changed"},
+          "deadline": {"metric": "day", "operator": "<=", "target": 3, "description": "Before the tutorial ends"},
+          "prerequisites": ["tutorial_price_menu"],
+          "initial_state": "hidden",
+          "hidden": true,
+          "revealed": false,
+          "active": false,
+          "reward": {"cash": 0, "reputation": 0, "unlocks": []},
+          "failure_consequence": {"cash": 0, "reputation": 0, "message": "This step can be retried or skipped."}
+        },
+        {
+          "id": "tutorial_open_restaurant",
+          "kind": "required",
+          "text": "Set opening hours and open the restaurant",
+          "metric": "action",
+          "operator": "==",
+          "target": 1,
+          "filters": {"action_id": "restaurant_opened"},
+          "deadline": {"metric": "day", "operator": "<=", "target": 3, "description": "Before the tutorial ends"},
+          "prerequisites": ["tutorial_schedule_staff"],
+          "initial_state": "hidden",
+          "hidden": true,
+          "revealed": false,
+          "active": false,
+          "reward": {"cash": 500, "reputation": 0.1, "unlocks": []},
+          "failure_consequence": {"cash": 0, "reputation": 0, "message": "This step can be retried or skipped."}
+        },
+        {
+          "id": "tutorial_read_report",
+          "kind": "required",
+          "text": "Open the daily report after a profitable shift",
+          "metric": "action",
+          "operator": "==",
+          "target": 1,
+          "filters": {"action_id": "daily_report_opened"},
+          "deadline": {"metric": "day", "operator": "<=", "target": 3, "description": "Before the tutorial ends"},
+          "prerequisites": ["tutorial_open_restaurant"],
+          "initial_state": "hidden",
+          "hidden": true,
+          "revealed": false,
+          "active": false,
+          "reward": {"cash": 1000, "reputation": 0.2, "unlocks": ["scenario:campaign_riverside_opening"]},
+          "failure_consequence": {"cash": 0, "reputation": 0, "message": "This step can be retried or skipped."}
+        }
+      ],
+      "side_missions": [
+        {
+          "id": "tutorial_first_profit",
+          "kind": "optional",
+          "text": "Finish a day with positive profit",
+          "metric": "profit_today",
+          "operator": ">=",
+          "target": 1,
+          "filters": {},
+          "deadline": {"metric": "day", "operator": "<=", "target": 3, "description": "Before the tutorial ends"},
+          "prerequisites": ["tutorial_open_restaurant"],
+          "offer_day": 1,
+          "accept_required": false,
+          "initial_state": "hidden",
+          "hidden": true,
+          "revealed": false,
+          "active": false,
+          "reward": {"cash": 1000, "reputation": 0.1, "unlocks": []},
+          "failure_consequence": {"cash": 0, "reputation": 0, "message": "Optional practice can be retried later."}
+        }
+      ],
+      "score_components": [
+        {"id": "tutorial_actions_score", "label": "Tasks learned", "metric": "action", "operator": ">=", "target": 6, "filters": {"group": "tutorial_first_shift"}, "points": 3000},
+        {"id": "tutorial_profit_score", "label": "First profitable day", "metric": "profit_today", "operator": ">=", "target": 1, "points": 1000}
+      ],
+      "scripted_events": [
+        {
+          "id": "tutorial_welcome",
+          "trigger": {"metric": "day", "operator": "==", "target": 1},
+          "once": true,
+          "action": "tutorial_prompt",
+          "payload": {"objective_id": "tutorial_move_camera", "allow_skip": true, "allow_reset": true}
+        },
+        {
+          "id": "tutorial_lunch_warning",
+          "trigger": {"metric": "action", "operator": "==", "target": 1, "filters": {"action_id": "restaurant_opened"}},
+          "once": true,
+          "action": "message",
+          "payload": {"title": "Lunch is coming", "body": "Let the simulation run and watch the operation before opening the report."}
+        }
+      ],
+      "outcomes": {
+        "success": {
+          "title": "First Shift Complete",
+          "summary": "You know the essentials. Riverside is ready for a real opening night.",
+          "rewards": [
+            {"type": "profile_flag", "id": "tutorial_completed"},
+            {"type": "unlock_scenario", "id": "campaign_riverside_opening"}
+          ],
+          "allow_continue_free_play": false
+        },
+        "failure": []
+      }
+    },
+    {
+      "schema_version": 1,
+      "id": "sandbox_free_play",
+      "mode": "free_play",
+      "campaign_id": "",
+      "chapter_id": "",
+      "is_template": true,
+      "city_id": "riverside",
+      "title": "Free Play",
+      "subtitle": "Build Bella Vista your way.",
+      "description": "A reproducible free-play template with selectable city, seed, starting resources, rivals, economy difficulty, victory rule, and optional systems.",
+      "intro": {
+        "headline": "Your city, your rules.",
+        "briefing": "Choose your city and rules, then build without a campaign script. Pick a goal or leave the horizon open."
+      },
+      "difficulty": "custom",
+      "expected_duration_minutes": 120,
+      "time_limit_days": 0,
+      "next_scenario": {},
+      "configuration": {
+        "city_selectable": true,
+        "seed_editable": true,
+        "starting_cash": {"default": 20000, "minimum": 5000, "maximum": 100000, "step": 5000},
+        "rival_count": {"default": 3, "minimum": 0, "maximum": 6},
+        "rival_difficulty": ["easy", "medium", "hard"],
+        "economy_difficulty": ["relaxed", "standard", "harsh"],
+        "victory_rules": ["endless", "balanced_growth", "cash_goal", "reputation_goal"],
+        "default_victory_rule": "endless",
+        "optional_systems": ["government", "crime"],
+        "city_gated_systems": ["suppliers", "inventory", "headquarters", "managers"]
+      },
+      "starting_state": {
+        "seed": "free-play-default-v1",
+        "cash": 20000,
+        "profit_today": 0,
+        "reputation": 2.0,
+        "restaurant_count": 1,
+        "deliveries": 0,
+        "awards": 0,
+        "day": 1,
+        "locations": ["selected_city_starter_location"],
+        "unlocked_recipes": ["margherita", "pepperoni", "classic_burger", "cheeseburger"]
+      },
+      "rivals": [
+        {"id": "pronto", "difficulty": "medium", "starting_restaurant_count": 1, "starting_cash": 18000, "behavior": "balanced"},
+        {"id": "swift", "difficulty": "medium", "starting_restaurant_count": 1, "starting_cash": 18000, "behavior": "delivery_first"},
+        {"id": "nonna", "difficulty": "medium", "starting_restaurant_count": 1, "starting_cash": 18000, "behavior": "conservative"}
+      ],
+      "restrictions": {
+        "enabled_systems": ["restaurants", "deliveries", "staff", "marketing", "reports", "awards"],
+        "disabled_systems": [],
+        "rules": [
+          {"id": "reproducible_seed", "description": "Identical configuration and seed produce the same session setup."},
+          {"id": "endless_supported", "description": "Endless play ignores victory objectives but still records statistics."},
+          {"id": "city_capabilities", "description": "City-gated systems follow the selected city's capability flags."}
+        ]
+      },
+      "objectives": [
+        {
+          "id": "sandbox_cash_goal",
+          "kind": "required",
+          "text": "Grow the treasury to $30,000",
+          "metric": "cash",
+          "operator": ">=",
+          "target": 30000,
+          "filters": {},
+          "deadline": null,
+          "prerequisites": [],
+          "victory_rule": "balanced_growth",
+          "initial_state": "active",
+          "hidden": false,
+          "revealed": true,
+          "active": true,
+          "reward": {"cash": 0, "reputation": 0, "unlocks": []},
+          "failure_consequence": {"cash": 0, "reputation": 0, "message": "Free play has no campaign consequence."}
+        },
+        {
+          "id": "sandbox_restaurant_goal",
+          "kind": "required",
+          "text": "Open 3 restaurants",
+          "metric": "restaurant_count",
+          "operator": ">=",
+          "target": 3,
+          "filters": {},
+          "deadline": null,
+          "prerequisites": [],
+          "victory_rule": "balanced_growth",
+          "initial_state": "active",
+          "hidden": false,
+          "revealed": true,
+          "active": true,
+          "reward": {"cash": 0, "reputation": 0, "unlocks": []},
+          "failure_consequence": {"cash": 0, "reputation": 0, "message": "Free play has no campaign consequence."}
+        },
+        {
+          "id": "sandbox_delivery_goal",
+          "kind": "required",
+          "text": "Complete 20 deliveries",
+          "metric": "deliveries",
+          "operator": ">=",
+          "target": 20,
+          "filters": {},
+          "deadline": null,
+          "prerequisites": [],
+          "victory_rule": "balanced_growth",
+          "initial_state": "active",
+          "hidden": false,
+          "revealed": true,
+          "active": true,
+          "reward": {"cash": 5000, "reputation": 0, "unlocks": []},
+          "failure_consequence": {"cash": 0, "reputation": 0, "message": "Free play has no campaign consequence."}
+        }
+      ],
+      "side_missions": [],
+      "score_components": [
+        {"id": "sandbox_cash_score", "label": "Cash", "metric": "cash", "operator": ">=", "target": 30000, "points": 3000},
+        {"id": "sandbox_reputation_score", "label": "Reputation", "metric": "reputation", "operator": ">=", "target": 4.0, "points": 2500},
+        {"id": "sandbox_deliveries_score", "label": "Deliveries", "metric": "deliveries", "operator": ">=", "target": 50, "points": 2500}
+      ],
+      "scripted_events": [
+        {
+          "id": "sandbox_welcome",
+          "trigger": {"metric": "day", "operator": "==", "target": 1},
+          "once": true,
+          "action": "message",
+          "payload": {"title": "Your city, your rules", "body": "Build toward the selected victory rule or continue endlessly."}
+        }
+      ],
+      "outcomes": {
+        "success": {
+          "title": "Free Play Goal Complete",
+          "summary": "The selected victory rule is complete. You may keep building.",
+          "rewards": [],
+          "allow_continue_free_play": true
+        },
+        "failure": [
+          {
+            "id": "sandbox_bankruptcy",
+            "condition": {"metric": "cash", "operator": "<=", "target": -2500},
+            "title": "Company Closed",
+            "summary": "The free-play company can no longer cover its debts."
+          }
+        ]
+      }
+    },
+    {
+      "schema_version": 1,
+      "id": "challenge_delivery_dash",
+      "mode": "challenge",
+      "campaign_id": "",
+      "chapter_id": "",
+      "city_id": "harbor_quarter",
+      "title": "Delivery Dash",
+      "subtitle": "One kitchen, one fleet, five frantic days.",
+      "description": "A short delivery-only fixture focused on route throughput, cash discipline, and customer trust.",
+      "intro": {
+        "headline": "Every order leaves by scooter.",
+        "briefing": "The dining room is closed for repairs, but the harbor still wants dinner. Keep one kitchen moving and beat Swift Eats to every doorstep."
+      },
+      "difficulty": "medium",
+      "expected_duration_minutes": 30,
+      "time_limit_days": 5,
+      "next_scenario": {},
+      "starting_state": {
+        "seed": "challenge-delivery-dash-v1",
+        "cash": 9000,
+        "profit_today": 0,
+        "reputation": 3.0,
+        "restaurant_count": 1,
+        "deliveries": 0,
+        "awards": 0,
+        "day": 1,
+        "locations": ["harbor_delivery_kitchen"],
+        "unlocked_recipes": ["margherita", "pepperoni"]
+      },
+      "rivals": [
+        {"id": "swift", "difficulty": "hard", "starting_restaurant_count": 1, "starting_cash": 12000, "behavior": "delivery_first"}
+      ],
+      "restrictions": {
+        "enabled_systems": ["restaurants", "deliveries", "staff", "reports"],
+        "disabled_systems": ["marketing", "awards", "suppliers", "inventory", "headquarters", "managers", "government", "crime"],
+        "rules": [
+          {"id": "delivery_only", "description": "Dining-room service is disabled."},
+          {"id": "one_kitchen", "description": "No additional locations may be acquired."}
+        ]
+      },
+      "objectives": [
+        {
+          "id": "delivery_dash_volume",
+          "kind": "required",
+          "text": "Complete 35 deliveries",
+          "metric": "deliveries",
+          "operator": ">=",
+          "target": 35,
+          "filters": {},
+          "deadline": {"metric": "day", "operator": "<=", "target": 5, "description": "Before the end of day 5"},
+          "prerequisites": [],
+          "initial_state": "active",
+          "hidden": false,
+          "revealed": true,
+          "active": true,
+          "reward": {"cash": 2500, "reputation": 0.2, "unlocks": []},
+          "failure_consequence": {"cash": -1000, "reputation": -0.3, "message": "Swift Eats keeps the harbor contract."}
+        },
+        {
+          "id": "delivery_dash_reputation",
+          "kind": "required",
+          "text": "Finish with at least 3.2 reputation",
+          "metric": "reputation",
+          "operator": ">=",
+          "target": 3.2,
+          "filters": {},
+          "deadline": {"metric": "day", "operator": "<=", "target": 5, "description": "Measured at scenario completion"},
+          "prerequisites": ["delivery_dash_volume"],
+          "initial_state": "hidden",
+          "hidden": true,
+          "revealed": false,
+          "active": false,
+          "reward": {"cash": 1000, "reputation": 0.2, "unlocks": []},
+          "failure_consequence": {"cash": 0, "reputation": -0.2, "message": "Fast orders still leave disappointed customers."}
+        }
+      ],
+      "side_missions": [
+        {
+          "id": "delivery_dash_stay_lean",
+          "kind": "optional",
+          "text": "Finish with no more than 1 restaurant",
+          "metric": "restaurant_count",
+          "operator": "<=",
+          "target": 1,
+          "filters": {},
+          "deadline": {"metric": "day", "operator": "<=", "target": 5, "description": "Measured at scenario completion"},
+          "prerequisites": [],
+          "offer_day": 1,
+          "accept_required": false,
+          "initial_state": "active",
+          "hidden": false,
+          "revealed": true,
+          "active": true,
+          "evaluation": "at_scenario_completion",
+          "reward": {"cash": 1500, "reputation": 0.1, "unlocks": []},
+          "failure_consequence": {"cash": 0, "reputation": 0, "message": "No lean-operation bonus is awarded."}
+        }
+      ],
+      "score_components": [
+        {"id": "delivery_dash_count_score", "label": "Deliveries", "metric": "deliveries", "operator": ">=", "target": 45, "points": 4000},
+        {"id": "delivery_dash_cash_score", "label": "Cash", "metric": "cash", "operator": ">=", "target": 14000, "points": 2000},
+        {"id": "delivery_dash_speed_score", "label": "Fast finish", "metric": "day", "operator": "<=", "target": 4, "points": 1500}
+      ],
+      "scripted_events": [
+        {
+          "id": "delivery_dash_start",
+          "trigger": {"metric": "day", "operator": "==", "target": 1},
+          "once": true,
+          "action": "message",
+          "payload": {"title": "Dining room closed", "body": "Every sale must leave by scooter."}
+        },
+        {
+          "id": "delivery_dash_storm",
+          "trigger": {"metric": "day", "operator": "==", "target": 3},
+          "once": true,
+          "action": "delivery_modifier",
+          "payload": {"modifier": "harbor_rain", "duration_days": 1}
+        }
+      ],
+      "outcomes": {
+        "success": {
+          "title": "Harbor Express",
+          "summary": "One small kitchen outruns the city's largest fleet.",
+          "rewards": [{"type": "medal", "id": "delivery_dash"}],
+          "allow_continue_free_play": false
+        },
+        "failure": [
+          {"id": "delivery_dash_deadline", "condition": {"metric": "day", "operator": ">=", "target": 6}, "title": "Contract Lost", "summary": "The delivery quota is not met before repairs finish."},
+          {"id": "delivery_dash_bankruptcy", "condition": {"metric": "cash", "operator": "<=", "target": -500}, "title": "Fleet Grounded", "summary": "The kitchen cannot pay its drivers."}
+        ]
+      }
+    },
+    {
+      "schema_version": 1,
+      "id": "challenge_turnaround_table",
+      "mode": "challenge",
+      "campaign_id": "",
+      "chapter_id": "",
+      "city_id": "riverside",
+      "title": "The Turnaround Table",
+      "subtitle": "Save a tired restaurant before the lease review.",
+      "description": "A short recovery scenario with weak cash, poor reputation, and one underperforming branch.",
+      "intro": {
+        "headline": "Seven days to save the corner.",
+        "briefing": "The Riverside branch has two days of cash left, a tired team, and a lease review in one week. Stabilize the books before Nonna's Kitchen takes the corner."
+      },
+      "difficulty": "medium",
+      "expected_duration_minutes": 35,
+      "time_limit_days": 7,
+      "next_scenario": {},
+      "starting_state": {
+        "seed": "challenge-turnaround-table-v1",
+        "cash": 2500,
+        "profit_today": -450,
+        "reputation": 2.2,
+        "restaurant_count": 1,
+        "deliveries": 4,
+        "awards": 0,
+        "day": 1,
+        "locations": ["riverside_tired_branch"],
+        "unlocked_recipes": ["margherita", "classic_burger"]
+      },
+      "rivals": [
+        {"id": "nonna", "difficulty": "medium", "starting_restaurant_count": 1, "starting_cash": 12000, "behavior": "conservative"}
+      ],
+      "restrictions": {
+        "enabled_systems": ["restaurants", "staff", "marketing", "reports"],
+        "disabled_systems": ["deliveries", "awards", "suppliers", "inventory", "headquarters", "managers", "government", "crime"],
+        "rules": [
+          {"id": "no_new_locations", "description": "The player may not acquire another location."},
+          {"id": "no_loans", "description": "Loans are disabled during the lease review."}
+        ]
+      },
+      "objectives": [
+        {
+          "id": "turnaround_daily_profit",
+          "kind": "required",
+          "text": "Earn $750 profit in one day",
+          "metric": "profit_today",
+          "operator": ">=",
+          "target": 750,
+          "filters": {},
+          "deadline": {"metric": "day", "operator": "<=", "target": 7, "description": "Before the end of day 7"},
+          "prerequisites": [],
+          "initial_state": "active",
+          "hidden": false,
+          "revealed": true,
+          "active": true,
+          "reward": {"cash": 2000, "reputation": 0.2, "unlocks": []},
+          "failure_consequence": {"cash": -1000, "reputation": -0.2, "message": "The landlord rejects the recovery plan."}
+        },
+        {
+          "id": "turnaround_cash_reserve",
+          "kind": "required",
+          "text": "Build a $10,000 reserve",
+          "metric": "cash",
+          "operator": ">=",
+          "target": 10000,
+          "filters": {},
+          "deadline": {"metric": "day", "operator": "<=", "target": 7, "description": "Before the end of day 7"},
+          "prerequisites": ["turnaround_daily_profit"],
+          "initial_state": "hidden",
+          "hidden": true,
+          "revealed": false,
+          "active": false,
+          "reward": {"cash": 1500, "reputation": 0.1, "unlocks": []},
+          "failure_consequence": {"cash": -500, "reputation": 0, "message": "The lease remains at risk."}
+        },
+        {
+          "id": "turnaround_reputation",
+          "kind": "required",
+          "text": "Restore reputation to 3.0",
+          "metric": "reputation",
+          "operator": ">=",
+          "target": 3.0,
+          "filters": {},
+          "deadline": {"metric": "day", "operator": "<=", "target": 7, "description": "Before the end of day 7"},
+          "prerequisites": ["turnaround_cash_reserve"],
+          "initial_state": "hidden",
+          "hidden": true,
+          "revealed": false,
+          "active": false,
+          "reward": {"cash": 0, "reputation": 0.3, "unlocks": []},
+          "failure_consequence": {"cash": 0, "reputation": -0.3, "message": "Regulars stop returning."}
+        }
+      ],
+      "side_missions": [
+        {
+          "id": "turnaround_one_table",
+          "kind": "optional",
+          "text": "Finish with exactly 1 restaurant",
+          "metric": "restaurant_count",
+          "operator": "==",
+          "target": 1,
+          "filters": {},
+          "deadline": {"metric": "day", "operator": "<=", "target": 7, "description": "Measured at scenario completion"},
+          "prerequisites": [],
+          "offer_day": 1,
+          "accept_required": false,
+          "initial_state": "active",
+          "hidden": false,
+          "revealed": true,
+          "active": true,
+          "evaluation": "at_scenario_completion",
+          "reward": {"cash": 1200, "reputation": 0.1, "unlocks": []},
+          "failure_consequence": {"cash": 0, "reputation": 0, "message": "No focused-turnaround bonus is awarded."}
+        }
+      ],
+      "score_components": [
+        {"id": "turnaround_profit_score", "label": "Daily profit", "metric": "profit_today", "operator": ">=", "target": 1000, "points": 3000},
+        {"id": "turnaround_cash_score", "label": "Cash reserve", "metric": "cash", "operator": ">=", "target": 12000, "points": 2500},
+        {"id": "turnaround_speed_score", "label": "Fast recovery", "metric": "day", "operator": "<=", "target": 5, "points": 2000}
+      ],
+      "scripted_events": [
+        {
+          "id": "turnaround_warning",
+          "trigger": {"metric": "day", "operator": "==", "target": 1},
+          "once": true,
+          "action": "message",
+          "payload": {"title": "Lease under review", "body": "Seven days remain to prove this branch is viable."}
+        },
+        {
+          "id": "turnaround_review",
+          "trigger": {"metric": "day", "operator": "==", "target": 6},
+          "once": true,
+          "action": "message",
+          "payload": {"title": "The landlord arrives tomorrow", "body": "This is the final full day to finish the recovery."}
+        }
+      ],
+      "outcomes": {
+        "success": {
+          "title": "Corner Saved",
+          "summary": "The Riverside branch is profitable, trusted, and ready for another season.",
+          "rewards": [{"type": "medal", "id": "turnaround_table"}],
+          "allow_continue_free_play": false
+        },
+        "failure": [
+          {"id": "turnaround_insolvent", "condition": {"metric": "cash", "operator": "<=", "target": 0}, "title": "Doors Closed", "summary": "The branch runs out of money before the turnaround takes hold."},
+          {"id": "turnaround_deadline", "condition": {"metric": "day", "operator": ">=", "target": 8}, "title": "Lease Not Renewed", "summary": "The landlord awards the corner to Nonna's Kitchen."}
+        ]
+      }
+    },
+    {
+      "schema_version": 1,
+      "id": "challenge_price_war",
+      "mode": "challenge",
+      "campaign_id": "",
+      "chapter_id": "",
+      "city_id": "bella_heights",
+      "title": "Price War",
+      "subtitle": "Protect the brand when every rival cuts deep.",
+      "description": "A short pricing-pressure fixture that tests cash reserves, daily profit, and reputation under sustained rival discounts.",
+      "intro": {
+        "headline": "Do not discount the brand away.",
+        "briefing": "Pronto and Alto slash prices on the same morning. Matching them could empty the till; ignoring them could empty the dining room. Keep Bella Vista profitable without cheapening its name."
+      },
+      "difficulty": "hard",
+      "expected_duration_minutes": 40,
+      "time_limit_days": 8,
+      "next_scenario": {},
+      "starting_state": {
+        "seed": "challenge-price-war-v1",
+        "cash": 20000,
+        "profit_today": 0,
+        "reputation": 4.0,
+        "restaurant_count": 2,
+        "deliveries": 0,
+        "awards": 0,
+        "day": 1,
+        "locations": ["heights_terrace", "heights_market"],
+        "unlocked_recipes": ["margherita", "pepperoni", "classic_burger", "cheeseburger"]
+      },
+      "rivals": [
+        {"id": "pronto", "difficulty": "hard", "starting_restaurant_count": 2, "starting_cash": 30000, "behavior": "value"},
+        {"id": "alto", "difficulty": "hard", "starting_restaurant_count": 1, "starting_cash": 26000, "behavior": "premium"}
+      ],
+      "restrictions": {
+        "enabled_systems": ["restaurants", "deliveries", "staff", "marketing", "reports"],
+        "disabled_systems": ["awards", "suppliers", "inventory", "headquarters", "managers", "government", "crime"],
+        "rules": [
+          {"id": "rival_discount_pressure", "description": "Rivals receive recurring discount campaigns."},
+          {"id": "fixed_portfolio", "description": "Locations cannot be bought or sold during the challenge."}
+        ]
+      },
+      "objectives": [
+        {
+          "id": "price_war_cash",
+          "kind": "required",
+          "text": "Finish with at least $18,000 cash",
+          "metric": "cash",
+          "operator": ">=",
+          "target": 18000,
+          "filters": {},
+          "deadline": {"metric": "day", "operator": "<=", "target": 8, "description": "Measured at scenario completion"},
+          "prerequisites": [],
+          "initial_state": "active",
+          "hidden": false,
+          "revealed": true,
+          "active": true,
+          "reward": {"cash": 2500, "reputation": 0.1, "unlocks": []},
+          "failure_consequence": {"cash": -1500, "reputation": 0, "message": "Discounts consume the company's reserve."}
+        },
+        {
+          "id": "price_war_profit",
+          "kind": "required",
+          "text": "Earn $600 profit in one day",
+          "metric": "profit_today",
+          "operator": ">=",
+          "target": 600,
+          "filters": {},
+          "deadline": {"metric": "day", "operator": "<=", "target": 8, "description": "Before the end of day 8"},
+          "prerequisites": ["price_war_cash"],
+          "initial_state": "hidden",
+          "hidden": true,
+          "revealed": false,
+          "active": false,
+          "reward": {"cash": 1500, "reputation": 0.15, "unlocks": []},
+          "failure_consequence": {"cash": -1000, "reputation": 0, "message": "The price strategy never becomes sustainable."}
+        },
+        {
+          "id": "price_war_reputation",
+          "kind": "required",
+          "text": "Finish with at least 4.0 reputation",
+          "metric": "reputation",
+          "operator": ">=",
+          "target": 4.0,
+          "filters": {},
+          "deadline": {"metric": "day", "operator": "<=", "target": 8, "description": "Measured at scenario completion"},
+          "prerequisites": ["price_war_profit"],
+          "initial_state": "hidden",
+          "hidden": true,
+          "revealed": false,
+          "active": false,
+          "reward": {"cash": 0, "reputation": 0.3, "unlocks": []},
+          "failure_consequence": {"cash": 0, "reputation": -0.4, "message": "Bella Vista wins sales but loses its premium identity."}
+        }
+      ],
+      "side_missions": [
+        {
+          "id": "price_war_delivery_counter",
+          "kind": "optional",
+          "text": "Complete 30 deliveries during the price war",
+          "metric": "deliveries",
+          "operator": ">=",
+          "target": 30,
+          "filters": {},
+          "deadline": {"metric": "day", "operator": "<=", "target": 8, "description": "Before the end of day 8"},
+          "prerequisites": [],
+          "offer_day": 3,
+          "accept_required": true,
+          "initial_state": "revealed",
+          "hidden": false,
+          "revealed": true,
+          "active": false,
+          "reward": {"cash": 3000, "reputation": 0.2, "unlocks": []},
+          "failure_consequence": {"cash": 0, "reputation": -0.1, "message": "Pronto controls the delivery headlines."}
+        }
+      ],
+      "score_components": [
+        {"id": "price_war_cash_score", "label": "Cash reserve", "metric": "cash", "operator": ">=", "target": 24000, "points": 3000},
+        {"id": "price_war_profit_score", "label": "Daily profit", "metric": "profit_today", "operator": ">=", "target": 900, "points": 2500},
+        {"id": "price_war_reputation_score", "label": "Brand strength", "metric": "reputation", "operator": ">=", "target": 4.25, "points": 2500},
+        {"id": "price_war_speed_score", "label": "Fast finish", "metric": "day", "operator": "<=", "target": 6, "points": 1500}
+      ],
+      "scripted_events": [
+        {
+          "id": "price_war_begins",
+          "trigger": {"metric": "day", "operator": "==", "target": 1},
+          "once": true,
+          "action": "economy_modifier",
+          "payload": {"modifier": "rival_price_cut", "duration_days": 8}
+        },
+        {
+          "id": "price_war_delivery_offer",
+          "trigger": {"metric": "day", "operator": "==", "target": 3},
+          "once": true,
+          "action": "offer_side_mission",
+          "payload": {"side_mission_id": "price_war_delivery_counter"}
+        },
+        {
+          "id": "price_war_final_push",
+          "trigger": {"metric": "day", "operator": "==", "target": 6},
+          "once": true,
+          "action": "rival_modifier",
+          "payload": {"rival_id": "pronto", "modifier": "deep_discount", "duration_days": 2}
+        }
+      ],
+      "outcomes": {
+        "success": {
+          "title": "Worth Every Slice",
+          "summary": "Bella Vista protects both its margins and its name.",
+          "rewards": [{"type": "medal", "id": "price_war"}],
+          "allow_continue_free_play": false
+        },
+        "failure": [
+          {"id": "price_war_insolvent", "condition": {"metric": "cash", "operator": "<=", "target": 0}, "title": "Discounted to Nothing", "summary": "The company empties its reserve trying to match every rival."},
+          {"id": "price_war_deadline", "condition": {"metric": "day", "operator": ">=", "target": 9}, "title": "Brand Squeezed Out", "summary": "The campaign ends before Bella Vista proves a sustainable response."}
+        ]
+      }
+    }
+  ]
+}

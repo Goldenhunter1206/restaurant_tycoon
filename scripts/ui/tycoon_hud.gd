@@ -11,6 +11,7 @@ var restaurant_panel: RestaurantPanel
 var screens: SubScreenManager
 var inspector: InspectorPanel
 var insight_overlay: WorldInsightOverlay
+var scenario_overlay: ScenarioOverlay
 
 var _assets: GDScript = load("res://scripts/ui/ui_assets.gd")
 var _cash_label: Label
@@ -26,6 +27,8 @@ var _rep_row: HBoxContainer
 var _summary_grid: GridContainer
 var _deliveries_box: HBoxContainer
 var _company_label: Label
+var _breadcrumb_label: Label
+var _breadcrumb_panel: PanelContainer
 var _messages: RichTextLabel
 var _feed_entries: Array[Dictionary] = []
 var _feed_mode: String = "messages"
@@ -43,6 +46,7 @@ func _ready() -> void:
 	move_child(insight_overlay, 0)
 
 	_build_top_bar()
+	_build_scenario_breadcrumb()
 	_build_right_panel()
 	_build_bottom_bar()
 	_build_right_status()
@@ -71,6 +75,7 @@ func _ready() -> void:
 
 	screens = SubScreenManager.new()
 	add_child(screens)
+	_build_scenario_overlay()
 	SelectionManager.entity_selected.connect(_on_hq_entity_selected)
 
 	GameClock.minute_ticked.connect(_on_minute)
@@ -84,6 +89,10 @@ func _ready() -> void:
 	var awards: Node = get_tree().root.get_node_or_null(^"AwardsManager")
 	if awards != null and awards.has_signal("award_granted"):
 		awards.connect("award_granted", _on_award_granted)
+	if not GameSetup.session_configured.is_connected(_on_session_configured):
+		GameSetup.session_configured.connect(_on_session_configured)
+	if not GameSetup.session_initialized.is_connected(_on_session_configured):
+		GameSetup.session_initialized.connect(_on_session_configured)
 	_refresh_static.call_deferred()
 
 
@@ -160,6 +169,35 @@ func _build_top_bar() -> void:
 		_speed_buttons[entry[1]] = btn
 	bar.add_child(speed_box)
 	_on_speed_changed(GameClock.speed)
+
+
+func _build_scenario_breadcrumb() -> void:
+	_breadcrumb_panel = PanelContainer.new()
+	_breadcrumb_panel.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	_breadcrumb_panel.offset_left = -210.0
+	_breadcrumb_panel.offset_right = 210.0
+	_breadcrumb_panel.offset_top = 70.0
+	_breadcrumb_panel.offset_bottom = 108.0
+	_breadcrumb_panel.add_theme_stylebox_override("panel", TycoonTheme.chip_box())
+	add_child(_breadcrumb_panel)
+	var row: HBoxContainer = HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 7)
+	_breadcrumb_panel.add_child(row)
+	row.add_child(_assets.icon_rect(&"city_map", 16))
+	_breadcrumb_label = Label.new()
+	_breadcrumb_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_breadcrumb_label.add_theme_font_size_override("font_size", 14)
+	_breadcrumb_label.add_theme_color_override("font_color", TycoonTheme.PALETTE["wood_deep"])
+	row.add_child(_breadcrumb_label)
+	_refresh_breadcrumb()
+
+
+func _build_scenario_overlay() -> void:
+	var overlay_script: GDScript = load("res://scripts/ui/hud/scenario_overlay.gd")
+	scenario_overlay = overlay_script.new() as ScenarioOverlay
+	scenario_overlay.name = "ScenarioOverlay"
+	add_child(scenario_overlay)
 
 
 func _build_right_panel() -> void:
@@ -280,9 +318,9 @@ func _build_bottom_bar() -> void:
 	_assets.icon_button(menu_btn, &"menu", 22)
 	if menu_btn.icon != null:
 		menu_btn.text = ""
-	menu_btn.tooltip_text = "Save game"
+	menu_btn.tooltip_text = "Pause menu"
 	menu_btn.custom_minimum_size = Vector2(56, 58)
-	menu_btn.pressed.connect(func() -> void: SaveSystem.save_game())
+	menu_btn.pressed.connect(_open_pause_menu)
 	nav.add_child(menu_btn)
 
 	for entry: Array in [
@@ -371,6 +409,22 @@ func _chip_label(chip_row: HBoxContainer, text: String, font_size: int = 15) -> 
 
 
 # --- Signal handlers ----------------------------------------------------------
+
+
+func _open_pause_menu() -> void:
+	if is_instance_valid(scenario_overlay):
+		scenario_overlay.open_pause()
+
+
+func _on_session_configured(_config: GameSessionConfig) -> void:
+	_refresh_breadcrumb()
+
+
+func _refresh_breadcrumb() -> void:
+	if not is_instance_valid(_breadcrumb_label):
+		return
+	_breadcrumb_label.text = GameSetup.breadcrumb()
+	_breadcrumb_panel.visible = not _breadcrumb_label.text.is_empty()
 
 
 func _on_company_chip_input(event: InputEvent) -> void:
@@ -553,6 +607,7 @@ func _on_bankrupt() -> void:
 
 
 func _refresh_static() -> void:
+	_refresh_breadcrumb()
 	_company_label.text = EconomyManager.company_name
 	_level_label.text = str(maxi(1, RestaurantManager.owned.size()))
 	_on_cash_changed(EconomyManager.cash)

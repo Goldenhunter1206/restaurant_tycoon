@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "campaigns": [
+    {
+      "schema_version": 1,
+      "id": "bella_vista_rise",
+      "title": "The Rise of Bella Vista",
+      "tagline": "One corner shop. Three cities. A name worth remembering.",
+      "description": "A three-chapter campaign about growing Bella Vista from a riverside favorite into a celebrated city institution.",
+      "narrative": {
+        "opening": "A worn storefront and two family recipes are all Bella Vista has. Careful growth, dependable service, and a little courage can turn them into a legacy.",
+        "arc": "Master neighborhood operations in Riverside, build a fast delivery network in Harbor Quarter, then face the critics and established rivals of Bella Heights.",
+        "ending": "Bella Vista earns its place at the city gala without abandoning the warm, reliable service that built its first loyal crowd."
+      },
+      "unlock_rules": [
+        {
+          "type": "always",
+          "description": "Available from the start."
+        }
+      ],
+      "starting_chapter_id": "riverside_roots",
+      "chapters": [
+        {
+          "id": "riverside_roots",
+          "order": 1,
+          "title": "Riverside Roots",
+          "city_id": "riverside",
+          "scenario_ids": ["campaign_riverside_opening"],
+          "description": "Open Bella Vista, build a cash reserve, and earn the neighborhood's trust.",
+          "expected_duration_minutes": 75,
+          "unlock_rules": [
+            {
+              "type": "always",
+              "description": "The campaign begins here."
+            }
+          ],
+          "persistent_rewards": [
+            {"type": "unlock_city", "id": "harbor_quarter"},
+            {"type": "profile_cash", "amount": 3000}
+          ],
+          "next_chapter_id": "harbor_hustle"
+        },
+        {
+          "id": "harbor_hustle",
+          "order": 2,
+          "title": "Harbor Hustle",
+          "city_id": "harbor_quarter",
+          "scenario_ids": ["campaign_harbor_rush"],
+          "description": "Survive high rent and tourist surges by becoming the fastest dependable kitchen on the docks.",
+          "expected_duration_minutes": 105,
+          "unlock_rules": [
+            {
+              "type": "scenario_completed",
+              "scenario_id": "campaign_riverside_opening",
+              "description": "Complete Opening Night."
+            }
+          ],
+          "persistent_rewards": [
+            {"type": "unlock_city", "id": "bella_heights"},
+            {"type": "unlock_system", "id": "headquarters"}
+          ],
+          "next_chapter_id": "heights_legacy"
+        },
+        {
+          "id": "heights_legacy",
+          "order": 3,
+          "title": "The Heights Legacy",
+          "city_id": "bella_heights",
+          "scenario_ids": ["campaign_bella_heights_finale"],
+          "description": "Win the city awards, outgrow established rivals, and make Bella Vista an institution.",
+          "expected_duration_minutes": 140,
+          "unlock_rules": [
+            {
+              "type": "scenario_completed",
+              "scenario_id": "campaign_harbor_rush",
+              "description": "Complete Rush at the Docks."
+            }
+          ],
+          "persistent_rewards": [
+            {"type": "unlock_mode", "id": "campaign_plus"},
+            {"type": "unlock_cosmetic", "id": "founders_badge"}
+          ],
+          "next_chapter_id": null
+        }
+      ],
+      "persistent_rewards": [
+        {
+          "type": "score_medal",
+          "id": "bella_vista_rise_bronze",
+          "threshold": 12000
+        },
+        {
+          "type": "score_medal",
+          "id": "bella_vista_rise_silver",
+          "threshold": 18000
+        },
+        {
+          "type": "score_medal",
+          "id": "bella_vista_rise_gold",
+          "threshold": 24000
+        }
+      ],
+      "completion_scoring": {
+        "aggregation": "sum_best_scenario_scores",
+        "components": [
+          {
+            "id": "campaign_cash_finish",
+            "label": "Final treasury",
+            "metric": "cash",
+            "operator": ">=",
+            "target": 60000,
+            "points": 3000
+          },
+          {
+            "id": "campaign_reputation_finish",
+            "label": "Final reputation",
+            "metric": "reputation",
+            "operator": ">=",
+            "target": 4.75,
+            "points": 3000
+          },
+          {
+            "id": "campaign_awards_finish",
+            "label": "Awards earned",
+            "metric": "awards",
+            "operator": ">=",
+            "target": 2,
+            "points": 2000
+          },
+          {
+            "id": "campaign_speed_finish",
+            "label": "Final chapter speed",
+            "metric": "day",
+            "operator": "<=",
+            "target": 18,
+            "points": 2000
+          }
+        ],
+        "medal_thresholds": {
+          "bronze": 12000,
+          "silver": 18000,
+          "gold": 24000
+        },
+        "record_once": true
+      }
+    }
+  ]
+}

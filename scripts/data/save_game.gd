@@ -1,8 +1,8 @@
 class_name SaveGame
 extends Resource
-## Serializable snapshot (v10: ratings, awards, recipe competitions).
+## Serializable snapshot (v11: session configuration and scenario progress).
 
-@export var save_version: int = 10
+@export var save_version: int = 11
 @export var day: int = 1
 @export var game_hours: float = 7.0
 ## Every competing company carries its own finances, restaurants, and workforce.
@@ -17,6 +17,11 @@ extends Resource
 @export var citizen_wealth: Dictionary = {}
 @export var world_seed: int = 0
 @export var difficulty: StringName = &"medium"
+## Campaign/session state is intentionally separate from the durable player profile.
+@export var session_schema_version: int = 0
+@export var session_config: Dictionary = {}
+@export var scenario_state: Dictionary = {}
+@export var scenario_result: Dictionary = {}
 @export var capability_sources: Array[CapabilitySourceState] = []
 ## Supply chain.
 @export var warehouses: Array[WarehouseState] = []

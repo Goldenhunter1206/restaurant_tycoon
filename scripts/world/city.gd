@@ -29,6 +29,8 @@ func _ready() -> void:
 	get_node("/root/StaffManager").call_deferred("initialize")
 	get_node("/root/BranchCommandRouter").call_deferred("initialize")
 	get_node("/root/ManagementManager").call_deferred("initialize")
+	# Start the selected scenario only after every gameplay authority has restored.
+	GameSetup.initialize_session.call_deferred()
 	CompanyManager.start_ai.call_deferred()
 
 

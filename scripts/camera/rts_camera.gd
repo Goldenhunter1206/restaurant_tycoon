@@ -32,6 +32,7 @@ var _follow_dist: float = FOLLOW_DIST_START
 
 var _last_mouse_pos: Vector2 = Vector2.INF
 var _mouse_idle_time: float = 999.0
+var _movement_observed: bool = false
 
 @onready var _cam: Camera3D = get_node("Camera3D")
 
@@ -52,6 +53,9 @@ func _process(delta: float) -> void:
 		else:
 			_stop_follow()
 		return
+	var previous_position: Vector3 = position
+	var previous_yaw: float = yaw_deg
+	var previous_tilt: float = tilt_deg
 	var move := Vector2.ZERO
 	if _pressed(&"cam_pan_up", [KEY_W, KEY_UP]):
 		move.y -= 1.0
@@ -104,6 +108,9 @@ func _process(delta: float) -> void:
 		position.x = clampf(position.x, -120.0, 820.0)
 		position.z = clampf(position.z, -120.0, 900.0)
 	_apply()
+	if position != previous_position or not is_equal_approx(yaw_deg, previous_yaw) \
+			or not is_equal_approx(tilt_deg, previous_tilt):
+		_observe_camera_movement()
 
 
 ## Action-aware key check: uses the rebindable input map when the action
@@ -134,8 +141,17 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
 			zoom_dist = clampf(zoom_dist / ZOOM_STEP, ZOOM_MIN, ZOOM_MAX)
+			_observe_camera_movement()
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			zoom_dist = clampf(zoom_dist * ZOOM_STEP, ZOOM_MIN, ZOOM_MAX)
+			_observe_camera_movement()
+
+
+func _observe_camera_movement() -> void:
+	if _movement_observed:
+		return
+	_movement_observed = true
+	GameSetup.observe_action(&"camera_moved")
 
 
 func _apply() -> void:

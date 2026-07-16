@@ -1482,6 +1482,8 @@ func _restore_from_save(save: SaveGame) -> void:
 
 
 func _found_starting_restaurant() -> void:
+	if GameSetup.starting_restaurant_count(1) <= 0:
+		return
 	var best_id: int = -1
 	var best_score: float = INF
 	var center: Vector3 = _city_center()

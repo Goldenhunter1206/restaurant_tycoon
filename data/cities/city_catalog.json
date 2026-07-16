@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "cities": [
+    {
+      "id": "riverside",
+      "name": "Riverside",
+      "tagline": "A welcoming neighborhood with room to grow.",
+      "description": "Bella Vista begins beside the river, where family traffic is dependable, leases are forgiving, and a hungry lunch crowd rewards steady operators.",
+      "session_scene": "res://scenes/Main.tscn",
+      "expected_duration_minutes": 75,
+      "strategic_traits": [
+        {
+          "id": "family_demand",
+          "label": "Family favorite",
+          "description": "Reliable family demand softens slow service periods.",
+          "tone": "positive"
+        },
+        {
+          "id": "moderate_rent",
+          "label": "Moderate rent",
+          "description": "Starter locations are affordable enough for early expansion.",
+          "tone": "neutral"
+        },
+        {
+          "id": "lunch_rush",
+          "label": "Sharp lunch rush",
+          "description": "Midday queues punish understaffed kitchens.",
+          "tone": "warning"
+        }
+      ],
+      "unlock_requirement": {
+        "type": "always",
+        "description": "Available from the start."
+      },
+      "system_flags": {
+        "restaurants": true,
+        "deliveries": true,
+        "staff": true,
+        "marketing": true,
+        "reports": true,
+        "awards": true,
+        "suppliers": false,
+        "inventory": false,
+        "headquarters": false,
+        "managers": false,
+        "government": false,
+        "crime": false
+      }
+    },
+    {
+      "id": "harbor_quarter",
+      "name": "Harbor Quarter",
+      "tagline": "Fast streets, fickle visitors, and no quiet shifts.",
+      "description": "Tourists, dock crews, and tight delivery windows turn the harbor into a test of speed. Higher rents are offset by dense demand and lucrative evening trade.",
+      "session_scene": "res://scenes/Main.tscn",
+      "expected_duration_minutes": 105,
+      "strategic_traits": [
+        {
+          "id": "tourist_demand",
+          "label": "Tourist surges",
+          "description": "Demand rises quickly around harbor events and evening arrivals.",
+          "tone": "positive"
+        },
+        {
+          "id": "delivery_density",
+          "label": "Dense delivery grid",
+          "description": "Short routes make a delivery-focused operation viable.",
+          "tone": "positive"
+        },
+        {
+          "id": "high_rent",
+          "label": "High rent",
+          "description": "Every branch needs healthy daily profit to stay afloat.",
+          "tone": "warning"
+        }
+      ],
+      "unlock_requirement": {
+        "type": "scenario_completed",
+        "scenario_id": "campaign_riverside_opening",
+        "description": "Complete Opening Night in Riverside."
+      },
+      "system_flags": {
+        "restaurants": true,
+        "deliveries": true,
+        "staff": true,
+        "marketing": true,
+        "reports": true,
+        "awards": true,
+        "suppliers": true,
+        "inventory": true,
+        "headquarters": false,
+        "managers": true,
+        "government": false,
+        "crime": false
+      }
+    },
+    {
+      "id": "bella_heights",
+      "name": "Bella Heights",
+      "tagline": "The city watches every price, plate, and promise.",
+      "description": "An affluent hill district where reputation travels fast. Premium rents, entrenched rivals, inspectors, and award judges make this the campaign's defining test.",
+      "session_scene": "res://scenes/Main.tscn",
+      "expected_duration_minutes": 140,
+      "strategic_traits": [
+        {
+          "id": "premium_demand",
+          "label": "Premium demand",
+          "description": "Guests will pay more, but expect a celebrated brand.",
+          "tone": "positive"
+        },
+        {
+          "id": "public_scrutiny",
+          "label": "Public scrutiny",
+          "description": "Price changes and operational failures damage reputation quickly.",
+          "tone": "warning"
+        },
+        {
+          "id": "award_circuit",
+          "label": "Award circuit",
+          "description": "Citywide competitions can turn strong service into lasting fame.",
+          "tone": "neutral"
+        }
+      ],
+      "unlock_requirement": {
+        "type": "scenario_completed",
+        "scenario_id": "campaign_harbor_rush",
+        "description": "Complete Rush at the Docks in Harbor Quarter."
+      },
+      "system_flags": {
+        "restaurants": true,
+        "deliveries": true,
+        "staff": true,
+        "marketing": true,
+        "reports": true,
+        "awards": true,
+        "suppliers": true,
+        "inventory": true,
+        "headquarters": true,
+        "managers": true,
+        "government": true,
+        "crime": true
+      }
+    }
+  ]
+}
