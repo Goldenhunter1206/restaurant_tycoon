@@ -69,6 +69,9 @@ func on_day(day: int) -> void:
 	_plan_workforce(day)
 	_consider_headquarters(day)
 	_consider_competition(day)
+	_plan_security(day)
+	_plan_underworld(day)
+	_plan_civic(day)
 
 
 # --- Strategic planner ---------------------------------------------------------
@@ -812,6 +815,9 @@ func _consider_headquarters(day: int) -> void:
 		{"id": &"operations", "score": profile.operational_skill},
 		{"id": &"analytics", "score": profile.forecast_accuracy},
 		{"id": &"procurement", "score": (profile.procurement_style + profile.warehouse_appetite) * 0.5},
+		{"id": &"security", "score": 0.3 + 0.4 * profile.operational_skill},
+		{"id": &"underworld", "score": profile.crime_appetite},
+		{"id": &"government", "score": 0.25 + 0.5 * profile.corruption_appetite},
 	]
 	choices.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a["score"]) > float(b["score"]))
 	for choice: Dictionary in choices:
@@ -828,6 +834,320 @@ func _consider_headquarters(day: int) -> void:
 		var result: CommandResult = manager.call("start_department_project_cmd", company.id, definition.id) as CommandResult
 		if result != null and result.ok:
 			return
+
+
+# --- Underworld & security (feature 12) ----------------------------------------
+
+
+func _crime_manager() -> Node:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return null
+	return tree.root.get_node_or_null("CrimeManager")
+
+
+func _government_manager() -> Node:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return null
+	return tree.root.get_node_or_null("GovernmentManager")
+
+
+# --- Civic planner (feature 13) -------------------------------------------------
+
+
+## Compliance first (diligence-driven), influence second (appetite-driven).
+## Same commands and costs as the player; bounded by cash reserve, scrutiny
+## and the scenario's corruption mode.
+func _plan_civic(day: int) -> void:
+	var gov: Node = _government_manager()
+	if gov == null or not gov.call("enabled") or company.is_bankrupt:
+		return
+	var civic: Resource = gov.call("civic_for", company.id)
+	if civic == null:
+		return
+	var reserve: float = maxf(_cash_reserve_floor(),
+		float(_tuning("government.ai.min_cash_reserve", 6000.0)))
+	if _rng.randf() < profile.compliance_diligence:
+		_civic_comply(gov, civic, reserve)
+	if (day + absi(hash(company.id))) % 4 != 0:
+		return
+	if profile.corruption_appetite <= 0.05 or company.cash < reserve:
+		return
+	_civic_influence(gov, civic, reserve)
+
+
+func _civic_comply(gov: Node, civic: Resource, reserve: float) -> void:
+	# Fix violations whose underlying fact has recovered (repairs/restock ran).
+	for row: Dictionary in civic.call("open_violations"):
+		var fix: CommandResult = gov.call("fix_violation_cmd", company.id, int(row.get("uid", -1)))
+		if fix != null and fix.ok:
+			_record("civic", "fix_violation", [], "cleared: %s" % String(row.get("label", "")))
+	# Renew permits at (or just before) expiry.
+	var clock: int = _clock_day()
+	for permit: Dictionary in civic.get("permits"):
+		var status: String = String(permit.get("status", ""))
+		var expiring: bool = status == "active" and clock >= int(permit.get("expires_day", 0)) - 2
+		if status == "lapsed" or expiring:
+			var cost: float = float(permit.get("cost", 500.0))
+			if company.cash - cost > reserve:
+				gov.call("renew_permit_cmd", company.id,
+					StringName(String(permit.get("permit_id", ""))))
+	# Pay affordable fines; appeal big ones when feeling lucky.
+	for fine: Dictionary in civic.call("unpaid_fines"):
+		var amount: float = float(fine.get("amount", 0.0))
+		var appealable: bool = not bool(fine.get("appealed_once", false)) \
+			and clock <= int(fine.get("appeal_deadline_day", 0))
+		if appealable and amount > 2000.0 and _rng.randf() < profile.risk_tolerance * 0.5:
+			gov.call("appeal_fine_cmd", company.id, int(fine.get("uid", -1)))
+		elif company.cash - amount > reserve:
+			gov.call("pay_fine_cmd", company.id, int(fine.get("uid", -1)))
+
+
+func _civic_influence(gov: Node, civic: Resource, reserve: float) -> void:
+	# Declared donations to the mayor: cheap, safe standing.
+	if _rng.randf() < profile.corruption_appetite:
+		var amount: float = clampf(company.cash * 0.04, 250.0, 1500.0 + 2000.0 * profile.corruption_appetite)
+		if company.cash - amount > reserve:
+			var result: CommandResult = gov.call("donate_cmd", company.id, &"mayor", amount, &"declared")
+			if result != null and result.ok:
+				_record("civic", "donate", [], "donated %.0f to the mayor" % amount)
+	# Bribes only for the truly corrupt, when the scenario allows them.
+	if bool(gov.call("corruption_enabled")) and profile.corruption_appetite >= 0.5 \
+			and _rng.randf() < profile.corruption_appetite * profile.risk_tolerance * 0.5:
+		var target_official: StringName = &"mayor"
+		if not (civic.call("open_violations") as Array).is_empty():
+			target_official = &"food_inspector"
+		var envelope: float = clampf(company.cash * 0.05, 600.0, 2500.0)
+		if company.cash - envelope > reserve:
+			var bribe: CommandResult = gov.call("bribe_cmd", company.id, target_official, envelope)
+			if bribe != null and bribe.ok:
+				_record("civic", "bribe", [], "paid %s an envelope" % String(target_official))
+	# Back development proposals in districts where the company operates.
+	var proposals: Array = gov.call("open_proposals")
+	if not proposals.is_empty() and _rng.randf() < profile.corruption_appetite:
+		var own_districts: Array[String] = []
+		for rest: RestaurantState in company.restaurants:
+			own_districts.append(rest.district)
+		for project in proposals:
+			if not own_districts.has(String(project.get("district"))):
+				continue
+			var pledge: float = clampf(company.cash * 0.03, 200.0, 1200.0)
+			if company.cash - pledge <= reserve:
+				break
+			var lobby: CommandResult = gov.call("lobby_development_cmd", company.id,
+				int(project.get("uid")), pledge)
+			if lobby != null and lobby.ok:
+				_record("civic", "lobby", [], "backed a project in %s" % String(project.get("district")))
+			break
+	# Report a rival branch when aggressive (the fee is wasted if baseless).
+	if profile.aggression >= 0.5 and _rng.randf() < profile.aggression * 0.25:
+		var target: int = _civic_report_target()
+		if target >= 0:
+			var report: CommandResult = gov.call("request_inspection_cmd", company.id, target)
+			if report != null and report.ok:
+				_record("civic", "report_rival", [], "reported building %d" % target)
+
+
+func _civic_report_target() -> int:
+	var candidates: Array[int] = []
+	for rest: RestaurantState in RestaurantManager.all_restaurants():
+		if rest.company_id != company.id:
+			candidates.append(rest.building_id)
+	if candidates.is_empty():
+		return -1
+	return candidates[_rng.randi_range(0, candidates.size() - 1)]
+
+
+func _clock_day() -> int:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return 1
+	var clock: Node = tree.root.get_node_or_null("GameClock")
+	return int(clock.get("day")) if clock != null else 1
+
+
+## Defensive posture: after being hit (or when appetite-driven rivals operate),
+## buy guards, equipment, and insurance for exposed branches.
+func _plan_security(day: int) -> void:
+	var crime: Node = _crime_manager()
+	if crime == null or not crime.call("enabled") or company.restaurants.is_empty():
+		return
+	if (day + absi(hash(company.id))) % 3 != 0:
+		return
+	var reserve: float = _cash_reserve_floor()
+	for rest: RestaurantState in company.restaurants:
+		var sec: Resource = crime.call("security_for", rest.building_id)
+		if sec == null:
+			continue
+		var recent_hit: bool = int(sec.get("last_incident_day")) >= 0 \
+			and day - int(sec.get("last_incident_day")) <= 6
+		var want: float = profile.operational_skill * 0.5 + (0.5 if recent_hit else 0.0)
+		if _rng.randf() > want:
+			continue
+		if int(sec.get("equipment_level")) < 2 and company.cash - 900.0 > reserve:
+			crime.call("upgrade_security_cmd", company.id, rest.building_id)
+		elif recent_hit and int(sec.get("insurance_level")) < 1 and company.cash - 2000.0 > reserve:
+			crime.call("set_insurance_cmd", company.id, rest.building_id, 1)
+		elif recent_hit and String(sec.get("alert_level")) == "normal":
+			crime.call("set_alert_cmd", company.id, rest.building_id, &"elevated")
+		_maybe_hire_guard(crime, rest, reserve)
+
+
+func _maybe_hire_guard(_crime: Node, rest: RestaurantState, reserve: float) -> void:
+	var guard_cap: int = _capability_level(&"security.guard_capacity")
+	if guard_cap <= 0 or company.cash - 1000.0 < reserve:
+		return
+	var guards: int = 0
+	for member: StaffMember in rest.staff:
+		var def: StaffTypeDef = RestaurantManager.staff_type(member.type_id)
+		if def != null and def.operational_tags.has(&"security"):
+			guards += 1
+	if guards >= guard_cap:
+		return
+	var pool: Array[JobCandidate] = RestaurantManager.candidates_for(&"guard")
+	if pool.is_empty():
+		return
+	RestaurantManager.hire(company.id, rest.building_id, pool[0].uid, 9.0, 12.0)
+
+
+## Offensive planner: build crew, then run an operation the profile can afford,
+## favouring rank-adjacent rivals and retaliation. Bounded by heat and cash.
+func _plan_underworld(day: int) -> void:
+	var crime: Node = _crime_manager()
+	if crime == null or not crime.call("enabled"):
+		return
+	if profile.crime_appetite <= 0.01 or company.is_bankrupt:
+		return
+	if int(crime.call("action_tier", company.id)) <= 0:
+		return
+	if (day + absi(hash(company.id))) % 2 != 0:
+		return
+	var heat_state: Resource = crime.call("heat_for", company.id)
+	var heat_ceiling: float = float(_tuning("crime.ai.heat_backoff", 55.0)) * (0.5 + profile.risk_tolerance)
+	if heat_state != null and float(heat_state.get("heat")) > heat_ceiling:
+		return
+	var reserve: float = maxf(_cash_reserve_floor(), float(_tuning("crime.ai.min_cash_reserve", 8000.0)))
+	if company.cash < reserve:
+		return
+	_ensure_crew(crime, day)
+	if _rng.randf() > profile.crime_appetite:
+		return
+	var target: Dictionary = _pick_crime_target(crime)
+	if target.is_empty():
+		return
+	var action_id: StringName = _pick_crime_action(crime, target)
+	if action_id == &"":
+		return
+	var preview: Dictionary = crime.call("preview_operation", company.id, action_id, int(target["building"]))
+	if not bool(preview.get("ok", false)):
+		return
+	if company.cash - float(preview.get("cost", 0.0)) < reserve:
+		return
+	if float(preview.get("success_chance", 0.0)) < 0.35:
+		return
+	var result: CommandResult = crime.call("launch_operation_cmd", company.id, action_id, int(target["building"]))
+	if result != null and result.ok:
+		_record("underworld", String(action_id), [], "launched op vs %s" % String(target.get("company", "")))
+
+
+func _ensure_crew(crime: Node, day: int) -> void:
+	var capacity: int = int(crime.call("crew_capacity", company.id))
+	var crew: Array = crime.call("crew_of", company.id)
+	if crew.size() >= capacity or company.cash < _cash_reserve_floor() + 800.0:
+		return
+	var market: Array = crime.call("market_candidates", company.id)
+	if market.is_empty():
+		return
+	var pick: Dictionary = market[0]
+	for candidate: Dictionary in market:
+		if float(candidate.get("skill", 0.0)) > float(pick.get("skill", 0.0)):
+			pick = candidate
+	crime.call("hire_agent_cmd", company.id, pick)
+	var _unused: int = day
+
+
+func _pick_crime_target(crime: Node) -> Dictionary:
+	var candidates: Array[Dictionary] = []
+	var retaliate_against: Dictionary = _recent_attackers(crime)
+	var retaliation_weight: float = float(_tuning("crime.ai.retaliation_weight", 2.0))
+	for rest: RestaurantState in RestaurantManager.all_restaurants():
+		if rest.company_id == company.id:
+			continue
+		var owner: CompanyState = CompanyManager.company(rest.company_id)
+		if owner == null or owner.is_bankrupt:
+			continue
+		var weight: float = 1.0
+		if retaliate_against.has(rest.company_id):
+			weight *= retaliation_weight * (0.5 + profile.aggression)
+		candidates.append({"building": rest.building_id, "company": rest.company_id, "weight": weight})
+	if candidates.is_empty():
+		return {}
+	return _weighted_pick(candidates)
+
+
+func _recent_attackers(crime: Node) -> Dictionary:
+	var out: Dictionary = {}
+	for rest: RestaurantState in company.restaurants:
+		var sec: Resource = crime.call("security_for", rest.building_id)
+		if sec == null:
+			continue
+		for row: Dictionary in sec.get("incidents"):
+			var suspect: String = String(row.get("suspected_company", ""))
+			if not suspect.is_empty():
+				out[StringName(suspect)] = true
+	return out
+
+
+func _pick_crime_action(crime: Node, target: Dictionary) -> StringName:
+	var available: Array = crime.call("actions_for", company.id)
+	var target_company: StringName = target.get("company", &"")
+	var is_company_target: bool = false
+	var options: Array[Dictionary] = []
+	for entry: Dictionary in available:
+		if not bool(entry.get("ok", false)):
+			continue
+		var def: CrimeActionDef = entry.get("def")
+		if def == null or def.cost > company.cash * 0.4:
+			continue
+		# Ruthless-only violent actions need a mean streak.
+		var weight: float = 1.0 + float(3 - def.tier) * 0.3
+		if def.tier >= 3 and profile.aggression < 0.6:
+			continue
+		options.append({"id": def.id, "weight": weight})
+	if options.is_empty():
+		return &""
+	var _unused_company: StringName = target_company
+	var _unused_flag: bool = is_company_target
+	return StringName(_weighted_pick(options).get("id", &""))
+
+
+func _weighted_pick(items: Array[Dictionary]) -> Dictionary:
+	var total: float = 0.0
+	for item: Dictionary in items:
+		total += maxf(0.0, float(item.get("weight", 1.0)))
+	if total <= 0.0:
+		return items[_rng.randi_range(0, items.size() - 1)]
+	var roll: float = _rng.randf() * total
+	for item: Dictionary in items:
+		roll -= maxf(0.0, float(item.get("weight", 1.0)))
+		if roll <= 0.0:
+			return item
+	return items[items.size() - 1]
+
+
+func _capability_level(cap_id: StringName) -> int:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return 0
+	var registry: Node = tree.root.get_node_or_null("CapabilityRegistry")
+	if registry == null:
+		return 0
+	return int(registry.call("capacity", company.id, cap_id))
+
+
+func _tuning(path: String, fallback: Variant) -> Variant:
+	return EconomyManager.tuning_value(path, fallback)
 
 
 func _cash_reserve_floor() -> float:

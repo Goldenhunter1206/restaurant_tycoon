@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="CrimeActionDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/crime_action_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"staff_intimidation"
+display_name = "Rough Up Staff"
+blurb = "Threaten a rival's worker — stress, absence, and a chance of injury keep them off the floor."
+icon = &"fist"
+tier = 2
+target_kind = &"restaurant"
+required_dept_level = 2
+required_roles = {
+&"enforcer": 1
+}
+cost = 2200.0
+prep_minutes = 240
+exec_minutes = 60
+base_success = 0.7
+skill_weight = 0.3
+security_weight = 0.35
+effects = {
+"stress_hit": 0.3,
+"injury_chance": 0.3,
+"loyalty_hit": 0.1,
+"effect_days": 0
+}
+evidence_base = 0.35
+heat_base = 9.0
+cooldown_days = 5
+countermeasures = Array[StringName]([&"guards", &"police"])
+min_crime_mode = &"standard"

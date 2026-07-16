@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PermitDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/permit_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"health_grade"
+display_name = "Health Grade Certificate"
+blurb = "A framed clean-inspection certificate. Reassures customers and softens complaint-driven visits."
+icon = &"check"
+cost = 200.0
+renewal_days = 56
+gates_channel = &""
+required_min_tier = 1

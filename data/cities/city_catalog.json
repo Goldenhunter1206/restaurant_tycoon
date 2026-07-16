@@ -90,7 +90,7 @@
         "inventory": true,
         "headquarters": false,
         "managers": true,
-        "government": false,
+        "government": true,
         "crime": false
       }
     },

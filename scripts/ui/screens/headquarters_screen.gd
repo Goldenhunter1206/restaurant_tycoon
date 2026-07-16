@@ -111,8 +111,7 @@ func _build_tabs() -> void:
 			"lock": "Requires a Tier 2 headquarters and the Staff Training feature."},
 		{"id": &"security", "text": "SECURITY",
 			"lock": "Requires a Tier 2 headquarters and the Security feature."},
-		{"id": &"government", "text": "GOVERNMENT RELATIONS",
-			"lock": "Requires a Tier 3 headquarters and the Government Relations feature."},
+		{"id": &"government", "text": "GOVERNMENT RELATIONS"},
 	]
 	for tab: Dictionary in tabs:
 		var button: Button = Button.new()
@@ -137,11 +136,20 @@ func _refresh_tabs(state: HeadquartersState) -> void:
 			button.tooltip_text = "Procurement requires headquarters Tier 3."
 		if id == &"analytics" and state.tier < 2:
 			button.tooltip_text = "Analytics requires headquarters Tier 2."
+		if id == &"government":
+			var gov: Node = get_tree().root.get_node_or_null(^"GovernmentManager")
+			var gov_on: bool = gov != null and bool(gov.call("enabled"))
+			button.disabled = not gov_on
+			button.tooltip_text = "Opens City Hall." if gov_on \
+				else "The civic layer is disabled in this game."
 
 
 func _select_tab(tab_id: StringName) -> void:
 	if tab_id == &"managers":
 		request_screen.emit(&"company.managers")
+		return
+	if tab_id == &"government":
+		request_screen.emit(&"city_hall")
 		return
 	if _active_tab == tab_id:
 		return

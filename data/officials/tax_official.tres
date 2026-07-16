@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="OfficialDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/official_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"tax_official"
+display_name = "Assessor Petra Stein"
+blurb = "Tax official. Cross-checks the ledger against the register and never rounds in your favor."
+icon = &"receipt"
+role = &"tax_official"
+base_integrity = 0.85
+base_scrutiny = 0.6
+priorities = {
+&"paperwork": 1.0
+}
+authority = 2

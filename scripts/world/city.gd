@@ -22,6 +22,18 @@ func _ready() -> void:
 	# initialize right after it (needs CompanyManager.loaded_save, no day_changed
 	# connection of its own).
 	get_node("/root/AwardsManager").call_deferred("initialize")
+	# Crime does its day-close work in the same buckets_closed slot; initialize
+	# after AwardsManager (needs CompanyManager.loaded_save; hooks minute_ticked
+	# itself). get_node_or_null: the autoload only exists after an editor restart.
+	var crime_manager: Node = get_node_or_null("/root/CrimeManager")
+	if crime_manager != null:
+		crime_manager.call_deferred("initialize")
+	# Government/civic layer resolves inspections, fines and police in the same
+	# buckets_closed slot, AFTER crime's enforcement (initialize order = handler
+	# order). get_node_or_null: the autoload only exists after an editor restart.
+	var government_manager: Node = get_node_or_null("/root/GovernmentManager")
+	if government_manager != null:
+		government_manager.call_deferred("initialize")
 	RestaurantManager.initialize.call_deferred()
 	SupplyManager.initialize.call_deferred()
 	DemandManager.initialize.call_deferred()
@@ -32,6 +44,10 @@ func _ready() -> void:
 	# Start the selected scenario only after every gameplay authority has restored.
 	GameSetup.initialize_session.call_deferred()
 	CompanyManager.start_ai.call_deferred()
+	# Cosmetic crime-world layer (graffiti/police/walkers). Purely presentation;
+	add_child(load("res://scripts/world/crime_props.gd").new())
+	# Cosmetic civic layer (station signs, inspector walkers, dispatch cars).
+	add_child(load("res://scripts/world/civic_props.gd").new())
 
 
 func _register_buildings() -> void:

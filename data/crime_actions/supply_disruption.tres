@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="CrimeActionDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/crime_action_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"supply_disruption"
+display_name = "Choke the Supply"
+blurb = "Lean on a rival's suppliers — stretches their lead times and starves their kitchens."
+icon = &"truck"
+tier = 2
+target_kind = &"company"
+required_dept_level = 2
+required_roles = {
+&"enforcer": 1
+}
+cost = 3000.0
+prep_minutes = 360
+exec_minutes = 120
+base_success = 0.66
+skill_weight = 0.25
+security_weight = 0.25
+effects = {
+"disruption_kind": "delay",
+"disruption_days": 3,
+"effect_days": 3
+}
+evidence_base = 0.25
+heat_base = 7.0
+cooldown_days = 7
+countermeasures = Array[StringName]([&"counterintel"])
+min_crime_mode = &"standard"

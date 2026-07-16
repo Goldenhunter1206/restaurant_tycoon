@@ -89,6 +89,12 @@ func _ready() -> void:
 	var awards: Node = get_tree().root.get_node_or_null(^"AwardsManager")
 	if awards != null and awards.has_signal("award_granted"):
 		awards.connect("award_granted", _on_award_granted)
+	var crime: Node = get_tree().root.get_node_or_null(^"CrimeManager")
+	if crime != null and crime.has_signal("police_incident"):
+		crime.connect("police_incident", _on_police_incident)
+	var gov: Node = get_tree().root.get_node_or_null(^"GovernmentManager")
+	if gov != null and gov.has_signal("police_incident"):
+		gov.connect("police_incident", _on_civic_incident)
 	if not GameSetup.session_configured.is_connected(_on_session_configured):
 		GameSetup.session_configured.connect(_on_session_configured)
 	if not GameSetup.session_initialized.is_connected(_on_session_configured):
@@ -330,6 +336,8 @@ func _build_bottom_bar() -> void:
 		["RECIPES", &"recipes", &"pizza", false],
 		["FINANCES", &"finances", &"coin", false],
 		["HQ", &"headquarters", &"store", false],
+		["BACK ROOM", &"underworld", &"mask", false],
+		["CITY HALL", &"city_hall", &"city_hall", false],
 		["RANKINGS", &"rankings", &"trophy", false],
 	]:
 		var btn: Button = Button.new()
@@ -595,6 +603,27 @@ func _render_deliveries() -> void:
 			count_label.add_theme_color_override("font_color", TycoonTheme.PALETTE["text_soft"])
 		cell.add_child(count_label)
 		_deliveries_box.add_child(cell)
+
+
+func _on_police_incident(operation: Object) -> void:
+	# Only the player's live incidents pause the game; ignore if a modal is up.
+	if screens.is_open():
+		return
+	var crime: Node = get_tree().root.get_node_or_null(^"CrimeManager")
+	if crime == null:
+		return
+	load("res://scripts/ui/police_incident_dialog.gd").present(self, crime, operation)
+
+
+func _on_civic_incident(payload: Dictionary) -> void:
+	# Government raids on the player pause the game like live crime incidents.
+	if screens.is_open():
+		return
+	var gov: Node = get_tree().root.get_node_or_null(^"GovernmentManager")
+	if gov == null:
+		return
+	load("res://scripts/ui/civic_incident_dialog.gd").present(self, gov, payload,
+		func() -> void: _on_action(&"city_hall", _selected_building()))
 
 
 func _on_bankrupt() -> void:

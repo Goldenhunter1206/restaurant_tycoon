@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="DevelopmentProjectDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/development_project_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"office_park"
+display_name = "Office Park"
+blurb = "Workday lunch crowds for everyone within walking distance."
+icon = &"chart_bars"
+kind = &"industry"
+target_district = ""
+demand_delta = 0.1
+demographic_shift = {
+&"seniors": -0.03,
+&"workers": 0.12
+}
+support_cost_base = 2500.0
+decision_days = 14
+build_days = 10
+sponsors_allowed = true

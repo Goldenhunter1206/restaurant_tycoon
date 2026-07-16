@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="DevelopmentProjectDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/development_project_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"housing_block"
+display_name = "Housing Block"
+blurb = "New apartments mean new neighbors — and new regulars."
+icon = &"house"
+kind = &"housing"
+target_district = ""
+demand_delta = 0.08
+demographic_shift = {
+&"families": 0.1
+}
+support_cost_base = 2000.0
+decision_days = 14
+build_days = 10
+sponsors_allowed = true

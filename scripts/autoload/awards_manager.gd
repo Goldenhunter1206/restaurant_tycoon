@@ -240,9 +240,15 @@ func _evaluate_awards(closed_day: int, cadence: int) -> void:
 ## One row per live branch: rating dims + quarter-window analytics metrics.
 func _build_nominees(closed_day: int, window: int) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
+	# Civic influence tilts award juries within a clamped band (feature 13) —
+	# it can swing a close race, never manufacture a win or erase results.
+	var gov: Node = _autoload_node("GovernmentManager")
+	if gov != null and not gov.has_method("award_bias"):
+		gov = null
 	for company: CompanyState in CompanyManager.companies:
 		if company.is_bankrupt:
 			continue
+		var civic_bias: float = float(gov.call("award_bias", company.id)) if gov != null else 0.0
 		for rest: RestaurantState in company.restaurants:
 			var state: RestaurantRatingState = ratings.get(rest.building_id)
 			if state == null:
@@ -271,6 +277,7 @@ func _build_nominees(closed_day: int, window: int) -> Array[Dictionary]:
 				"company_id": company.id,
 				"building_id": rest.building_id,
 				"name": rest.restaurant_name,
+				"civic_bias": civic_bias,
 				"opened_day": state.opened_day,
 				"stars": rest.star_rating,
 				"delivery_enabled": rest.delivery_enabled,

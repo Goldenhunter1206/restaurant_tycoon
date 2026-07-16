@@ -13,6 +13,14 @@ const KIND_ICONS: Dictionary = {
 	"set_rival_aggression": &"trophy",
 	"message": &"bell",
 	"scenario": &"star",
+	"extortion": &"money_bag",
+	"police": &"bell",
+	"crime": &"mask",
+	"civic_inspection": &"magnifier",
+	"permit": &"permit",
+	"fine": &"gavel",
+	"development": &"city_hall",
+	"election": &"ballot",
 }
 
 var _rows: VBoxContainer

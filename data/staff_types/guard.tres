@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="StaffTypeDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/staff_type_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"guard"
+display_name = "Security Guard"
+base_daily_wage = 96.0
+base_hourly_wage = 12.0
+attribute_keys = Array[StringName]([&"vigilance", &"strength", &"reliability"])
+competency_keys = Array[StringName]([&"vigilance", &"strength", &"reliability"])
+operational_tags = Array[StringName]([&"security"])
+skill_weights = {
+&"vigilance": 0.6,
+&"strength": 0.4
+}

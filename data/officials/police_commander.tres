@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="OfficialDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/official_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"police_commander"
+display_name = "Commander Dana Ruiz"
+blurb = "Police commander. Allocates response units, weighs evidence and signs off on raids."
+icon = &"bell"
+role = &"police_commander"
+base_integrity = 0.7
+base_scrutiny = 0.65
+priorities = {
+&"safety": 0.6,
+&"crime": 1.0
+}
+authority = 2

@@ -145,6 +145,30 @@ static func green_button(button: Button) -> void:
 	button.add_theme_color_override("font_disabled_color", Color(1, 1, 1, 0.7))
 
 
+## Chunky danger button — same block feel as green_button, tomato red. Used
+## for destructive/hostile actions (call police, refuse demand, launch op).
+static func red_button(button: Button) -> void:
+	var states: Dictionary = {
+		"normal": RED_ACTIVE,
+		"hover": RED_ACTIVE.lightened(0.08),
+		"pressed": RED_ACTIVE.darkened(0.12),
+		"disabled": RED_ACTIVE.lerp(Color("#9a9a8a"), 0.55),
+	}
+	for state: String in states:
+		var style: StyleBoxFlat = StyleBoxFlat.new()
+		style.bg_color = states[state]
+		style.border_color = RED_EDGE
+		style.set_border_width_all(2)
+		style.border_width_bottom = 5
+		style.set_corner_radius_all(12)
+		style.set_content_margin_all(8.0)
+		button.add_theme_stylebox_override(state, style)
+	button.add_theme_color_override("font_color", Color.WHITE)
+	button.add_theme_color_override("font_hover_color", Color.WHITE)
+	button.add_theme_color_override("font_pressed_color", Color("#FFE6E0"))
+	button.add_theme_color_override("font_disabled_color", Color(1, 1, 1, 0.7))
+
+
 ## Warm radial backdrop behind the assembly canvases.
 static func radial_backdrop() -> TextureRect:
 	var gradient: Gradient = Gradient.new()
@@ -197,6 +221,195 @@ static func card_header(icon_name: StringName, title: String, trailing: String) 
 	trailing_label.add_theme_color_override("font_color", WOOD_EDGE)
 	row.add_child(trailing_label)
 	return {"panel": panel, "title": title_label, "trailing": trailing_label}
+
+
+const BLUE: Color = Color("#3AA6D6")
+const BLUE_EDGE: Color = Color("#2380AE")
+
+
+## Checklist row (F1 City Hall design): a circular state chip — green ✓ pass,
+## red ! fail, gold ★ optional, grey · pending — plus label, detail line and an
+## optional wood action button ("Fix now").
+static func checklist_row(label: String, state: StringName, detail: String = "",
+		action_label: String = "", action: Callable = Callable()) -> PanelContainer:
+	var panel: PanelContainer = PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", tile_box())
+	var row: HBoxContainer = HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	panel.add_child(row)
+	var chip_holder: CenterContainer = CenterContainer.new()
+	chip_holder.custom_minimum_size = Vector2(28, 28)
+	row.add_child(chip_holder)
+	var chip_panel: PanelContainer = PanelContainer.new()
+	var chip_style: StyleBoxFlat = StyleBoxFlat.new()
+	chip_style.set_corner_radius_all(999)
+	chip_style.set_border_width_all(2)
+	chip_style.content_margin_left = 8.0
+	chip_style.content_margin_right = 8.0
+	chip_style.content_margin_top = 2.0
+	chip_style.content_margin_bottom = 2.0
+	var glyph: String
+	var glyph_color: Color = Color.WHITE
+	match state:
+		&"pass":
+			chip_style.bg_color = GREEN
+			chip_style.border_color = GREEN_EDGE
+			glyph = "✓"
+		&"fail":
+			chip_style.bg_color = RED_ACTIVE
+			chip_style.border_color = RED_EDGE
+			glyph = "!"
+		&"optional":
+			chip_style.bg_color = GOLD
+			chip_style.border_color = GOLD_EDGE
+			glyph = "★"
+			glyph_color = INK
+		_:
+			chip_style.bg_color = PAPER_SUNK
+			chip_style.border_color = PAPER_EDGE
+			glyph = "·"
+			glyph_color = INK_SOFT
+	chip_panel.add_theme_stylebox_override("panel", chip_style)
+	var glyph_label: Label = Label.new()
+	glyph_label.text = glyph
+	glyph_label.add_theme_font_size_override("font_size", 13)
+	glyph_label.add_theme_color_override("font_color", glyph_color)
+	chip_panel.add_child(glyph_label)
+	chip_holder.add_child(chip_panel)
+	var texts: VBoxContainer = VBoxContainer.new()
+	texts.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	texts.add_theme_constant_override("separation", 0)
+	row.add_child(texts)
+	var title_label: Label = Label.new()
+	title_label.text = label
+	title_label.add_theme_font_size_override("font_size", 14)
+	title_label.add_theme_color_override("font_color", INK)
+	texts.add_child(title_label)
+	if not detail.is_empty():
+		var detail_label: Label = Label.new()
+		detail_label.text = detail
+		detail_label.add_theme_font_size_override("font_size", 11)
+		detail_label.add_theme_color_override("font_color",
+			RED_EDGE if state == &"fail" else INK_SOFT)
+		detail_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		texts.add_child(detail_label)
+	if not action_label.is_empty() and action.is_valid():
+		var button: Button = Button.new()
+		button.text = action_label
+		button.focus_mode = Control.FOCUS_NONE
+		button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		button.add_theme_font_size_override("font_size", 12)
+		button.pressed.connect(action)
+		row.add_child(button)
+	return panel
+
+
+## Standing pill for civic headers: icon + colored tone pill
+## (positive/info/warning/negative), e.g. "Standing: Good".
+static func standing_pill(text: String, icon_name: StringName, tone: StringName) -> PanelContainer:
+	var bg: Color
+	var edge: Color
+	var fg: Color = Color.WHITE
+	match tone:
+		&"positive":
+			bg = GREEN
+			edge = GREEN_EDGE
+		&"warning":
+			bg = GOLD
+			edge = GOLD_EDGE
+			fg = INK
+		&"negative":
+			bg = RED_ACTIVE
+			edge = RED_EDGE
+		_:
+			bg = BLUE
+			edge = BLUE_EDGE
+	var panel: PanelContainer = PanelContainer.new()
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = bg
+	style.border_color = edge
+	style.set_border_width_all(2)
+	style.set_corner_radius_all(999)
+	style.content_margin_left = 10.0
+	style.content_margin_right = 12.0
+	style.content_margin_top = 4.0
+	style.content_margin_bottom = 4.0
+	panel.add_theme_stylebox_override("panel", style)
+	var row: HBoxContainer = HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	panel.add_child(row)
+	var icon: TextureRect = UiAssets.icon_rect(icon_name, 16)
+	if icon != null:
+		row.add_child(icon)
+	var label: Label = Label.new()
+	label.text = text
+	label.add_theme_font_size_override("font_size", 12)
+	label.add_theme_color_override("font_color", fg)
+	row.add_child(label)
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return panel
+
+
+## Feed row (handoff FeedRow): 5px tone accent bead + icon socket + title /
+## subtitle + right-aligned meta. Tones: positive/negative/warning/info/neutral.
+static func feed_row(icon_name: StringName, title: String, subtitle: String,
+		meta: String, tone: StringName = &"neutral") -> PanelContainer:
+	var accent: Color
+	var meta_color: Color = INK_SOFT
+	match tone:
+		&"positive", &"good":
+			accent = GREEN
+			meta_color = GREEN_EDGE
+		&"negative", &"bad":
+			accent = RED_ACTIVE
+			meta_color = RED_EDGE
+		&"warning":
+			accent = GOLD
+		&"info":
+			accent = BLUE
+		_:
+			accent = WOOD_MID
+	var panel: PanelContainer = PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", tile_box())
+	var row: HBoxContainer = HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	panel.add_child(row)
+	var bead: ColorRect = ColorRect.new()
+	bead.color = accent
+	bead.custom_minimum_size = Vector2(5, 0)
+	bead.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	row.add_child(bead)
+	var socket: PanelContainer = PanelContainer.new()
+	socket.add_theme_stylebox_override("panel", sunk_box(999))
+	var icon: TextureRect = UiAssets.icon_rect(icon_name, 24)
+	if icon != null:
+		socket.add_child(icon)
+	row.add_child(socket)
+	var texts: VBoxContainer = VBoxContainer.new()
+	texts.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	texts.add_theme_constant_override("separation", 0)
+	row.add_child(texts)
+	var title_label: Label = Label.new()
+	title_label.text = title
+	title_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	title_label.add_theme_font_size_override("font_size", 14)
+	title_label.add_theme_color_override("font_color", INK)
+	texts.add_child(title_label)
+	if not subtitle.is_empty():
+		var subtitle_label: Label = Label.new()
+		subtitle_label.text = subtitle
+		subtitle_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		subtitle_label.add_theme_font_size_override("font_size", 11)
+		subtitle_label.add_theme_color_override("font_color", INK_SOFT)
+		texts.add_child(subtitle_label)
+	if not meta.is_empty():
+		var meta_label: Label = Label.new()
+		meta_label.text = meta
+		meta_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		meta_label.add_theme_font_size_override("font_size", 13)
+		meta_label.add_theme_color_override("font_color", meta_color)
+		row.add_child(meta_label)
+	return panel
 
 
 ## Restyle a TabContainer to the handoff pill-tab look (red active tab).

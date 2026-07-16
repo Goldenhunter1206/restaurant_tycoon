@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PermitDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/permit_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"signage"
+display_name = "Signage Permit"
+blurb = "Covers billboards and street advertising. Marketing placements without it can draw violations."
+icon = &"megaphone"
+cost = 250.0
+renewal_days = 84
+gates_channel = &""
+required_min_tier = 1

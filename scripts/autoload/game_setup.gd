@@ -182,6 +182,41 @@ func system_enabled(system_id: StringName) -> bool:
 	return session_config.enabled_systems.has(system_id)
 
 
+## Crime & sabotage setting: &"off" | &"standard" | &"ruthless" (ruthless
+## additionally enables tier-3 violent actions). Scenarios that exclude the
+## "crime" system force &"off"; otherwise the wizard's free-play choice
+## (session_config.gameplay_options) applies, defaulting to standard.
+func crime_mode() -> StringName:
+	if not system_enabled(&"crime"):
+		return &"off"
+	if session_config == null:
+		return &"standard"
+	var chosen: String = String(session_config.gameplay_options.get("crime_mode", "standard"))
+	if chosen != "off" and chosen != "standard" and chosen != "ruthless":
+		return &"standard"
+	return StringName(chosen)
+
+
+## Government/civic layer gate (feature 13). Scenarios excluding the
+## "government" system disable City Hall, inspections and police dispatch.
+func government_enabled() -> bool:
+	return system_enabled(&"government")
+
+
+## Corruption setting: &"off" | &"limited" | &"rampant". Bribes and rigged
+## inspections need at least &"limited"; &"rampant" lowers official integrity.
+## Forced &"off" when the government system itself is disabled.
+func corruption_mode() -> StringName:
+	if not government_enabled():
+		return &"off"
+	if session_config == null:
+		return &"limited"
+	var chosen: String = String(session_config.gameplay_options.get("corruption_mode", "limited"))
+	if chosen != "off" and chosen != "limited" and chosen != "rampant":
+		return &"limited"
+	return StringName(chosen)
+
+
 func scenario_rules() -> Array:
 	var restrictions: Dictionary = active_scenario().get("restrictions", {})
 	return (restrictions.get("rules", []) as Array).duplicate(true)

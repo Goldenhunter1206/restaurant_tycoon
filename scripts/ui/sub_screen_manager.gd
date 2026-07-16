@@ -17,6 +17,9 @@ var SCREENS: Dictionary = {
 	&"awards": load("res://scripts/ui/screens/awards_screen.gd"),
 	&"headquarters": load("res://scenes/ui/HeadquartersScreen.tscn"),
 	&"company.managers": load("res://scripts/ui/screens/managers_screen.gd"),
+	&"underworld": load("res://scripts/ui/screens/underworld_screen.gd"),
+	&"security": load("res://scripts/ui/screens/security_screen.gd"),
+	&"city_hall": load("res://scripts/ui/screens/city_hall_screen.gd"),
 }
 
 var _active: TycoonScreen

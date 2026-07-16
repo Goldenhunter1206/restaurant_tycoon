@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="OfficialDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/official_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"food_inspector"
+display_name = "Inspector Marion Vance"
+blurb = "Health inspector. Checks storage, freshness, cleanliness and whether the paperwork is framed or fabricated."
+icon = &"magnifier"
+role = &"food_inspector"
+base_integrity = 0.8
+base_scrutiny = 0.7
+priorities = {
+&"food": 1.0,
+&"safety": 0.7,
+&"paperwork": 0.4
+}
+authority = 2

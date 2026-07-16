@@ -47,6 +47,12 @@ func evaluate(def: AwardDef, nominees: Array[Dictionary], period: int, period_la
 			var weight: float = float(def.scoring[comp])
 			breakdown[StringName(comp)] = {"raw": raw, "normalized": norm, "weight": weight}
 			score += weight * norm
+		# Civic influence (feature 13): a pre-clamped jury nudge carried on the
+		# nominee. Shown in the breakdown so award rationales stay honest.
+		var civic_bias: float = clampf(float(nominee.get("civic_bias", 0.0)), 0.0, 0.2)
+		if civic_bias > 0.0:
+			breakdown[&"civic"] = {"raw": civic_bias, "normalized": civic_bias, "weight": 1.0}
+			score += civic_bias
 		rows.append({
 			"company_id": StringName(nominee.get("company_id", &"")),
 			"building_id": int(nominee.get("building_id", -1)),

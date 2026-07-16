@@ -22,6 +22,9 @@ const MODE_CHALLENGE: StringName = &"challenge"
 @export var rivals: Array[Dictionary] = []
 @export var enabled_systems: Array[StringName] = []
 @export var victory_rules: Array[Dictionary] = []
+## Free-form per-system options chosen at setup (e.g. "crime_mode":
+## off|standard|ruthless). Missing keys mean the system default.
+@export var gameplay_options: Dictionary = {}
 
 
 func is_known_mode() -> bool:
@@ -48,6 +51,7 @@ func to_dict() -> Dictionary:
 		"rivals": _copy_dictionary_array(rivals),
 		"enabled_systems": _string_name_array_to_strings(enabled_systems),
 		"victory_rules": _copy_dictionary_array(victory_rules),
+		"gameplay_options": gameplay_options.duplicate(true),
 	}
 
 
@@ -66,6 +70,7 @@ static func from_dict(data: Dictionary) -> Resource:
 	config.rivals = _dictionary_array_from_variant(data.get("rivals", []))
 	config.enabled_systems = _string_name_array_from_variant(data.get("enabled_systems", []))
 	config.victory_rules = _dictionary_array_from_variant(data.get("victory_rules", []))
+	config.gameplay_options = _copy_dictionary(data.get("gameplay_options", {}))
 	return config as Resource
 
 

@@ -191,6 +191,16 @@ func upcoming_events(count: int = 3) -> Array[Dictionary]:
 	if awards != null and awards.get("_initialized"):
 		events.append_array(awards.upcoming_inspections(count))
 		events.append_array(awards.upcoming_competition_events(count))
+	var crime: Node = null
+	if tree != null:
+		crime = tree.root.get_node_or_null(^"CrimeManager")
+	if crime != null and crime.has_method("upcoming_threats"):
+		events.append_array(crime.call("upcoming_threats", count))
+	var gov: Node = null
+	if tree != null:
+		gov = tree.root.get_node_or_null(^"GovernmentManager")
+	if gov != null and gov.has_method("upcoming_civic"):
+		events.append_array(gov.call("upcoming_civic", count))
 	events.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return int(a["day"]) < int(b["day"]))
 	return events.slice(0, count)

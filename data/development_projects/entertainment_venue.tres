@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="DevelopmentProjectDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/development_project_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"entertainment_venue"
+display_name = "Entertainment Venue"
+blurb = "Evening crowds spill out hungry after every show."
+icon = &"megaphone"
+kind = &"entertainment"
+target_district = ""
+demand_delta = 0.15
+demographic_shift = {
+&"students": 0.08,
+&"teens": 0.08
+}
+support_cost_base = 3000.0
+decision_days = 14
+build_days = 12
+sponsors_allowed = true

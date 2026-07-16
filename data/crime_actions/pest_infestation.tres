@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="CrimeActionDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/crime_action_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"pest_infestation"
+display_name = "Release Pests"
+blurb = "Seed the kitchen with vermin — spoils stock and tanks cleanliness until pest control clears it."
+icon = &"rat"
+tier = 2
+target_kind = &"restaurant"
+required_dept_level = 2
+required_roles = {
+&"enforcer": 1
+}
+cost = 2500.0
+prep_minutes = 300
+exec_minutes = 90
+base_success = 0.68
+skill_weight = 0.25
+security_weight = 0.35
+effects = {
+"clean_hit": 0.4,
+"stock_spoil_fraction": 0.4,
+"effect_days": 3,
+"repair_cost": 800.0
+}
+evidence_base = 0.3
+heat_base = 8.0
+cooldown_days = 6
+countermeasures = Array[StringName]([&"guards", &"cameras", &"pest_control"])
+min_crime_mode = &"standard"

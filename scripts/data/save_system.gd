@@ -1,6 +1,6 @@
 class_name SaveSystem
 extends RefCounted
-## Static v11 save/load for companies plus rollback-able scenario sessions.
+## Static v13 save/load for companies plus rollback-able scenario sessions.
 
 const SAVE_PATH: String = "user://savegame.tres"
 
@@ -31,6 +31,8 @@ static func save_game() -> bool:
 	_write_service_save("/root/ManagementManager", save)
 	_write_service_save("/root/AnalyticsManager", save)
 	_write_service_save("/root/AwardsManager", save)
+	_write_service_save("/root/CrimeManager", save)
+	_write_service_save("/root/GovernmentManager", save)
 	for candidate: JobCandidate in RestaurantManager.job_market:
 		save.job_market.append(candidate)
 	save.next_candidate_uid = RestaurantManager._next_candidate_uid
@@ -63,6 +65,10 @@ static func load_game() -> SaveGame:
 		_migrate_v10(save)
 	if save.save_version < 11:
 		_migrate_v11(save)
+	if save.save_version < 12:
+		_migrate_v12(save)
+	if save.save_version < 13:
+		_migrate_v13(save)
 	return save
 
 
@@ -78,6 +84,25 @@ static func _write_service_save(node_path: String, save: SaveGame) -> void:
 	var service := tree.root.get_node_or_null(node_path)
 	if service != null and service.has_method("write_save"):
 		service.call("write_save", save)
+
+
+## v13: mark the government section present. Civic states, officials and
+## starter permits are seeded by GovernmentManager._ensure_states() /
+## _seed_officials() (one code path also covers fresh games, new companies,
+## and pre-v13 saves re-written by a v13 build).
+static func _migrate_v13(save: SaveGame) -> void:
+	save.government_schema_version = 1
+	save.save_version = 13
+
+
+## v12: mark the crime section present. Security/heat states are seeded by
+## CrimeManager._ensure_states() (one code path also covers fresh games, new
+## branches, and pre-v12 saves re-written by a v12 build). Existing saves get
+## the underworld at its default "standard" setting; scenarios that never
+## enabled crime stay untouched because ops/incidents only accrue forward.
+static func _migrate_v12(save: SaveGame) -> void:
+	save.crime_schema_version = 1
+	save.save_version = 12
 
 
 ## v11: legacy saves remain valid free-play sessions. Their empty session

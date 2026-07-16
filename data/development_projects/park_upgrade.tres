@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="DevelopmentProjectDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/development_project_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"park_upgrade"
+display_name = "Park Upgrade"
+blurb = "Playgrounds and picnic lawns pull weekend strollers to the area."
+icon = &"walker"
+kind = &"attraction"
+target_district = ""
+demand_delta = 0.06
+demographic_shift = {
+&"families": 0.08,
+&"seniors": 0.05
+}
+support_cost_base = 1200.0
+decision_days = 10
+build_days = 6
+sponsors_allowed = true

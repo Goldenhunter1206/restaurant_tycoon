@@ -16,6 +16,8 @@ const ACTIONS: Array[Array] = [
 	[&"chart_bars", "Reports", &"reports"],
 	[&"coin", "Finances", &"finances"],
 	[&"star", "Rating", &"rating"],
+	[&"shield", "Security", &"security"],
+	[&"magnifier", "Inspections", &"city_hall"],
 	[&"store", "Visit", &"interior"],
 ]
 
@@ -103,6 +105,7 @@ func _ready() -> void:
 		["City", Minimap.Layer.NONE], ["Demand", Minimap.Layer.DEMAND],
 		["Coverage", Minimap.Layer.COVERAGE], ["Routes", Minimap.Layer.ROUTES],
 		["Zoning", Minimap.Layer.ZONING], ["Marketing", Minimap.Layer.MARKETING],
+		["Police", Minimap.Layer.POLICE],
 	]:
 		_layer_menu.add_radio_check_item(entry[0], entry[1])
 	_layer_menu.set_item_checked(0, true)

@@ -28,6 +28,9 @@ const ADDITIVE_CAPS: Dictionary = {
 	&"procurement.warehouse_count": true,
 	&"management.branch_managers": true,
 	&"workforce.training_slots": true,
+	&"crime.crew_capacity": true,
+	&"security.guard_capacity": true,
+	&"government.lobby_capacity": true,
 }
 const SLOT_BASE: int = 1
 const RESTAURANTS_PER_SLOT: int = 2

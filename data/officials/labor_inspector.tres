@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="OfficialDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/official_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"labor_inspector"
+display_name = "Inspector Len Okafor"
+blurb = "Labor inspector. Reads shift plans, sick notes and the tired faces behind the counter."
+icon = &"people"
+role = &"labor_inspector"
+base_integrity = 0.75
+base_scrutiny = 0.55
+priorities = {
+&"labor": 1.0,
+&"paperwork": 0.3
+}
+authority = 2

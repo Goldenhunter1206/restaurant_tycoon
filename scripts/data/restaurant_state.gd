@@ -36,6 +36,9 @@ extends Resource
 ## Manager auto-repair: &"off" or &"auto" (repairs below repair_threshold).
 @export var repair_policy: StringName = &"off"
 @export_range(0.0, 1.0) var repair_threshold: float = 0.4
+## Timed forced closure (crime raids/violations, save v11 additive): the
+## branch serves nothing while GameClock.day < closed_until_day.
+@export var closed_until_day: int = 0
 @export var sales_history: Array[float] = []
 ## Daily expense totals, parallel to sales_history.
 @export var expense_history: Array[float] = []
@@ -85,6 +88,9 @@ func reset_today() -> void:
 
 
 func is_open(hour: float) -> bool:
+	# Timed forced closure from a raid/violation (feature 12) overrides hours.
+	if closed_until_day > 0 and GameClock.day < closed_until_day:
+		return false
 	if open_hour == close_hour:
 		return false
 	if open_hour < close_hour:

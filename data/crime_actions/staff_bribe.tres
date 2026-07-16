@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="CrimeActionDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/crime_action_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"staff_bribe"
+display_name = "Bribe an Insider"
+blurb = "Pay off a rival's employee for inside intel and a hit to their loyalty."
+icon = &"coin"
+tier = 1
+target_kind = &"restaurant"
+required_dept_level = 1
+required_roles = {
+&"courier": 1
+}
+cost = 1500.0
+prep_minutes = 240
+exec_minutes = 90
+base_success = 0.72
+skill_weight = 0.25
+security_weight = 0.2
+effects = {
+"intel_days": 8,
+"loyalty_hit": 0.2,
+"effect_days": 0
+}
+evidence_base = 0.15
+heat_base = 3.0
+cooldown_days = 5
+countermeasures = Array[StringName]([&"counterintel"])
+min_crime_mode = &"standard"

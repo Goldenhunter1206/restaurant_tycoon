@@ -41,6 +41,8 @@ var _company_color: Color = Color("#EA4A2F")
 var _selected_rivals: Array[StringName] = []
 var _seed_text: String = ""
 var _difficulty: StringName = &"normal"
+var _crime_mode: StringName = &"standard"
+var _corruption_mode: StringName = &"limited"
 var _victory_preset: StringName = &"endless"
 var _incoming_config: GameSessionConfig = null
 var _fallback_catalog: Variant = null
@@ -80,6 +82,8 @@ func _apply_config(config: GameSessionConfig) -> void:
 	_scenario_id = config.scenario_id
 	_city_id = config.city_id
 	_difficulty = config.difficulty
+	_crime_mode = StringName(String(config.gameplay_options.get("crime_mode", "standard")))
+	_corruption_mode = StringName(String(config.gameplay_options.get("corruption_mode", "limited")))
 	_seed_text = str(config.seed)
 	_company_name = String(config.company_identity.get("name", ""))
 	var color_text: String = String(config.company_identity.get("color", ""))
@@ -543,6 +547,40 @@ func _build_free_play_setup() -> void:
 			_refresh())
 		victory_row.add_child(chip)
 
+	_content.add_child(_field_label("Underworld"))
+	var crime_row: HBoxContainer = HBoxContainer.new()
+	crime_row.add_theme_constant_override("separation", 8)
+	_content.add_child(crime_row)
+	for mode_option: StringName in [&"off", &"standard", &"ruthless"]:
+		var chip: Button = BellaUi.chip(_crime_label(mode_option), _crime_mode == mode_option)
+		chip.pressed.connect(func() -> void:
+			_crime_mode = mode_option
+			_refresh())
+		crime_row.add_child(chip)
+	var crime_hint: Label = Label.new()
+	crime_hint.text = "Sabotage and protection rackets between companies. Ruthless also allows violent operations."
+	crime_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	crime_hint.add_theme_font_size_override("font_size", 11)
+	crime_hint.add_theme_color_override("font_color", Color("#8a6a4a"))
+	_content.add_child(crime_hint)
+
+	_content.add_child(_field_label("City Hall corruption"))
+	var corruption_row: HBoxContainer = HBoxContainer.new()
+	corruption_row.add_theme_constant_override("separation", 8)
+	_content.add_child(corruption_row)
+	for mode_option: StringName in [&"off", &"limited", &"rampant"]:
+		var chip: Button = BellaUi.chip(_corruption_label(mode_option), _corruption_mode == mode_option)
+		chip.pressed.connect(func() -> void:
+			_corruption_mode = mode_option
+			_refresh())
+		corruption_row.add_child(chip)
+	var corruption_hint: Label = Label.new()
+	corruption_hint.text = "Whether officials take envelopes. Bribes and rigged audits need at least Limited; Rampant makes officials cheaper to sway."
+	corruption_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	corruption_hint.add_theme_font_size_override("font_size", 11)
+	corruption_hint.add_theme_color_override("font_color", Color("#8a6a4a"))
+	_content.add_child(corruption_hint)
+
 
 func _build_review_step() -> void:
 	_heading("Ready for the briefing?", "This exact configuration and seed are stored with the session, so the setup is reproducible.")
@@ -557,6 +595,8 @@ func _build_review_step() -> void:
 	rows.add_child(_summary_swatch_row("Company", _display_company_name(), _company_color))
 	rows.add_child(_summary_row("City", _city_name()))
 	rows.add_child(_summary_row("Difficulty", String(_difficulty).capitalize()))
+	rows.add_child(_summary_row("Underworld", _crime_label(_crime_mode)))
+	rows.add_child(_summary_row("Corruption", _corruption_label(_corruption_mode)))
 	rows.add_child(_summary_row("Rivals", _rival_summary()))
 	rows.add_child(_summary_row("Seed", str(_resolved_seed())))
 	rows.add_child(_summary_row("Starting cash", _starting_cash_label()))
@@ -661,6 +701,26 @@ func _commit_and_show_briefing(config: GameSessionConfig) -> void:
 	get_parent().show_intro(config)
 
 
+func _crime_label(mode_option: StringName) -> String:
+	match mode_option:
+		&"off":
+			return "Off"
+		&"ruthless":
+			return "Ruthless"
+		_:
+			return "Standard"
+
+
+func _corruption_label(mode_option: StringName) -> String:
+	match mode_option:
+		&"off":
+			return "Off"
+		&"rampant":
+			return "Rampant"
+		_:
+			return "Limited"
+
+
 func _make_config() -> GameSessionConfig:
 	var config: GameSessionConfig = GameSessionConfig.new()
 	config.mode = _mode
@@ -678,6 +738,10 @@ func _make_config() -> GameSessionConfig:
 	config.rivals = _rivals_for_config()
 	config.enabled_systems = _enabled_systems()
 	config.victory_rules = _victory_rules()
+	config.gameplay_options = {
+		"crime_mode": String(_crime_mode),
+		"corruption_mode": String(_corruption_mode),
+	}
 	return config
 
 
@@ -955,6 +1019,8 @@ func _rebuild_rail() -> void:
 	_rail_body.add_child(_summary_row("City", _city_name()))
 	_rail_body.add_child(_summary_row("Rivals", str(_selected_rivals.size())))
 	_rail_body.add_child(_summary_row("Difficulty", String(_difficulty).capitalize()))
+	_rail_body.add_child(_summary_row("Underworld", _crime_label(_crime_mode)))
+	_rail_body.add_child(_summary_row("Corruption", _corruption_label(_corruption_mode)))
 	_rail_body.add_child(_rule())
 	_rail_body.add_child(_summary_row("Starting cash", _starting_cash_label(), GOLD_EDGE))
 	_rail_body.add_child(_summary_row("Seed", str(_resolved_seed())))

@@ -1,8 +1,8 @@
 class_name SaveGame
 extends Resource
-## Serializable snapshot (v11: session configuration and scenario progress).
+## Serializable snapshot (v13: government, mayor & police civic layer).
 
-@export var save_version: int = 11
+@export var save_version: int = 13
 @export var day: int = 1
 @export var game_hours: float = 7.0
 ## Every competing company carries its own finances, restaurants, and workforce.
@@ -68,3 +68,25 @@ extends Resource
 @export var award_claimed_keys: Dictionary = {}
 @export var competitions: Array[CompetitionState] = []
 @export var competition_next_uid: int = 1
+## Crime & sabotage section (v12). Schema 0 = section absent — CrimeManager
+## seeds security/heat states on restore (one code path also covers fresh
+## games and new branches).
+@export var crime_schema_version: int = 0
+@export var crime_agents: Array[CriminalAgentState] = []
+@export var crime_operations: Array[CrimeOperationState] = []
+@export var crime_security_states: Array[SecurityState] = []
+@export var crime_heat_states: Array[CompanyHeatState] = []
+## {"intel": attacker->target->last_valid_day, "cooldowns": key->day}.
+@export var crime_intel: Dictionary = {}
+@export var crime_op_next_uid: int = 1
+@export var crime_incident_next_uid: int = 1
+## Government / civic section (v13). Schema 0 = section absent — the
+## GovernmentManager seeds civic states, officials and starter permits on
+## restore (one code path also covers fresh games and new companies).
+@export var government_schema_version: int = 0
+@export var civic_states: Array[CompanyCivicState] = []
+@export var gov_officials: Array[OfficialState] = []
+@export var gov_inspections: Array[InspectionState] = []
+@export var police_stations: Array[PoliceStationState] = []
+@export var development_projects: Array[DevelopmentProjectState] = []
+@export var gov_next_uids: Dictionary = {}

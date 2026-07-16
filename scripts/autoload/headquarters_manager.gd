@@ -153,6 +153,10 @@ func start_tier_upgrade_cmd(company_id: StringName) -> CommandResult:
 
 
 func start_department_project_cmd(company_id: StringName, department_id: StringName) -> CommandResult:
+	if department_id == &"underworld":
+		_refresh_underworld_availability()
+	if department_id == &"government":
+		_refresh_government_availability()
 	var company: CompanyState = CompanyManager.company(company_id)
 	var state: HeadquartersState = company.headquarters if company != null else null
 	if state == null or not state.is_active():
@@ -406,9 +410,45 @@ func _capability_hints() -> Dictionary:
 		&"operations.portfolio_alerts": "Build Operations in a Tier 1 headquarters.",
 		&"workforce.training_slots": "Build People Ops to train more staff at once.",
 		&"management.branch_managers": "Build People Ops to delegate more branches to managers.",
-		&"security.guard_capacity": "Security specialization is not installed in this build.",
-		&"crime.crew_capacity": "Underworld specialization is disabled in this scenario.",
+		&"security.guard_capacity": "Build the Security department in a Tier 3 headquarters.",
+		&"security.counterintel": "Build the Security department in a Tier 3 headquarters.",
+		&"crime.crew_capacity": "Open the Underworld department in a Tier 2 headquarters.",
+		&"crime.action_tier": "Grow the Underworld department for heavier operations.",
 	}
+
+
+## The Underworld department follows the session's crime setting (scenario
+## systems / free-play wizard choice). Re-checked lazily because the session
+## config may hydrate after this manager builds its definitions.
+func _refresh_underworld_availability() -> void:
+	var definition: DepartmentDef = _departments.get(&"underworld")
+	if definition == null:
+		return
+	var mode_ok: bool = true
+	var tree: SceneTree = Engine.get_main_loop() as SceneTree
+	if tree != null:
+		var crime: Node = tree.root.get_node_or_null(NodePath("CrimeManager"))
+		if crime != null and crime.has_method("enabled"):
+			mode_ok = crime.call("enabled")
+	definition.available = mode_ok
+	definition.unavailable_reason = "" if mode_ok \
+		else "Underworld operations are disabled in this game."
+
+
+## Same live re-check for Government Relations (feature 13).
+func _refresh_government_availability() -> void:
+	var definition: DepartmentDef = _departments.get(&"government")
+	if definition == null:
+		return
+	var mode_ok: bool = true
+	var tree: SceneTree = Engine.get_main_loop() as SceneTree
+	if tree != null:
+		var gov: Node = tree.root.get_node_or_null(NodePath("GovernmentManager"))
+		if gov != null and gov.has_method("enabled"):
+			mode_ok = gov.call("enabled")
+	definition.available = mode_ok
+	definition.unavailable_reason = "" if mode_ok \
+		else "The civic layer is disabled in this game."
 
 
 func _building_available(company_id: StringName, building_id: int) -> bool:
@@ -463,7 +503,8 @@ func _build_definitions() -> void:
 	_tiers.clear()
 	_departments.clear()
 	_add_tier(0, "Founder", 0, 0.0, 0, 0.0, 0, &"founder",
-		{&"management.branch_managers": 1, &"workforce.training_slots": 1},
+		{&"management.branch_managers": 1, &"workforce.training_slots": 1,
+			&"security.guard_capacity": 1},
 		"hands-on restaurant management")
 	_add_tier(1, "Office", 1, 6000.0, 2 * MINUTES_PER_DAY, 80.0, 1, &"office",
 		{&"headquarters.dashboard": 1}, "company dashboard and one department")
@@ -505,6 +546,28 @@ func _build_definitions() -> void:
 			{&"management.branch_managers": 4, &"workforce.training_slots": 2},
 			{&"management.branch_managers": 8, &"workforce.training_slots": 3},
 		])
+	_add_department(&"security", "Security", "Guard capacity and counterintelligence for every branch.", &"shield",
+		[3, 3], [4500.0, 7000.0], [3 * MINUTES_PER_DAY, 4 * MINUTES_PER_DAY],
+		[60.0, 110.0], [
+			{&"security.guard_capacity": 2, &"security.counterintel": 1},
+			{&"security.guard_capacity": 4, &"security.counterintel": 2},
+		])
+	_add_department(&"underworld", "Underworld", "The back room: criminal crews and operations against rivals.", &"mask",
+		[2, 2, 3], [4000.0, 6000.0, 9000.0],
+		[3 * MINUTES_PER_DAY, 4 * MINUTES_PER_DAY, 5 * MINUTES_PER_DAY],
+		[60.0, 100.0, 160.0], [
+			{&"crime.crew_capacity": 2, &"crime.action_tier": 1},
+			{&"crime.crew_capacity": 4, &"crime.action_tier": 2},
+			{&"crime.crew_capacity": 6, &"crime.action_tier": 3},
+		])
+	_add_department(&"government", "Government Relations", "Legal counsel and lobbyists: advanced permits and development lobbying.", &"city_hall",
+		[3, 4], [5000.0, 8000.0], [3 * MINUTES_PER_DAY, 5 * MINUTES_PER_DAY],
+		[70.0, 120.0], [
+			{&"government.permit_tier": 1, &"government.lobby_capacity": 1},
+			{&"government.permit_tier": 2, &"government.lobby_capacity": 2},
+		])
+	_refresh_underworld_availability()
+	_refresh_government_availability()
 
 
 func _add_tier(

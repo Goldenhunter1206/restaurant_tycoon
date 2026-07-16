@@ -537,9 +537,76 @@ func _render_more() -> void:
 	_clear(_detail)
 	_detail.add_child(_section("Awards & prestige"))
 	_render_awards_summary()
-	_detail.add_child(_section("Planned report families"))
-	_locked_card("Crime & Security", "Incident, sabotage and recovery reports arrive with the Crime & Sabotage update.")
-	_locked_card("Government", "Permits, inspections and taxes arrive with the Government update.")
+	var crime: Node = get_tree().root.get_node_or_null(^"CrimeManager")
+	if crime != null and crime.call("enabled"):
+		_detail.add_child(_section("Crime & security"))
+		_render_crime_summary(crime)
+	else:
+		_detail.add_child(_section("Planned report families"))
+		_locked_card("Crime & Security", "Incident, sabotage and recovery reports arrive with the Crime & Sabotage update.")
+	var gov: Node = get_tree().root.get_node_or_null(^"GovernmentManager")
+	if gov != null and gov.call("enabled"):
+		_detail.add_child(_section("Government"))
+		_render_gov_summary(gov)
+	else:
+		_locked_card("Government", "Permits, inspections and taxes arrive with the Government update.")
+
+
+func _render_gov_summary(gov: Node) -> void:
+	var player_id: StringName = CompanyManager.player.id
+	var civic: Object = gov.call("civic_for", player_id)
+	var tiles: HBoxContainer = HBoxContainer.new()
+	tiles.add_theme_constant_override("separation", 8)
+	_detail.add_child(tiles)
+	_mini_tile(tiles, "Official rep", "%d%%" % int(round(float(civic.get("official_reputation")) * 100.0)))
+	_mini_tile(tiles, "Fines paid", MetricDef.money(float(civic.get("fines_total"))))
+	_mini_tile(tiles, "Donations", MetricDef.money(float(civic.get("donations_total"))))
+	_mini_tile(tiles, "Tax debt", MetricDef.money(float(civic.get("tax_debt"))))
+	var active_permits: int = 0
+	for row: Dictionary in civic.get("permits"):
+		if String(row.get("status", "")) == "active":
+			active_permits += 1
+	var open_violations: int = (civic.call("open_violations") as Array).size()
+	var tiles2: HBoxContainer = HBoxContainer.new()
+	tiles2.add_theme_constant_override("separation", 8)
+	_detail.add_child(tiles2)
+	_mini_tile(tiles2, "Active permits", str(active_permits))
+	_mini_tile(tiles2, "Open violations", str(open_violations))
+	_mini_tile(tiles2, "Influence", "%d" % int(civic.get("influence")))
+	_hint("Legal expense (fines, permits, tax) is booked separately from crime losses — see the ledger categories in Finances.")
+
+
+func _render_crime_summary(crime: Node) -> void:
+	var player_id: StringName = CompanyManager.player.id
+	var heat_state: Object = crime.call("heat_for", player_id)
+	var tiles: HBoxContainer = HBoxContainer.new()
+	tiles.add_theme_constant_override("separation", 8)
+	_detail.add_child(tiles)
+	_mini_tile(tiles, "Heat", "%d%%" % int(heat_state.get("heat")))
+	_mini_tile(tiles, "Fines paid", MetricDef.money(float(heat_state.get("fines_total"))))
+	var active_incidents: int = 0
+	var total_loss: float = 0.0
+	for rest: RestaurantState in RestaurantManager.owned:
+		var sec: Object = crime.call("security_for", rest.building_id)
+		if sec == null:
+			continue
+		for row: Dictionary in sec.get("incidents"):
+			total_loss += float(row.get("loss", 0.0))
+			if bool(row.get("active", false)):
+				active_incidents += 1
+	_mini_tile(tiles, "Open incidents", "%d" % active_incidents)
+	var loss_row: Label = Label.new()
+	loss_row.text = "Lifetime incident losses: %s" % MetricDef.money(total_loss)
+	loss_row.add_theme_font_size_override("font_size", 12)
+	loss_row.add_theme_color_override("font_color", BellaUi.INK_SOFT)
+	_detail.add_child(loss_row)
+	var raids: Array = heat_state.get("raids")
+	if not raids.is_empty():
+		var raid_row: Label = Label.new()
+		raid_row.text = "Police raids: %d" % raids.size()
+		raid_row.add_theme_font_size_override("font_size", 12)
+		raid_row.add_theme_color_override("font_color", Color("#ea4a2f"))
+		_detail.add_child(raid_row)
 
 
 func _render_awards_summary() -> void:

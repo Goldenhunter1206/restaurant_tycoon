@@ -536,6 +536,9 @@ func role_effects_for(rest: RestaurantState) -> Dictionary:
 	var counts := totals.duplicate(true)
 	for key: Variant in counts:
 		counts[key] = 0
+	# Guard coverage (feature 12) sums across on-shift guards rather than
+	# averaging — more guards means more coverage. SecurityService clamps it.
+	var security_coverage: float = 0.0
 	for member: StaffMember in rest.staff:
 		if member.is_absent(GameClock.day) or not member.on_shift(GameClock.game_hours):
 			continue
@@ -560,9 +563,12 @@ func role_effects_for(rest: RestaurantState) -> Dictionary:
 		if definition.is_manager:
 			totals["management"] += member.operational_effect(&"judgment")
 			counts["management"] += 1
+		if definition.operational_tags.has(&"security"):
+			security_coverage += 0.55 * member.operational_effect(&"vigilance")
 	for key: Variant in totals:
 		if int(counts[key]) > 0:
 			totals[key] = float(totals[key]) / float(counts[key])
+	totals["security"] = minf(1.0, security_coverage)
 	return totals
 
 

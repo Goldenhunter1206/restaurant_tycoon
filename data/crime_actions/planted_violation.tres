@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="CrimeActionDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/crime_action_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"planted_violation"
+display_name = "Plant Violations"
+blurb = "Rig a rival's next inspection — a failed visit means a forced day of closure."
+icon = &"receipt"
+tier = 2
+target_kind = &"restaurant"
+required_dept_level = 2
+required_roles = {
+&"courier": 1,
+&"enforcer": 1
+}
+cost = 4000.0
+prep_minutes = 360
+exec_minutes = 120
+base_success = 0.6
+skill_weight = 0.3
+security_weight = 0.3
+effects = {
+"inspection_bias": -20.0,
+"closure_days": 1,
+"effect_days": 0
+}
+evidence_base = 0.3
+heat_base = 9.0
+cooldown_days = 8
+countermeasures = Array[StringName]([&"counterintel", &"cameras"])
+min_crime_mode = &"standard"

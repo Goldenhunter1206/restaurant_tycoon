@@ -46,6 +46,12 @@ var _initialized: bool = false
 var _econ_ready: bool = false
 var _last_demand_minute: int = -1
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
+## Cached CrimeManager node (feature 12); may stay null when crime is off or
+## the autoload is not yet registered (pre editor-restart).
+var _crime: Node = null
+var _crime_checked: bool = false
+var _gov: Node = null
+var _gov_checked: bool = false
 
 
 func initialize() -> void:
@@ -353,7 +359,9 @@ func _best_offer(entry: Dictionary, budget: float, origin: Vector3,
 		# Marketing terms: per-restaurant awareness/coverage bump hoisted out of
 		# the menu loop; per-dish promotion/trend uplift added per entry.
 		var segment: StringName = entry.get("demographic", &"workers")
-		var ad_bonus: float = MarketingManager.bonus_for(rest, segment, origin)
+		var ad_bonus: float = MarketingManager.bonus_for(rest, segment, origin) \
+			- _crime_penalty(rest.building_id) \
+			+ _development_bonus(rest.building_id)
 		for menu_entry: MenuEntry in rest.enabled_menu():
 			if menu_entry.price > budget:
 				continue
@@ -380,6 +388,28 @@ func _best_offer(entry: Dictionary, budget: float, origin: Vector3,
 				best_utility = utility
 				best = {"rest": rest, "dish_id": menu_entry.dish_id, "utility": utility}
 	return best
+
+
+## Sabotage/alert demand penalty (feature 12), 0..0.6. Cheap when crime is
+## off or the branch has no active incident effects.
+func _crime_penalty(building_id: int) -> float:
+	if not _crime_checked:
+		_crime_checked = true
+		_crime = get_node_or_null("/root/CrimeManager")
+	if _crime == null or not _crime.has_method("attraction_penalty"):
+		return 0.0
+	return float(_crime.call("attraction_penalty", building_id))
+
+
+## Built city-development uplift for the branch's district (feature 13),
+## clamped ±government.development.demand_uplift_max. District-cached daily.
+func _development_bonus(building_id: int) -> float:
+	if not _gov_checked:
+		_gov_checked = true
+		_gov = get_node_or_null("/root/GovernmentManager")
+	if _gov == null or not _gov.has_method("development_bonus"):
+		return 0.0
+	return float(_gov.call("development_bonus", building_id))
 
 
 func _load_json(path: String) -> Dictionary:

@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="CrimeActionDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/crime_action_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"graffiti"
+display_name = "Graffiti Tag"
+blurb = "Deface the storefront overnight — lowers curb appeal until it is cleaned off."
+icon = &"spray_can"
+tier = 1
+target_kind = &"restaurant"
+required_dept_level = 1
+required_roles = {
+&"punk": 1
+}
+cost = 500.0
+prep_minutes = 180
+exec_minutes = 30
+base_success = 0.78
+skill_weight = 0.2
+security_weight = 0.35
+effects = {
+"appeal_debuff": 0.15,
+"effect_days": 4,
+"repair_cost": 300.0
+}
+evidence_base = 0.15
+heat_base = 3.0
+cooldown_days = 3
+countermeasures = Array[StringName]([&"cameras", &"guards"])
+min_crime_mode = &"standard"

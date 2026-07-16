@@ -24,6 +24,19 @@ const STAR_LOST: StringName = &"star_lost"
 const INSPECTION: StringName = &"inspection"
 const COMPETITION_ANNOUNCED: StringName = &"competition_announced"
 const COMPETITION_RESULT: StringName = &"competition_result"
+const SABOTAGE: StringName = &"sabotage"
+const EXTORTION: StringName = &"extortion"
+const POLICE: StringName = &"police"
+const SECURITY: StringName = &"security"
+const PERMIT: StringName = &"permit"
+const FINE: StringName = &"fine"
+const APPEAL: StringName = &"appeal"
+const DONATION: StringName = &"donation"
+const LOBBY: StringName = &"lobby"
+const TAX: StringName = &"tax"
+const DEVELOPMENT: StringName = &"development"
+const RAID: StringName = &"raid"
+const ELECTION: StringName = &"election"
 
 
 ## Build a journal entry. `fields` may carry restaurant_id, amount, title, tags.
@@ -55,13 +68,27 @@ static func icon_for(type: StringName) -> StringName:
 		COMPETITION_RESULT: return &"medal"
 		STAR_GAINED, STAR_LOST: return &"star"
 		INSPECTION: return &"magnifier"
+		SABOTAGE: return &"hammer"
+		EXTORTION: return &"money_bag"
+		POLICE: return &"bell"
+		SECURITY: return &"bell"
+		PERMIT: return &"permit"
+		FINE, APPEAL: return &"gavel"
+		DONATION, LOBBY: return &"bank"
+		TAX: return &"receipt"
+		DEVELOPMENT: return &"city_hall"
+		RAID: return &"handcuffs"
+		ELECTION: return &"ballot"
 		_: return &"receipt"
 
 
 ## Feed tone: &"good" / &"bad" / &"warning" / &"info" / &"neutral".
 static func tone_for(type: StringName, amount: float) -> StringName:
 	match type:
-		SHORTAGE, STAFF_LOST, INCIDENT: return &"bad"
+		SHORTAGE, STAFF_LOST, INCIDENT, SABOTAGE: return &"bad"
+		EXTORTION: return &"warning"
+		POLICE: return &"warning"
+		SECURITY: return &"info"
 		CAMPAIGN_STARTED, EXPANSION, PURCHASE: return &"info"
 		RANK_CHANGE: return &"good" if amount >= 0.0 else &"bad"
 		DAY_CLOSE: return &"good" if amount >= 0.0 else &"bad"
@@ -70,6 +97,10 @@ static func tone_for(type: StringName, amount: float) -> StringName:
 		INSPECTION: return &"good" if amount >= 0.0 else &"warning"
 		COMPETITION_ANNOUNCED: return &"info"
 		COMPETITION_RESULT: return &"good" if amount > 0.0 else &"info"
+		FINE, RAID: return &"bad"
+		APPEAL, TAX: return &"warning"
+		PERMIT, DONATION, LOBBY, ELECTION: return &"info"
+		DEVELOPMENT: return &"good" if amount >= 0.0 else &"info"
 		_: return &"neutral"
 
 

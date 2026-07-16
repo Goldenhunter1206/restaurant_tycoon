@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="OfficialDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/official_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"mayor"
+display_name = "Mayor Ottavia Bell"
+blurb = "Sets city priorities, blesses development projects and hands out the shiniest ribbons."
+icon = &"ballot"
+role = &"mayor"
+base_integrity = 0.6
+base_scrutiny = 0.3
+priorities = {
+&"development": 0.8,
+&"paperwork": 0.4
+}
+authority = 3

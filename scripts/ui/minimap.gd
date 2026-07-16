@@ -8,7 +8,7 @@ extends Control
 ## Management layers are pure _draw() overlays over the baked texture —
 ## never rebaked per frame (the static city is the perf ceiling).
 
-enum Layer { NONE, DEMAND, COVERAGE, ROUTES, ZONING, MARKETING }
+enum Layer { NONE, DEMAND, COVERAGE, ROUTES, ZONING, MARKETING, POLICE }
 
 const BAKE_SIZE: int = 512
 const PIN_COLOR: Color = Color("#d8452e")
@@ -70,6 +70,8 @@ func legend_text() -> String:
 			return "Zoning: purple downtown · blue commercial · grey industrial · green suburbs"
 		Layer.MARKETING:
 			return "Ads: orange = your campaigns · squares = billboard sites (green yours, grey vacant)"
+		Layer.POLICE:
+			return "Police: blue dots = stations · circles = response reach · numbers = free units"
 	return ""
 
 
@@ -95,6 +97,8 @@ func _draw() -> void:
 			_draw_routes()
 		Layer.MARKETING:
 			_draw_marketing()
+		Layer.POLICE:
+			_draw_police()
 	# Camera position indicator.
 	var rig: Node3D = _camera_rig()
 	if rig != null:
@@ -145,6 +149,33 @@ func _draw_coverage() -> void:
 		var center: Vector2 = _world_to_map(rest.door_pos)
 		draw_circle(center, radius_px, Color(0.25, 0.61, 0.27, 0.16))
 		draw_arc(center, radius_px, 0.0, TAU, 48, Color("#3f9b45"), 1.5, true)
+
+
+## Police coverage: station dots with free-unit counts plus response-reach
+## rings (radius = distance a unit covers within the "good response" ETA, so
+## the picture matches the quoted response times).
+func _draw_police() -> void:
+	var gov: Node = get_tree().root.get_node_or_null(^"GovernmentManager")
+	if gov == null or not gov.call("enabled"):
+		return
+	var rect: Rect2 = _display_rect()
+	var span: Vector2 = _bounds_max - _bounds_min
+	if span.x <= 0.0:
+		return
+	# A unit drives ~400 m in ~45 game-minutes; show the ~12-minute ring.
+	var reach_m: float = float(EconomyManager.tuning_value("government.police.coverage_radius_m", 220.0))
+	var radius_px: float = reach_m / span.x * rect.size.x
+	var now: int = GameClock.total_minutes()
+	var font: Font = get_theme_default_font()
+	for station in gov.get("stations"):
+		var center: Vector2 = _world_to_map(station.position)
+		draw_circle(center, radius_px, Color(0.23, 0.65, 0.84, 0.14))
+		draw_arc(center, radius_px, 0.0, TAU, 48, Color("#3AA6D6"), 1.5, true)
+		draw_circle(center, 5.0, Color("#2380AE"))
+		draw_circle(center, 5.0, Color("#1B5F85"), false, 1.5)
+		var free_units: int = station.available_units(now)
+		draw_string(font, center + Vector2(7.0, 4.0), str(free_units),
+			HORIZONTAL_ALIGNMENT_LEFT, -1.0, 11, Color("#1B3A4A"))
 
 
 ## Ad coverage: campaign reach circles (player orange, rivals in their brand

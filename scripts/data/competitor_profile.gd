@@ -21,6 +21,13 @@ extends Resource
 @export_range(0.0, 1.0) var marketing_style: float = 0.4
 @export_range(0.0, 1.0) var operational_skill: float = 0.6
 @export_range(0.0, 1.0) var aggression: float = 0.5
+## Willingness to run illegal operations (feature 12). 0 = never plays the
+## underworld; combines with aggression to gate retaliation.
+@export_range(0.0, 1.0) var crime_appetite: float = 0.0
+## Willingness to buy influence — donations, lobbying, bribes (feature 13).
+@export_range(0.0, 1.0) var corruption_appetite: float = 0.0
+## How promptly the AI fixes violations, renews permits and pays fines.
+@export_range(0.0, 1.0) var compliance_diligence: float = 0.5
 ## Willingness to enter recipe competitions and answer challenges.
 @export_range(0.0, 1.0) var competition_appetite: float = 0.4
 @export var target_demographics: Array[StringName] = []

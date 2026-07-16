@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="CrimeActionDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/crime_action_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"protest_punks"
+display_name = "Hired Protest"
+blurb = "Loiterers block the frontage for a day — scares off dine-in customers."
+icon = &"people"
+tier = 1
+target_kind = &"restaurant"
+required_dept_level = 1
+required_roles = {
+&"punk": 2
+}
+cost = 900.0
+prep_minutes = 240
+exec_minutes = 60
+base_success = 0.8
+skill_weight = 0.15
+security_weight = 0.3
+effects = {
+"demand_debuff": 0.2,
+"effect_days": 1
+}
+evidence_base = 0.1
+heat_base = 3.0
+cooldown_days = 3
+countermeasures = Array[StringName]([&"guards", &"alert"])
+min_crime_mode = &"standard"

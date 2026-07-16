@@ -1,135 +1,341 @@
 {
-	"company": {
-		"name": "Bella Vista Pizza Co.",
-		"starting_cash": 20000.0
-	},
-	"purchase": {
-		"base_price": 14000.0,
-		"signing_fee_fraction": 0.15,
-		"affluence_mult": { "D": 2.2, "C": 1.8, "R": 2.0, "N": 1.0, "P": 0.6, "I": 0.7, "K": 1.0, "G": 1.0, "X": 0.8 },
-		"size_factor": 0.004,
-		"table_area_per_table": 14.0,
-		"min_tables": 4,
-		"max_tables": 24
-	},
-	"rent": {
-		"daily_by_district": { "D": 220.0, "C": 140.0, "R": 180.0, "N": 100.0, "P": 60.0, "I": 70.0, "K": 100.0, "G": 100.0, "X": 80.0 }
-	},
-	"demand": {
-		"meal_occasions_per_citizen_per_day": 2.2,
-		"dinein_share": 0.5,
-		"meal_budget_wealth_fraction": 0.02,
-		"min_meal_budget": 6.0,
-		"taste_weight": 1.6,
-		"price_weight": 1.0,
-		"distance_weight": 0.8,
-		"rating_weight": 0.6,
-		"min_utility": 0.25
-	},
-	"distance": {
-		"walk_max_m": 150.0,
-		"drive_max_m": 900.0,
-		"delivery_max_m": 450.0
-	},
-	"delivery": {
-		"cancel_minutes": 210,
-		"deliver_dwell_minutes": 2
-	},
-	"dinein": {
-		"queue_leave_minutes": 25,
-		"eat_minutes": 45
-	},
-	"menu": {
-		"base_slots": 4,
-		"max_slots": 8,
-		"slot_base_price": 2500.0,
-		"slot_price_growth": 1.6,
-		"daily_upkeep_per_dish": 8.0,
-		"upkeep_ingredient_factor": 1.5
-	},
-	"reputation": {
-		"start": 3.0,
-		"per_served": 0.02,
-		"per_cancelled": -0.05,
-		"per_queue_leave": -0.02,
-		"quality_bonus_scale": 0.02,
-		"min": 1.0,
-		"max": 5.0
-	},
-	"loan": {
-		"max": 50000.0,
-		"daily_interest": 0.002,
-		"increment": 5000.0
-	},
-	"rating": {
-		"window_days": 14,
-		"min_observation_days": 5,
-		"weights": {
-			"food": 0.28,
-			"service": 0.22,
-			"atmosphere": 0.16,
-			"cleanliness": 0.16,
-			"value": 0.12,
-			"consistency": 0.06
-		},
-		"rise_hysteresis": 0.2,
-		"loss_hysteresis": 0.5,
-		"min_days_at_level": 5,
-		"warn_days": 3,
-		"loss_days": 7,
-		"level_floors": { "2": 45.0, "3": 58.0, "4": 70.0, "5": 84.0 }
-	},
-	"inspection": {
-		"period_days": 28,
-		"leniency": 4.0,
-		"level_floor": { "1": 30.0, "2": 45.0, "3": 58.0, "4": 72.0, "5": 86.0 }
-	},
-	"awards": {
-		"cadence_days": 42,
-		"active_categories": ["best_premium", "best_value", "best_service", "best_delivery", "popular_recipe", "cleanest"],
-		"reputation_diminishing": true,
-		"scenario_weight_per_trophy": 1200.0
-	},
-	"competition": {
-		"default_entry_window_days": 4,
-		"judging_day_offset": 2,
-		"noise_range": 0.05,
-		"schedule_cadence_days": 42
-	},
-	"staff": {
-		"max_shift_hours": 10.0,
-		"min_shift_hours": 2.0,
-		"effects": {
-			"prep_span": 0.5,
-			"waiter_span": 0.6,
-			"drive_span": 0.3,
-			"walk_span": 0.3,
-			"dwell_span": 0.5,
-			"consistency_rep_scale": 0.02,
-			"charm_rep_scale": 0.015
-		}
-	},
-	"hiring": {
-		"market_min": 3,
-		"market_max": 5,
-		"candidate_lifetime_days": 4,
-		"daily_leave_chance": 0.2,
-		"wage_base_frac": 0.6,
-		"wage_attr_span": 0.8,
-		"wage_noise": 0.06
-	},
-	"analytics": {
-		"event_retention_days": 45,
-		"daily_retention_days": 120,
-		"rank_news_threshold": 1,
-		"market_share_window_days": 7
-	},
-	"objectives": [
-		{ "id": "cash_30k", "text": "Grow the treasury to $30,000", "type": "cash", "target": 30000 },
-		{ "id": "second_restaurant", "text": "Open a 2nd restaurant", "type": "restaurants", "target": 2 },
-		{ "id": "rating_4", "text": "Reach a 4.0 star rating", "type": "reputation", "target": 4.0 },
-		{ "id": "deliveries_20", "text": "Complete 20 deliveries", "type": "deliveries", "target": 20 },
-		{ "id": "stars_4", "text": "Earn a 4-star restaurant", "type": "stars", "target": 4 },
-		{ "id": "first_award", "text": "Win a city award or medal", "type": "awards", "target": 1 }
-	]
+  "company": {
+    "name": "Bella Vista Pizza Co.",
+    "starting_cash": 20000.0
+  },
+  "purchase": {
+    "base_price": 14000.0,
+    "signing_fee_fraction": 0.15,
+    "affluence_mult": {
+      "D": 2.2,
+      "C": 1.8,
+      "R": 2.0,
+      "N": 1.0,
+      "P": 0.6,
+      "I": 0.7,
+      "K": 1.0,
+      "G": 1.0,
+      "X": 0.8
+    },
+    "size_factor": 0.004,
+    "table_area_per_table": 14.0,
+    "min_tables": 4,
+    "max_tables": 24
+  },
+  "rent": {
+    "daily_by_district": {
+      "D": 220.0,
+      "C": 140.0,
+      "R": 180.0,
+      "N": 100.0,
+      "P": 60.0,
+      "I": 70.0,
+      "K": 100.0,
+      "G": 100.0,
+      "X": 80.0
+    }
+  },
+  "demand": {
+    "meal_occasions_per_citizen_per_day": 2.2,
+    "dinein_share": 0.5,
+    "meal_budget_wealth_fraction": 0.02,
+    "min_meal_budget": 6.0,
+    "taste_weight": 1.6,
+    "price_weight": 1.0,
+    "distance_weight": 0.8,
+    "rating_weight": 0.6,
+    "min_utility": 0.25
+  },
+  "distance": {
+    "walk_max_m": 150.0,
+    "drive_max_m": 900.0,
+    "delivery_max_m": 450.0
+  },
+  "delivery": {
+    "cancel_minutes": 210,
+    "deliver_dwell_minutes": 2
+  },
+  "dinein": {
+    "queue_leave_minutes": 25,
+    "eat_minutes": 45
+  },
+  "menu": {
+    "base_slots": 4,
+    "max_slots": 8,
+    "slot_base_price": 2500.0,
+    "slot_price_growth": 1.6,
+    "daily_upkeep_per_dish": 8.0,
+    "upkeep_ingredient_factor": 1.5
+  },
+  "reputation": {
+    "start": 3.0,
+    "per_served": 0.02,
+    "per_cancelled": -0.05,
+    "per_queue_leave": -0.02,
+    "quality_bonus_scale": 0.02,
+    "min": 1.0,
+    "max": 5.0
+  },
+  "loan": {
+    "max": 50000.0,
+    "daily_interest": 0.002,
+    "increment": 5000.0
+  },
+  "rating": {
+    "window_days": 14,
+    "min_observation_days": 5,
+    "weights": {
+      "food": 0.28,
+      "service": 0.22,
+      "atmosphere": 0.16,
+      "cleanliness": 0.16,
+      "value": 0.12,
+      "consistency": 0.06
+    },
+    "rise_hysteresis": 0.2,
+    "loss_hysteresis": 0.5,
+    "min_days_at_level": 5,
+    "warn_days": 3,
+    "loss_days": 7,
+    "level_floors": {
+      "2": 45.0,
+      "3": 58.0,
+      "4": 70.0,
+      "5": 84.0
+    }
+  },
+  "inspection": {
+    "period_days": 28,
+    "leniency": 4.0,
+    "level_floor": {
+      "1": 30.0,
+      "2": 45.0,
+      "3": 58.0,
+      "4": 72.0,
+      "5": 86.0
+    }
+  },
+  "awards": {
+    "cadence_days": 42,
+    "active_categories": [
+      "best_premium",
+      "best_value",
+      "best_service",
+      "best_delivery",
+      "popular_recipe",
+      "cleanest"
+    ],
+    "reputation_diminishing": true,
+    "scenario_weight_per_trophy": 1200.0
+  },
+  "competition": {
+    "default_entry_window_days": 4,
+    "judging_day_offset": 2,
+    "noise_range": 0.05,
+    "schedule_cadence_days": 42
+  },
+  "staff": {
+    "max_shift_hours": 10.0,
+    "min_shift_hours": 2.0,
+    "effects": {
+      "prep_span": 0.5,
+      "waiter_span": 0.6,
+      "drive_span": 0.3,
+      "walk_span": 0.3,
+      "dwell_span": 0.5,
+      "consistency_rep_scale": 0.02,
+      "charm_rep_scale": 0.015
+    }
+  },
+  "hiring": {
+    "market_min": 3,
+    "market_max": 5,
+    "candidate_lifetime_days": 4,
+    "daily_leave_chance": 0.2,
+    "wage_base_frac": 0.6,
+    "wage_attr_span": 0.8,
+    "wage_noise": 0.06
+  },
+  "analytics": {
+    "event_retention_days": 45,
+    "daily_retention_days": 120,
+    "rank_news_threshold": 1,
+    "market_share_window_days": 7
+  },
+  "crime": {
+    "crew": {
+      "market_refresh_days": 4
+    },
+    "extortion": {
+      "base_amount": 1200.0,
+      "deadline_days": 4
+    },
+    "security": {
+      "equipment_bonus": 0.12,
+      "guard_weight": 0.5,
+      "counterintel_base": 0.25,
+      "counterintel_per_equipment": 0.12,
+      "equipment_costs": [
+        400.0,
+        900.0,
+        1600.0
+      ],
+      "upkeep_per_level": 25.0,
+      "sweep_cost": 350.0
+    },
+    "insurance": {
+      "daily_premiums": [
+        0.0,
+        45.0,
+        110.0
+      ],
+      "payout_fractions": [
+        0.0,
+        0.5,
+        0.8
+      ]
+    },
+    "resolve": {
+      "equipment_success_bonus": 0.05,
+      "intel_success_bonus": 0.1,
+      "detect_base": 0.08,
+      "detect_security_weight": 0.55,
+      "camera_evidence_bonus": 0.4,
+      "escape_injury_base": 0.12,
+      "escape_capture_base": 0.06
+    },
+    "heat": {
+      "decay_per_day": 1.5,
+      "fine_threshold": 40.0,
+      "raid_threshold": 75.0,
+      "min_evidence_fine": 0.6,
+      "min_evidence_raid": 1.5,
+      "fine_base": 1500.0,
+      "fine_per_evidence": 2000.0,
+      "raid_freeze_days": 5,
+      "incarceration_days": 10,
+      "investigation_days_base": 4,
+      "attribution_threshold": 0.55
+    },
+    "ai": {
+      "min_cash_reserve": 8000.0,
+      "heat_backoff": 55.0,
+      "retaliation_weight": 2.0,
+      "defense_after_incident_days": 3
+    }
+  },
+  "government": {
+    "inspection": {
+      "period_days": 21,
+      "notice_days": 5,
+      "complaint_chance_per_day": 0.03,
+      "grade_floors": {
+        "warning": 55.0,
+        "remediation": 40.0,
+        "fine": 25.0,
+        "closure": 12.0
+      },
+      "penalty_per_severity": 12.0,
+      "bias_band": 10.0,
+      "min_avg_freshness": 0.35,
+      "min_avg_cleanliness": 0.55,
+      "min_equipment_durability": 30.0,
+      "max_shift_hours": 12.0,
+      "remediation_days": 5,
+      "appeal_days": 4,
+      "reinspection_fee": 150.0,
+      "reinspection_days": 3,
+      "rigged_notice_days": 2,
+      "reputation_drift": 0.005,
+      "report_fee": 100.0
+    },
+    "fines": {
+      "base": 2000.0,
+      "per_severity": 800.0,
+      "closure_days": 3,
+      "late_multiplier": 1.5,
+      "appeal_fee": 250.0,
+      "appeal_overturn_chance": 0.35
+    },
+    "permits": {
+      "lapse_grace_days": 3
+    },
+    "tax": {
+      "daily_revenue_rate": 0.015,
+      "audit_threshold": 0.2
+    },
+    "influence": {
+      "donation_reputation_per_1k": 0.03,
+      "reputation_cap_from_donations": 0.35,
+      "influence_decay_per_day": 0.5,
+      "diminishing_half_life": 5000.0,
+      "bribe_base_success": 0.35,
+      "bribe_evidence_risk": 0.25,
+      "award_bias_max": 0.15
+    },
+    "police": {
+      "station_count": 2,
+      "units_per_station": 2,
+      "eta_min": 3.0,
+      "eta_max": 45.0,
+      "raid_evidence_min": 1.5,
+      "fine_evidence_min": 0.6,
+      "investigation_days": 4,
+      "raid_freeze_days": 5,
+      "false_report_reputation_hit": 0.08,
+      "respond_busy_minutes": 90,
+      "raid_busy_minutes": 240,
+      "coverage_radius_m": 220.0
+    },
+    "development": {
+      "proposal_cadence_days": 30,
+      "decision_days": 14,
+      "support_cost_base": 1500.0,
+      "demand_uplift_max": 0.25,
+      "base_approval": 0.45
+    },
+    "ai": {
+      "min_cash_reserve": 6000.0,
+      "scrutiny_backoff": 0.7,
+      "civic_weight": 1.0
+    }
+  },
+  "objectives": [
+    {
+      "id": "cash_30k",
+      "text": "Grow the treasury to $30,000",
+      "type": "cash",
+      "target": 30000
+    },
+    {
+      "id": "second_restaurant",
+      "text": "Open a 2nd restaurant",
+      "type": "restaurants",
+      "target": 2
+    },
+    {
+      "id": "rating_4",
+      "text": "Reach a 4.0 star rating",
+      "type": "reputation",
+      "target": 4.0
+    },
+    {
+      "id": "deliveries_20",
+      "text": "Complete 20 deliveries",
+      "type": "deliveries",
+      "target": 20
+    },
+    {
+      "id": "stars_4",
+      "text": "Earn a 4-star restaurant",
+      "type": "stars",
+      "target": 4
+    },
+    {
+      "id": "first_award",
+      "text": "Win a city award or medal",
+      "type": "awards",
+      "target": 1
+    }
+  ]
 }

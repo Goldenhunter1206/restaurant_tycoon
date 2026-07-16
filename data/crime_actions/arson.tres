@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="CrimeActionDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/crime_action_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"arson"
+display_name = "Torch the Branch"
+blurb = "Set the place ablaze — devastating damage and a long closure. Always rebuildable, never gone."
+icon = &"fist"
+tier = 3
+target_kind = &"restaurant"
+required_dept_level = 3
+required_roles = {
+&"gangster": 1
+}
+cost = 7500.0
+prep_minutes = 600
+exec_minutes = 120
+base_success = 0.55
+skill_weight = 0.3
+security_weight = 0.4
+effects = {
+"durability_hit": 2.0,
+"station_count": 8,
+"clean_hit": 0.5,
+"closure_days": 4,
+"effect_days": 0,
+"repair_cost": 6000.0
+}
+evidence_base = 0.6
+heat_base = 30.0
+cooldown_days = 14
+countermeasures = Array[StringName]([&"guards", &"cameras", &"police", &"insurance"])
+min_crime_mode = &"ruthless"

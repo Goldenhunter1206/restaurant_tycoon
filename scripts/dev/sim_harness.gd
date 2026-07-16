@@ -33,6 +33,8 @@ var _demand: Node
 var _delivery: Node
 var _analytics: Node
 var _awards: Node
+var _crime: Node
+var _government: Node
 
 
 func _initialize() -> void:
@@ -47,11 +49,17 @@ func _initialize() -> void:
 	_delivery = root.get_node("DeliveryManager")
 	_analytics = root.get_node("AnalyticsManager")
 	_awards = root.get_node("AwardsManager")
+	_crime = root.get_node_or_null("CrimeManager")
+	_government = root.get_node_or_null("GovernmentManager")
 	var args: PackedStringArray = OS.get_cmdline_user_args()
 	var scenario: String = args[0] if args.size() > 0 else "sim"
 	match scenario:
 		"commands":
 			_scenario_commands()
+		"crime":
+			_scenario_crime(int(args[1]) if args.size() > 1 else 1234)
+		"government":
+			_scenario_government(int(args[1]) if args.size() > 1 else 1234)
 		_:
 			var world_seed: int = int(args[1]) if args.size() > 1 else 1234
 			var days: int = int(args[2]) if args.size() > 2 else 15
@@ -98,6 +106,14 @@ func _boot(world_seed: int, rivals: Array) -> void:
 	_restaurants.initialize()
 	_demand.initialize()
 	_delivery.initialize()
+	# Crime hooks minute_ticked + buckets_closed and registers a daily cost
+	# provider; without an Underworld department (HQ isn't booted here) it stays
+	# inert, so its presence must not change the base fingerprint — only the
+	# dedicated crime scenario grants capability and drives operations.
+	if _crime != null:
+		_crime.initialize()
+	if _government != null:
+		_government.initialize()
 	_companies.start_ai()
 
 
@@ -222,6 +238,198 @@ func _scenario_sim(world_seed: int, days: int) -> void:
 		"competitions": comp_fp,
 	}
 	print("FINGERPRINT %s" % JSON.stringify(fingerprint))
+
+
+## Full attacker→resolve→ledger→enforcement path with capability granted
+## directly (HQ/staff are not booted here). Prints CRIME_FINGERPRINT for
+## cross-process determinism (diff two runs at the same seed).
+func _scenario_crime(world_seed: int) -> void:
+	print("== crime & sabotage ==")
+	if _crime == null:
+		printerr("  FAIL  CrimeManager autoload missing (needs an editor restart to register)")
+		_checks += 1
+		_failures += 1
+		return
+	_boot(world_seed, [&"pronto"])
+	var player: Resource = _companies.player
+	var rival: Resource = _companies.company(&"pronto")
+	var registry: Node = root.get_node("CapabilityRegistry")
+	# Grant the player an Underworld back room without an HQ department.
+	registry.set_source(player.id, &"harness_crime",
+		{&"crime.crew_capacity": 4, &"crime.action_tier": 3})
+	# Found a target branch for the rival to hit.
+	_restaurants.purchase_location(rival.id, 102, "Pronto Target")
+	var target: Resource = _restaurants.by_building.get(102)
+	_check(target != null and target.company_id == rival.id, "target branch founded for the rival")
+	if target == null:
+		return
+	# Recruit crew (deterministic market).
+	var market: Array = _crime.market_candidates(player.id)
+	_check(not market.is_empty(), "underworld market offers recruits")
+	var hired: int = 0
+	for candidate: Dictionary in market:
+		var result: RefCounted = _crime.hire_agent_cmd(player.id, candidate)
+		if result != null and result.ok:
+			hired += 1
+	_check(hired > 0, "player recruited at least one crew member")
+	_check(_crime.crew_of(player.id).size() <= _crime.crew_capacity(player.id),
+		"crew never exceeds capacity")
+	# Launch a tier-1 op that needs a single punk if available; else graffiti.
+	var cash_before: float = player.cash
+	var action_id: StringName = _first_launchable(player.id)
+	_check(action_id != &"", "at least one action is launchable")
+	if action_id == &"":
+		return
+	var launch: RefCounted = _crime.launch_operation_cmd(player.id, action_id, 102)
+	_check(launch != null and launch.ok, "operation launches")
+	if launch == null or not launch.ok:
+		return
+	var op: Resource = launch.payload.get("operation")
+	_check(player.cash < cash_before, "launching an operation costs cash")
+	# Advance just past resolution (extortion resolves within a day). Heat is
+	# sampled here before the daily decay grinds it back down.
+	_advance_days(2)
+	_check(op.outcome_applied, "operation resolved exactly once (outcome_applied)")
+	_check(op.outcome.has("success") and op.outcome.has("evidence"),
+		"outcome records success and evidence independently")
+	var attacker_heat: Resource = _crime.heat_for(player.id)
+	_check(attacker_heat.heat > 0.0, "the operation raised the attacker's heat")
+	var target_sec: Resource = _crime.security_for(102)
+	_check(target_sec != null, "the target has a security state")
+	# The anti-cheat: every dollar including crime categories is accounted.
+	_check_ledgers()
+	_check_crime()
+	var fingerprint: Dictionary = {
+		"op": [op.uid, String(op.action_id), String(op.phase), bool(op.outcome.get("success", false)),
+			snappedf(float(op.evidence), 0.0001)],
+		"heat": snappedf(attacker_heat.heat, 0.01),
+		"player_cash": snappedf(player.cash, 0.01),
+		"crew": _crime.crew_of(player.id).size(),
+		"incidents": target_sec.incidents.size() if target_sec != null else 0,
+	}
+	print("CRIME_FINGERPRINT %s" % JSON.stringify(fingerprint))
+
+
+## Civic layer end-to-end: permits, a forced-fail inspection with a live
+## checklist, remediation deadlines, fines, donations and once-only outcomes.
+## Prints GOVERNMENT_FINGERPRINT for cross-process determinism.
+func _scenario_government(world_seed: int) -> void:
+	print("== government, mayor & police ==")
+	if _government == null:
+		printerr("  FAIL  GovernmentManager autoload missing (needs an editor restart to register)")
+		_checks += 1
+		_failures += 1
+		return
+	_boot(world_seed, [&"pronto"])
+	var player: Resource = _companies.player
+	var civic: Resource = _government.civic_for(player.id)
+	_check(civic != null, "player has a civic state")
+	_check(civic.has_active_permit(&"business_license", _clock.day),
+		"starter business license is active")
+	_check(not _government.officials.is_empty(), "officials seeded")
+	_check(not _government.stations.is_empty(), "police stations seeded")
+	var player_branch: Resource = null
+	for rest: Resource in _restaurants.owned:
+		if rest.company_id == player.id:
+			player_branch = rest
+			break
+	_check(player_branch != null, "player owns a branch to inspect")
+	if player_branch == null:
+		return
+	var bid: int = player_branch.building_id
+	# Sabotage our own compliance. Dirty furniture flags the walk-in preview,
+	# but the nightly repair crew may clean it before the visit (fixing before
+	# the deadline is SUPPOSED to help) — so also lapse a permit, which nothing
+	# renews for the player automatically. That failure is durable.
+	if player_branch.interior_layout != null and not player_branch.interior_layout.placed.is_empty():
+		for item: Resource in player_branch.interior_layout.placed:
+			item.cleanliness = 0.05
+	var lapsed_permit: Dictionary = civic.permit_row(&"food_handling")
+	_check(not lapsed_permit.is_empty(), "starter food handling permit exists")
+	if not lapsed_permit.is_empty():
+		lapsed_permit["status"] = "lapsed"
+	var preview: Array = _government.checklist_preview(bid, &"food_safety")
+	var preview_fails: int = 0
+	for row: Dictionary in preview:
+		if not bool(row.get("passed", true)):
+			preview_fails += 1
+	_check(preview_fails > 0, "live checklist flags the dirty branch (%d fails)" % preview_fails)
+	# Request a re-inspection (player-driven scheduling) and let it happen.
+	var cash_before: float = player.cash
+	var request: RefCounted = _government.request_reinspection_cmd(player.id, bid)
+	_check(request != null and request.ok, "re-inspection can be requested")
+	_check(player.cash < cash_before, "the filing fee was charged")
+	_advance_days(5)
+	var done: Array = []
+	for insp: Resource in _government.inspections_for(bid):
+		if insp.visit_done:
+			done.append(insp)
+	_check(not done.is_empty(), "the inspection visit happened")
+	if done.is_empty():
+		return
+	var visit: Resource = done[0]
+	_check(visit.outcome_applied, "inspection outcome applied exactly once")
+	_check(visit.grade != &"clean", "the dirty branch did not grade clean (%s)" % visit.grade)
+	var open_violations: Array = civic.open_violations()
+	var escalated_or_open: bool = not open_violations.is_empty() or not civic.violations.is_empty()
+	_check(escalated_or_open, "violations were recorded with correctives")
+	if not civic.violations.is_empty():
+		var violation: Dictionary = civic.violations[0]
+		_check(not String(violation.get("corrective", "")).is_empty(),
+			"violation carries a concrete corrective")
+	# Donations: bounded civic goodwill, honest ledger.
+	var rep_before: float = civic.official_reputation
+	var donate: RefCounted = _government.donate_cmd(player.id, &"mayor", 1000.0, &"declared")
+	_check(donate != null and donate.ok, "donation accepted")
+	_check(civic.official_reputation >= rep_before, "donation never lowers reputation")
+	_check(civic.influence > 0.0, "donation grants influence")
+	_check(_government.award_bias(player.id) <= 0.151, "award bias stays inside its cap")
+	# Police: ETA quoted from station anchors, clamped.
+	var eta: float = _government.police_eta(bid)
+	_check(eta >= 3.0 and eta <= 45.0, "police ETA clamped (%.1f min)" % eta)
+	var dispatch: Dictionary = _government.dispatch_unit(bid, &"respond")
+	_check(not dispatch.is_empty(), "a unit dispatches to the branch")
+	# The anti-cheat: every civic dollar is accounted.
+	_check_ledgers()
+	var fingerprint: Dictionary = {
+		"official_rep": snappedf(civic.official_reputation, 0.0001),
+		"police_rep": snappedf(civic.police_reputation, 0.0001),
+		"influence": snappedf(civic.influence, 0.0001),
+		"grade": String(visit.grade),
+		"score": snappedf(visit.score, 0.01),
+		"violations": civic.violations.size(),
+		"fines": civic.fines.size(),
+		"permits_active": int(civic.has_active_permit(&"business_license", _clock.day)),
+		"stations": _government.stations.size(),
+		"player_cash": snappedf(player.cash, 0.01),
+	}
+	print("GOVERNMENT_FINGERPRINT %s" % JSON.stringify(fingerprint))
+
+
+func _first_launchable(company_id: StringName) -> StringName:
+	for entry: Dictionary in _crime.actions_for(company_id):
+		if bool(entry.get("ok", false)):
+			var def: Resource = entry.get("def")
+			if def != null and def.target_kind == &"restaurant":
+				var preview: Dictionary = _crime.preview_operation(company_id, def.id, 102)
+				if bool(preview.get("ok", false)):
+					return def.id
+	return &""
+
+
+func _check_crime() -> void:
+	# Heat state exists for every company (seeded on init / registration).
+	var missing: int = 0
+	for company: Resource in _companies.companies:
+		if _crime.heat_for(company.id) == null:
+			missing += 1
+	_check(missing == 0, "every company has a heat state")
+	# No operation is ever resolved twice.
+	var double_resolved: int = 0
+	for op: Resource in _crime.operations:
+		if op.phase == &"done" and not op.outcome_applied and not op.outcome.is_empty():
+			double_resolved += 1
+	_check(double_resolved == 0, "no operation resolves without its once-only guard")
 
 
 func _scenario_commands() -> void:
