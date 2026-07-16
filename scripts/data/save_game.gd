@@ -1,8 +1,8 @@
 class_name SaveGame
 extends Resource
-## Serializable snapshot (v8: workforce depth, training, labor events).
+## Serializable snapshot (v10: ratings, awards, recipe competitions).
 
-@export var save_version: int = 9
+@export var save_version: int = 10
 @export var day: int = 1
 @export var game_hours: float = 7.0
 ## Every competing company carries its own finances, restaurants, and workforce.
@@ -55,3 +55,11 @@ extends Resource
 @export var analytics_weekly: Array[Dictionary] = []
 @export var analytics_quarterly: Array[Dictionary] = []
 @export var analytics_events: Array[Dictionary] = []
+## Ratings / awards / competitions section (v10). Schema 0 = section absent
+## (pre-v10 save re-written by a v10 build) — AwardsManager reseeds on restore.
+@export var awards_schema_version: int = 0
+@export var rating_states: Array[RestaurantRatingState] = []
+@export var award_results: Array[AwardResult] = []
+@export var award_claimed_keys: Dictionary = {}
+@export var competitions: Array[CompetitionState] = []
+@export var competition_next_uid: int = 1

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="AwardDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/award_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"best_premium"
+display_name = "Best Premium Restaurant"
+category = &"premium"
+blurb = "The city's finest table — top food held in a superb room."
+icon = &"trophy"
+eligibility = {
+"min_guests": 120,
+"min_stars": 3.5
+}
+scoring = {
+&"food": 0.5,
+&"atmosphere": 0.3,
+&"sales": 0.2
+}
+tiebreak_metric = &"sales"
+reward_cash = 6000.0
+reward_reputation = 0.25

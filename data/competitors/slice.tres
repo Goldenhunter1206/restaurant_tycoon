@@ -21,3 +21,4 @@ safety_stock_bias = 0.8
 warehouse_appetite = 0.3
 forecast_accuracy = 0.6
 planning_noise = 0.25
+competition_appetite = 0.6

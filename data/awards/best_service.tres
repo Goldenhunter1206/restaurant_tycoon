@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="AwardDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/award_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"best_service"
+display_name = "Best Service"
+category = &"service"
+blurb = "Fast seats, warm smiles, and nobody walks out hungry."
+icon = &"people"
+eligibility = {
+"min_guests": 80
+}
+scoring = {
+&"service": 0.7,
+&"consistency": 0.3
+}
+tiebreak_metric = &"guests"
+reward_cash = 4000.0
+reward_reputation = 0.2

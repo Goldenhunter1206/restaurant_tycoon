@@ -30,6 +30,7 @@ static func save_game() -> bool:
 	_write_service_save("/root/BranchCommandRouter", save)
 	_write_service_save("/root/ManagementManager", save)
 	_write_service_save("/root/AnalyticsManager", save)
+	_write_service_save("/root/AwardsManager", save)
 	for candidate: JobCandidate in RestaurantManager.job_market:
 		save.job_market.append(candidate)
 	save.next_candidate_uid = RestaurantManager._next_candidate_uid
@@ -57,6 +58,8 @@ static func load_game() -> SaveGame:
 		_migrate_v8(save)
 	if save.save_version < 9:
 		_migrate_v9(save)
+	if save.save_version < 10:
+		_migrate_v10(save)
 	return save
 
 
@@ -72,6 +75,15 @@ static func _write_service_save(node_path: String, save: SaveGame) -> void:
 	var service := tree.root.get_node_or_null(node_path)
 	if service != null and service.has_method("write_save"):
 		service.call("write_save", save)
+
+
+## v10: mark the awards section present. Rating states are seeded by
+## AwardsManager._ensure_rating_states() from each branch's legacy star_rating
+## (one code path also covers fresh games, new branches, and pre-v10 saves
+## re-written by a v10 build where awards_schema_version stays 0).
+static func _migrate_v10(save: SaveGame) -> void:
+	save.awards_schema_version = 1
+	save.save_version = 10
 
 
 ## v9: seed analytics buckets from the unbounded CompanyState.history so loaded

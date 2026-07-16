@@ -534,10 +534,42 @@ func _render_competition() -> void:
 
 func _render_more() -> void:
 	_clear(_detail)
+	_detail.add_child(_section("Awards & prestige"))
+	_render_awards_summary()
 	_detail.add_child(_section("Planned report families"))
-	_locked_card("Awards", "City awards & recipe competitions arrive with the Competitions update.")
 	_locked_card("Crime & Security", "Incident, sabotage and recovery reports arrive with the Crime & Sabotage update.")
 	_locked_card("Government", "Permits, inspections and taxes arrive with the Government update.")
+
+
+func _render_awards_summary() -> void:
+	var awards: Node = get_tree().root.get_node_or_null(^"AwardsManager")
+	if awards == null:
+		_locked_card("Awards", "City awards & recipe competitions arrive with the Competitions update.")
+		return
+	var player_id: StringName = CompanyManager.player.id
+	var tiles: HBoxContainer = HBoxContainer.new()
+	tiles.add_theme_constant_override("separation", 8)
+	_detail.add_child(tiles)
+	_mini_tile(tiles, "Trophies", "%d" % int(awards.trophies_for(player_id)))
+	_mini_tile(tiles, "Live contests", "%d" % (awards.active_competitions() as Array).size())
+	var best: float = 0.0
+	for rest: RestaurantState in RestaurantManager.owned:
+		best = maxf(best, rest.star_rating)
+	_mini_tile(tiles, "Best branch", "%.1f stars" % best)
+	var results: Array = awards.award_results
+	var shown: int = 0
+	for i: int in range(results.size() - 1, -1, -1):
+		if shown >= 4:
+			break
+		shown += 1
+		var result: AwardResult = results[i]
+		var row: Label = Label.new()
+		row.text = "%s — %s (%s)" % [result.display_name, result.winner_name, result.period_label]
+		row.add_theme_font_size_override("font_size", 12)
+		row.add_theme_color_override("font_color", BellaUi.INK_SOFT)
+		_detail.add_child(row)
+	if shown == 0:
+		_hint("No awards decided yet — the first ceremony lands at the quarter close.")
 
 
 func _locked_card(title: String, body: String) -> void:

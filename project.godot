@@ -38,6 +38,7 @@ StaffManager="*res://scripts/autoload/staff_manager.gd"
 BranchCommandRouter="*res://scripts/autoload/branch_command_router.gd"
 ManagementManager="*res://scripts/autoload/management_manager.gd"
 AnalyticsManager="*res://scripts/autoload/analytics_manager.gd"
+AwardsManager="*res://scripts/autoload/awards_manager.gd"
 
 [display]
 

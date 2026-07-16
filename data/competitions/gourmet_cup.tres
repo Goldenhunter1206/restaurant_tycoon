@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="CompetitionDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/competition_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"gourmet_cup"
+display_name = "City Gourmet Cup"
+brief = "A rich, layered signature dish for discerning workers and seniors — at least 5 components."
+icon = &"chef_hat"
+target_demographics = Array[StringName]([&"workers", &"seniors"])
+constraints = {
+"min_components": 5
+}
+entry_fee = 500.0
+reward_cash = 8000.0
+reward_reputation = 0.4
+reward_trend_days = 5
+judging = {
+"recipe": 0.6,
+"compliance": 0.25,
+"novelty": 0.15,
+"noise_range": 0.05
+}
+entry_window_days = 4
+judging_day_offset = 2
+cadence_days = 42
+cadence_offset = 31

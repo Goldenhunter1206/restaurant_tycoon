@@ -5,6 +5,7 @@ extends TycoonScreen
 ## and a locked Competitions stub.
 
 signal open_workshop_requested(recipe_id: StringName, product_type: StringName)
+signal request_screen(screen_id: StringName)
 
 const BOOK_FILTERS: Array[Dictionary] = [
 	{"id": "all", "label": "All"},
@@ -16,6 +17,7 @@ const BOOK_FILTERS: Array[Dictionary] = [
 ]
 
 var _tabs: TabContainer
+var _competitions_box: VBoxContainer
 var _book_filter: String = "all"
 var _book_chips: Dictionary = {}
 var _book_grid: GridContainer
@@ -99,6 +101,8 @@ func refresh() -> void:
 			_refresh_menu_tab()
 		3:
 			_rebuild_performance()
+		4:
+			_rebuild_competitions()
 
 
 # --- Tab 1: Recipe Book -------------------------------------------------------
@@ -742,19 +746,73 @@ func _make_performance_row(rec: RecipeDef) -> Control:
 	return row
 
 
-# --- Tab 5: Competitions (locked) -------------------------------------------------
+# --- Tab 5: Competitions ------------------------------------------------------------
 
 
 func _build_competitions_tab() -> void:
 	var tab: VBoxContainer = VBoxContainer.new()
 	tab.name = "Competitions"
-	tab.alignment = BoxContainer.ALIGNMENT_CENTER
+	tab.add_theme_constant_override("separation", 8)
 	_tabs.add_child(tab)
-	var box: PanelContainer = PanelContainer.new()
-	box.add_theme_stylebox_override("panel", TycoonTheme.status_box("info"))
-	box.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	tab.add_child(box)
-	var label: Label = Label.new()
-	label.text = "🏆  Recipe competitions arrive with the Awards update.\nFrozen recipe versions will be your entries."
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(label)
+	var scroll: ScrollContainer = ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	tab.add_child(scroll)
+	_competitions_box = VBoxContainer.new()
+	_competitions_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_competitions_box.add_theme_constant_override("separation", 6)
+	scroll.add_child(_competitions_box)
+	_rebuild_competitions()
+
+
+## Live contest list — the full flow (entries, podium, challenges) lives on
+## the Awards & Competitions screen; this tab is the recipe-side doorway.
+func _rebuild_competitions() -> void:
+	for child: Node in _competitions_box.get_children():
+		child.queue_free()
+	var awards: Node = get_tree().root.get_node_or_null(^"AwardsManager")
+	var open_btn: Button = Button.new()
+	open_btn.text = "Open Awards & Competitions"
+	TycoonTheme.apply_orange(open_btn)
+	open_btn.pressed.connect(func() -> void: request_screen.emit(&"awards"))
+	_competitions_box.add_child(open_btn)
+	if awards == null:
+		return
+	var player_id: StringName = CompanyManager.player.id
+	var shown: int = 0
+	for comp: CompetitionState in awards.active_competitions():
+		var def: CompetitionDef = awards.competition_defs.get(comp.def_id)
+		if def == null:
+			continue
+		shown += 1
+		var row: PanelContainer = make_row()
+		_competitions_box.add_child(row)
+		var box: HBoxContainer = HBoxContainer.new()
+		box.add_theme_constant_override("separation", 10)
+		row.add_child(box)
+		box.add_child(UiAssets.icon_rect(def.icon, 24))
+		var text: VBoxContainer = VBoxContainer.new()
+		text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		box.add_child(text)
+		var title: Label = Label.new()
+		title.text = def.display_name
+		text.add_child(title)
+		var detail: Label = Label.new()
+		var entered: String = "entered" if comp.has_entry(player_id) else "no entry yet"
+		match comp.status:
+			&"entry":
+				detail.text = "%s · entries close day %d · %s" % [def.brief, comp.deadline_day, entered]
+			&"locked":
+				detail.text = "Entries locked · judging day %d · %s" % [comp.judging_day, entered]
+			_:
+				detail.text = "Results are in — see the podium on the Awards screen."
+		detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		detail.add_theme_font_size_override("font_size", 12)
+		detail.add_theme_color_override("font_color", TycoonTheme.PALETTE["text_soft"])
+		text.add_child(detail)
+	if shown == 0:
+		var hint: Label = Label.new()
+		hint.text = "No contest is running. Your frozen recipe versions are the entries when one opens."
+		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		hint.add_theme_color_override("font_color", TycoonTheme.PALETTE["text_soft"])
+		_competitions_box.add_child(hint)

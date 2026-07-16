@@ -21,6 +21,8 @@ extends Resource
 @export_range(0.0, 1.0) var marketing_style: float = 0.4
 @export_range(0.0, 1.0) var operational_skill: float = 0.6
 @export_range(0.0, 1.0) var aggression: float = 0.5
+## Willingness to enter recipe competitions and answer challenges.
+@export_range(0.0, 1.0) var competition_appetite: float = 0.4
 @export var target_demographics: Array[StringName] = []
 ## 0 = always the cheapest supplier, 1 = always the highest quality.
 @export_range(0.0, 1.0) var procurement_style: float = 0.5

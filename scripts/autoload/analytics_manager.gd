@@ -591,7 +591,7 @@ func _build_rankings() -> void:
 	_reg(RankingDef.new(&"recipe", "Recipe Popularity", &"pizza", MetricDef.Unit.COUNT,
 		func(c: CompanyState, _e: bool) -> float: return _rank_recipe(c), 0.0))
 	_reg(RankingDef.new(&"awards", "Awards", &"trophy", MetricDef.Unit.COUNT,
-		func(_c: CompanyState, _e: bool) -> float: return 0.0, 0.0))
+		func(c: CompanyState, _e: bool) -> float: return _rank_awards(c), 0.0))
 	_reg(RankingDef.new(&"scenario", "Scenario Score", &"trophy", MetricDef.Unit.RAW,
 		func(c: CompanyState, e: bool) -> float: return _scenario_score(c, e), 0.0))
 
@@ -749,7 +749,18 @@ func _rank_recipe(c: CompanyState) -> float:
 
 
 func _scenario_score(c: CompanyState, exact: bool) -> float:
-	return _rank_profit(c, exact) * 0.5 + RivalIntel.avg_rating(c) * 2000.0 + float(c.restaurants.size()) * 1500.0
+	var trophy_weight: float = float(EconomyManager.tuning_value("awards.scenario_weight_per_trophy", 1200.0))
+	return _rank_profit(c, exact) * 0.5 + RivalIntel.avg_rating(c) * 2000.0 \
+		+ float(c.restaurants.size()) * 1500.0 + _rank_awards(c) * trophy_weight
+
+
+## Trophies and medals are public record — no exact/estimated gating.
+func _rank_awards(c: CompanyState) -> float:
+	var tree: SceneTree = Engine.get_main_loop() as SceneTree
+	var awards: Node = tree.root.get_node_or_null(^"AwardsManager") if tree != null else null
+	if awards == null:
+		return 0.0
+	return float(awards.trophies_for(c.id))
 
 
 func _known_strength(c: CompanyState) -> String:

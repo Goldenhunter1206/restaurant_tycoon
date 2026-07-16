@@ -31,6 +31,8 @@ var _marketing: Node
 var _restaurants: Node
 var _demand: Node
 var _delivery: Node
+var _analytics: Node
+var _awards: Node
 
 
 func _initialize() -> void:
@@ -43,6 +45,8 @@ func _initialize() -> void:
 	_restaurants = root.get_node("RestaurantManager")
 	_demand = root.get_node("DemandManager")
 	_delivery = root.get_node("DeliveryManager")
+	_analytics = root.get_node("AnalyticsManager")
+	_awards = root.get_node("AwardsManager")
 	var args: PackedStringArray = OS.get_cmdline_user_args()
 	var scenario: String = args[0] if args.size() > 0 else "sim"
 	match scenario:
@@ -77,14 +81,20 @@ func _boot(world_seed: int, rivals: Array) -> void:
 	_setup.selected_rivals.assign(rivals)
 	_inject_city()
 	# Autoload _ready never fires in --script mode; RecipeManager self-inits
-	# there, so give it the same chance before menus are built.
+	# there, so give it the same chance before menus are built. (book is
+	# non-null at declaration — the reliable "catalogs missing" signal is an
+	# empty starter set.)
 	var recipes: Node = root.get_node("RecipeManager")
-	if recipes.book == null:
+	if recipes.starter_recipes.is_empty():
 		recipes._ready()
-	# Same order the City scene uses.
+	# Same order the City scene uses. Analytics enrichment stays off so the
+	# bucket pipeline runs without booting staff/supply (see feature 10 tests).
 	_economy.initialize()
 	_companies.initialize()
 	_marketing.initialize()
+	_analytics._enrich_enabled = false
+	_analytics.initialize()
+	_awards.initialize()
 	_restaurants.initialize()
 	_demand.initialize()
 	_delivery.initialize()
@@ -132,6 +142,12 @@ func _advance_days(days: int) -> void:
 func _scenario_sim(world_seed: int, days: int) -> void:
 	print("== sim: seed %d, %d days ==" % [world_seed, days])
 	_boot(world_seed, [&"pronto", &"nonna"])
+	# Headless has no guests, so every guest-gated award category filters out.
+	# Delivery-enable the boot-time branches so Best Delivery keeps a field and
+	# the quarterly reward path (transact + claim-once) runs under the harness.
+	for company: Resource in _companies.companies:
+		for rest: Resource in company.restaurants:
+			rest.delivery_enabled = true
 	_advance_days(days)
 
 	var pronto: Resource = _companies.company(&"pronto")
@@ -151,8 +167,21 @@ func _scenario_sim(world_seed: int, days: int) -> void:
 		_check(pronto_staff > 0, "Pronto hired staff from the shared market (%d)" % pronto_staff)
 	else:
 		print("long-run stability:")
-		_check(pronto.is_bankrupt and nonna.is_bankrupt,
-			"demand-less rivals eventually fail under the shared rules")
+		# Since feature 11, contest prizes are a legitimate non-demand income
+		# source — a demand-less rival survives only while trophy money lasts.
+		# (Bankruptcy-rule parity itself is proven in the commands scenario.)
+		var rivals_accounted: bool = true
+		for rival: Resource in [pronto, nonna]:
+			if rival.is_bankrupt:
+				continue
+			var prize_income: float = 0.0
+			for summary: Dictionary in rival.history:
+				var ledger: Dictionary = summary.get("ledger", {})
+				prize_income += float(ledger.get(&"award_prize", 0.0)) + float(ledger.get(&"competition_prize", 0.0))
+			if prize_income <= 0.0:
+				rivals_accounted = false
+		_check(rivals_accounted,
+			"demand-less rivals fail under shared rules unless prize money sustains them")
 		var bounded: bool = true
 		for company: Resource in _companies.companies:
 			if company.recent_moves.size() > 30 or company.history.size() > days + 2:
@@ -164,16 +193,33 @@ func _scenario_sim(world_seed: int, days: int) -> void:
 
 	_check_consistency()
 	_check_ledgers()
+	_check_ratings(days)
+	_check_competitions(days)
 
 	# Deterministic fingerprint for cross-process comparison.
 	var journals: Dictionary = {}
 	for rival_id: StringName in [&"pronto", &"nonna"]:
 		var brain: RefCounted = _companies.ai_for(rival_id)
 		journals[rival_id] = brain.journal if brain != null else []
+	var comp_fp: Array = []
+	for comp: Resource in _awards.competitions:
+		var totals: Array = []
+		for row: Dictionary in comp.results:
+			totals.append([String(row["company_id"]), snappedf(float(row["total"]), 0.0001)])
+		comp_fp.append([comp.uid, String(comp.def_id), String(comp.status), String(comp.winner_company_id), totals])
+	var stars: Dictionary = {}
+	for rival_id: StringName in [&"pronto", &"nonna"]:
+		var company: Resource = _companies.company(rival_id)
+		var values: Array = []
+		for rest: Resource in company.restaurants:
+			values.append(snappedf(rest.star_rating, 0.001))
+		stars[rival_id] = values
 	var fingerprint: Dictionary = {
 		"branches": {"pronto": pronto.restaurants.size(), "nonna": nonna.restaurants.size()},
 		"cash": {"pronto": snappedf(pronto.cash, 0.01), "nonna": snappedf(nonna.cash, 0.01)},
 		"journals": journals,
+		"stars": stars,
+		"competitions": comp_fp,
 	}
 	print("FINGERPRINT %s" % JSON.stringify(fingerprint))
 
@@ -214,6 +260,63 @@ func _scenario_commands() -> void:
 
 
 # --- Invariants -------------------------------------------------------------------
+
+
+## Every branch carries a live rating state; public stars respect the ceiling.
+func _check_ratings(days: int) -> void:
+	print("ratings:")
+	var all_have_state: bool = true
+	var stars_capped: bool = true
+	var sampled: bool = false
+	for company: Resource in _companies.companies:
+		for rest: Resource in company.restaurants:
+			var state: Resource = _awards.rating_for(rest.building_id)
+			if state == null:
+				all_have_state = false
+				continue
+			if not state.history.is_empty():
+				sampled = true
+			if rest.star_rating > float(state.star_ceiling) + 0.991:
+				stars_capped = false
+	_check(all_have_state, "every branch has a rating state")
+	if days >= 2:
+		_check(sampled, "daily rating samples accrued")
+	_check(stars_capped, "public stars never exceed the certified ceiling")
+	if days >= 43:
+		var quarterly: int = 0
+		for result: Resource in _awards.award_results:
+			if result.kind == &"award":
+				quarterly += 1
+		_check(quarterly > 0, "quarterly awards granted (%d)" % quarterly)
+		# Medals guard via CompetitionState.reward_applied; claim keys cover
+		# exactly the quarterly awards.
+		_check(_awards.award_claimed.size() == quarterly, "each award claimed exactly once")
+
+
+## Scheduled competitions announce, collect AI entries, and produce judged
+## results with full per-component breakdowns.
+func _check_competitions(days: int) -> void:
+	if days < 20:
+		return
+	print("competitions:")
+	var runs: int = _awards.competitions.size()
+	_check(runs > 0, "scheduled competitions announced (%d)" % runs)
+	var rival_entries: int = 0
+	var judged: int = 0
+	var components_ok: bool = true
+	for comp: Resource in _awards.competitions:
+		rival_entries += comp.entries.size()
+		if comp.results.is_empty():
+			continue
+		judged += 1
+		for row: Dictionary in comp.results:
+			for component: String in ["recipe_score", "compliance", "novelty", "noise", "total", "rank"]:
+				if not row.has(component):
+					components_ok = false
+	_check(rival_entries > 0, "AI rivals entered competitions (%d entries)" % rival_entries)
+	_check(judged > 0, "competitions judged with results (%d)" % judged)
+	if judged > 0:
+		_check(components_ok, "every result row carries all scoring components")
 
 
 ## by_building must mirror the per-company restaurant lists exactly.

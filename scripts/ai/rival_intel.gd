@@ -82,6 +82,23 @@ static func score(company: CompanyState, exact: bool) -> float:
 	return float(company.restaurants.size()) * 1000.0 + company.reputation * 2000.0 + revenue
 
 
+## Competition entries are sealed until the run is judged, then become public
+## record. (A future espionage capability can unseal entries early.)
+static func competition_entry_view(company: CompanyState, comp: CompetitionState) -> Dictionary:
+	var entry: Dictionary = comp.entry_for(company.id)
+	if entry.is_empty():
+		return {}
+	if comp.status == &"judged" or comp.status == &"closed":
+		var recipe: RecipeDef = entry.get("recipe")
+		return {
+			"visibility": &"known",
+			"recipe_name": recipe.display_name if recipe != null else "?",
+			"recipe": recipe,
+			"tier": entry.get("tier", &"med"),
+		}
+	return {"visibility": &"sealed", "recipe_name": "Sealed entry"}
+
+
 ## Stable multiplicative noise: seeded per company per in-game week.
 static func _noise_factor(company: CompanyState, spread: float) -> float:
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()

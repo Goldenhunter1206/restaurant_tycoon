@@ -160,13 +160,20 @@ func post_company_message(brand: Color, kind: String, text: String) -> void:
 
 
 ## Next scheduled economy beats, soonest first: [{title, kind, day, when}].
-## Purely informational for now; structured so a real event system can back it.
+## Festival/rent stay cyclic rules; inspections and competitions come live
+## from AwardsManager (the cosmetic inspection rule remains as a fallback
+## when the awards system is absent, e.g. stripped-down harness boots).
 func upcoming_events(count: int = 3) -> Array[Dictionary]:
 	var rules: Array[Dictionary] = [
 		{"title": "Food Festival", "kind": "festival", "every": 42, "offset": 20},
 		{"title": "Rent Review", "kind": "rent", "every": 42, "offset": 41},
-		{"title": "Health Inspection", "kind": "inspection", "every": 28, "offset": 9},
 	]
+	var awards: Node = null
+	var tree: SceneTree = Engine.get_main_loop() as SceneTree
+	if tree != null:
+		awards = tree.root.get_node_or_null(^"AwardsManager")
+	if awards == null or not awards.get("_initialized"):
+		rules.append({"title": "Health Inspection", "kind": "inspection", "every": 28, "offset": 9})
 	var events: Array[Dictionary] = []
 	var today: int = GameClock.day
 	for rule: Dictionary in rules:
@@ -181,6 +188,9 @@ func upcoming_events(count: int = 3) -> Array[Dictionary]:
 			"day": event_day,
 			"when": GameClock.month_name_for(event_day),
 		})
+	if awards != null and awards.get("_initialized"):
+		events.append_array(awards.upcoming_inspections(count))
+		events.append_array(awards.upcoming_competition_events(count))
 	events.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return int(a["day"]) < int(b["day"]))
 	return events.slice(0, count)

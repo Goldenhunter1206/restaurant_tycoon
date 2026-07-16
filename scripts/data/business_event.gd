@@ -18,6 +18,12 @@ const LOAN: StringName = &"loan"
 const RANK_CHANGE: StringName = &"rank_change"
 const DAY_CLOSE: StringName = &"day_close"
 const COMMAND: StringName = &"command"
+const AWARD_WON: StringName = &"award_won"
+const STAR_GAINED: StringName = &"star_gained"
+const STAR_LOST: StringName = &"star_lost"
+const INSPECTION: StringName = &"inspection"
+const COMPETITION_ANNOUNCED: StringName = &"competition_announced"
+const COMPETITION_RESULT: StringName = &"competition_result"
 
 
 ## Build a journal entry. `fields` may carry restaurant_id, amount, title, tags.
@@ -45,6 +51,10 @@ static func icon_for(type: StringName) -> StringName:
 		LOAN: return &"bank"
 		RANK_CHANGE: return &"trophy"
 		DAY_CLOSE: return &"calendar"
+		AWARD_WON, COMPETITION_ANNOUNCED: return &"trophy"
+		COMPETITION_RESULT: return &"medal"
+		STAR_GAINED, STAR_LOST: return &"star"
+		INSPECTION: return &"magnifier"
 		_: return &"receipt"
 
 
@@ -55,6 +65,11 @@ static func tone_for(type: StringName, amount: float) -> StringName:
 		CAMPAIGN_STARTED, EXPANSION, PURCHASE: return &"info"
 		RANK_CHANGE: return &"good" if amount >= 0.0 else &"bad"
 		DAY_CLOSE: return &"good" if amount >= 0.0 else &"bad"
+		AWARD_WON, STAR_GAINED: return &"good"
+		STAR_LOST: return &"bad"
+		INSPECTION: return &"good" if amount >= 0.0 else &"warning"
+		COMPETITION_ANNOUNCED: return &"info"
+		COMPETITION_RESULT: return &"good" if amount > 0.0 else &"info"
 		_: return &"neutral"
 
 

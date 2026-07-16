@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="AwardDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/award_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"best_value"
+display_name = "Best Value"
+category = &"value"
+blurb = "Honest plates at honest prices, loved by the whole block."
+icon = &"coin"
+eligibility = {
+"min_guests": 100
+}
+scoring = {
+&"value": 0.6,
+&"guests": 0.25,
+&"food": 0.15
+}
+tiebreak_metric = &"guests"
+reward_cash = 4000.0
+reward_reputation = 0.2

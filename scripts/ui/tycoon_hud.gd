@@ -81,6 +81,9 @@ func _ready() -> void:
 	EconomyManager.company_message_posted.connect(_on_company_message)
 	EconomyManager.bankrupt.connect(_on_bankrupt)
 	DeliveryManager.active_count_changed.connect(_on_deliveries_changed)
+	var awards: Node = get_tree().root.get_node_or_null(^"AwardsManager")
+	if awards != null and awards.has_signal("award_granted"):
+		awards.connect("award_granted", _on_award_granted)
 	_refresh_static.call_deferred()
 
 
@@ -427,6 +430,16 @@ func _open_workshop(building_id: int, recipe: RecipeDef, product_type: StringNam
 
 func _selected_building() -> int:
 	return restaurant_panel.selected_building_id
+
+
+## Celebrate a player win with the spring-open Awards screen (never steal an
+## open modal; the feed line already carries the news).
+func _on_award_granted(result: AwardResult) -> void:
+	if result.winner_company_id != CompanyManager.player.id:
+		return
+	if screens.is_open():
+		return
+	screens.open.call_deferred(&"awards", _selected_building())
 
 
 func _on_minute(_day: int, _hour: int, _minute: int) -> void:

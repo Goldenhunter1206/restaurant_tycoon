@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="AwardDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/award_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"popular_recipe"
+display_name = "Most Popular Recipe"
+category = &"recipe"
+blurb = "The dish the whole city queues for."
+icon = &"pizza"
+eligibility = {
+"min_guests": 40
+}
+scoring = {
+&"top_recipe_units": 1.0
+}
+tiebreak_metric = &"guests"
+reward_cash = 3000.0
+reward_reputation = 0.15
+reward_trend_days = 5

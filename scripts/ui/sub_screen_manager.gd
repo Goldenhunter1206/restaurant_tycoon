@@ -13,6 +13,8 @@ var SCREENS: Dictionary = {
 	&"suppliers": load("res://scripts/ui/screens/suppliers_screen.gd"),
 	&"reports": load("res://scripts/ui/screens/reports_screen.gd"),
 	&"rankings": load("res://scripts/ui/screens/rankings_screen.gd"),
+	&"rating": load("res://scripts/ui/screens/rating_screen.gd"),
+	&"awards": load("res://scripts/ui/screens/awards_screen.gd"),
 	&"headquarters": load("res://scenes/ui/HeadquartersScreen.tscn"),
 	&"company.managers": load("res://scripts/ui/screens/managers_screen.gd"),
 }

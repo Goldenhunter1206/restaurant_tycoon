@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="AwardDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/award_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"best_delivery"
+display_name = "Best Delivery"
+category = &"delivery"
+blurb = "Hot boxes, cold drinks, record time — every time."
+icon = &"scooter"
+eligibility = {
+"requires_delivery": true
+}
+scoring = {
+&"deliveries": 0.5,
+&"delivery_reliability": 0.5
+}
+tiebreak_metric = &"deliveries"
+reward_cash = 4000.0
+reward_reputation = 0.2

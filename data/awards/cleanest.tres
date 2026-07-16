@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="AwardDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/award_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"cleanest"
+display_name = "Cleanest Restaurant"
+category = &"clean"
+blurb = "Spotless floors, gleaming counters, a kitchen you could eat off."
+icon = &"check"
+eligibility = {
+"min_guests": 40
+}
+scoring = {
+&"cleanliness": 1.0
+}
+tiebreak_metric = &"consistency"
+reward_cash = 2500.0
+reward_reputation = 0.15

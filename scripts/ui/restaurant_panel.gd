@@ -15,6 +15,7 @@ const ACTIONS: Array[Array] = [
 	[&"truck", "Suppliers", &"suppliers"],
 	[&"chart_bars", "Reports", &"reports"],
 	[&"coin", "Finances", &"finances"],
+	[&"star", "Rating", &"rating"],
 	[&"store", "Visit", &"interior"],
 ]
 
@@ -293,7 +294,10 @@ func refresh() -> void:
 	_district.text = "%s DISTRICT" % _district_name(rest.district).to_upper()
 	_title.text = rest.restaurant_name
 	_clear(_stars_slot)
-	_stars_slot.add_child(TycoonTheme.star_row(EconomyManager.reputation, 14))
+	# Per-branch stars (feature 11) — company reputation stays on company views.
+	var rest_stars: RestaurantState = RestaurantManager.by_building.get(selected_building_id)
+	_stars_slot.add_child(TycoonTheme.star_row(
+		rest_stars.star_rating if rest_stars != null else EconomyManager.reputation, 14))
 	var open_now: bool = rest.is_open(GameClock.game_hours)
 	_status.text = "Status: %s   ·   Hours %02d:00–%02d:00" % [
 		"Open" if open_now else "Closed", int(rest.open_hour), int(rest.close_hour)]

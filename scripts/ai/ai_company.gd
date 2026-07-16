@@ -68,6 +68,7 @@ func on_day(day: int) -> void:
 	_plan_procurement(day)
 	_plan_workforce(day)
 	_consider_headquarters(day)
+	_consider_competition(day)
 
 
 # --- Strategic planner ---------------------------------------------------------
@@ -552,6 +553,20 @@ func _execute(item: Dictionary) -> void:
 			if candidate != null:
 				result = _command(&"staff.hire", {"building_id": int(args["building_id"]), "candidate_uid": candidate.uid, "offer": {"hourly_wage": candidate.hourly_wage, "shift_start": float(args["shift_start"]), "shift_hours": 8.0, "contract_type": &"permanent"}}, "hire:%d" % candidate.uid)
 			_record_outcome(item, result)
+		&"enter_competition":
+			var awards: Node = _awards_manager()
+			var result: CommandResult = CommandResult.fail(&"router_unavailable", "Awards system unavailable.")
+			if awards != null:
+				var entry_recipe: RecipeDef = null
+				for pool_recipe: RecipeDef in RecipeManager.rival_recipe_pool():
+					if pool_recipe.id == StringName(args["recipe_id"]):
+						entry_recipe = pool_recipe
+						break
+				result = awards.enter_competition(
+					company.id, int(args["uid"]), entry_recipe, StringName(args["tier"]))
+				if result.ok:
+					_news("%s entered the %s." % [company.display_name, String(args.get("label", "contest"))])
+			_record_outcome(item, result)
 		&"buy_warehouse":
 			var result: CommandResult = SupplyManager.buy_warehouse_cmd(company.id, int(args["building_id"]))
 			if result.ok and result.payload is WarehouseState:
@@ -656,6 +671,76 @@ func _command(command_id: StringName, arguments: Dictionary, suffix: String) -> 
 
 
 # --- Journal & helpers ---------------------------------------------------------
+
+
+# --- Competitions ---------------------------------------------------------------
+
+
+## Enter open recipe competitions when the profile's appetite, the expected
+## score, and the fee line up. Direct challenges are always answered. Rivals
+## cook from the shared starter pool (no per-company recipe books yet).
+func _consider_competition(_day: int) -> void:
+	var awards: Node = _awards_manager()
+	if awards == null:
+		return
+	for comp: CompetitionState in awards.active_competitions():
+		if comp.status != &"entry" or comp.has_entry(company.id):
+			continue
+		var def: CompetitionDef = awards.competition_defs.get(comp.def_id)
+		if def == null:
+			continue
+		if company.cash - def.entry_fee < _cash_reserve_floor():
+			continue
+		var challenged: bool = comp.challengee_id == company.id or comp.challenger_id == company.id
+		if not challenged and _rng.randf() > profile.competition_appetite:
+			_record("strategic", "skip %s" % def.display_name, [], "competition appetite roll failed")
+			continue
+		var pick: Dictionary = _pick_competition_entry(def)
+		if pick.is_empty():
+			continue
+		var recipe: RecipeDef = pick["recipe"]
+		# Imperfect information: the rival judges its own chances through noise.
+		var expected: float = clampf(float(pick["expected"]) + _rng.randfn(0.0, _forecast_noise() * 0.2), 0.0, 1.0)
+		if not challenged and expected * def.reward_cash <= def.entry_fee:
+			_record("strategic", "skip %s" % def.display_name, [],
+				"expected %.2f not worth the $%.0f fee" % [expected, def.entry_fee])
+			continue
+		_enqueue(&"enter_competition", {
+			"uid": comp.uid, "recipe_id": recipe.id, "tier": pick["tier"], "label": def.display_name,
+		}, "enters %s with %s (expected %.2f)" % [def.display_name, recipe.display_name, expected])
+
+
+## Best starter-pool recipe/tier for the brief: target-segment appeal plus
+## constraint compliance (novelty is unknowable before entries lock).
+func _pick_competition_entry(def: CompetitionDef) -> Dictionary:
+	var probe: CompetitionJudge = CompetitionJudge.new()
+	var best: Dictionary = {}
+	var best_score: float = -1.0
+	for recipe: RecipeDef in RecipeManager.rival_recipe_pool():
+		if def.product_type != &"" and recipe.product_type != def.product_type:
+			continue
+		var comply: float = float(probe.compliance(recipe, def)["score"])
+		for tier_def: QualityTier in RecipeManager.tiers_for(recipe.id):
+			var scored: Dictionary = RecipeManager.score(recipe, tier_def.tier)
+			var appeal: float = float(scored.get("overall", 0.5))
+			if not def.target_demographics.is_empty():
+				var by_segment: Dictionary = scored.get("by_segment", {})
+				appeal = 0.0
+				for segment: StringName in def.target_demographics:
+					appeal += float(by_segment.get(segment, 0.5))
+				appeal /= def.target_demographics.size()
+			var expected: float = 0.6 * appeal + 0.25 * comply + 0.075
+			if expected > best_score:
+				best_score = expected
+				best = {"recipe": recipe, "tier": tier_def.tier, "expected": expected}
+	return best
+
+
+func _awards_manager() -> Node:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return null
+	return tree.root.get_node_or_null(^"AwardsManager")
 
 
 func _record(layer: String, chosen: String, considered: Array, predicted: String) -> void:

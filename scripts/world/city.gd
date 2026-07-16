@@ -18,6 +18,10 @@ func _ready() -> void:
 	# closed, ranks snapshotted) but BEFORE RestaurantManager resets rest.today,
 	# so it must connect day_changed between the two.
 	get_node("/root/AnalyticsManager").call_deferred("initialize")
+	# Awards/ratings sample in the buckets_closed slot AnalyticsManager provides;
+	# initialize right after it (needs CompanyManager.loaded_save, no day_changed
+	# connection of its own).
+	get_node("/root/AwardsManager").call_deferred("initialize")
 	RestaurantManager.initialize.call_deferred()
 	SupplyManager.initialize.call_deferred()
 	DemandManager.initialize.call_deferred()

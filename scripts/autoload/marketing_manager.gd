@@ -461,6 +461,25 @@ func _maybe_spawn_trend(campaign: MarketingCampaign) -> void:
 	trends_changed.emit()
 
 
+## Public trend hook for awards/competitions: a winning recipe becomes a
+## short city-wide craving. Mirrors _maybe_spawn_trend without the exposure
+## threshold — the win itself is the trigger.
+func create_trend(recipe_id: StringName, trend_name: String, days: int, source_company: StringName, bonus: float = TREND_BONUS) -> void:
+	for existing: CityTrend in city_trends:
+		if existing.recipe_id == recipe_id:
+			existing.days_left = maxi(existing.days_left, days)
+			return
+	var trend: CityTrend = CityTrend.new()
+	trend.recipe_id = recipe_id
+	trend.display_name = trend_name if not trend_name.is_empty() else _recipe_name(recipe_id)
+	trend.utility_bonus = bonus
+	trend.days_left = maxi(1, days)
+	trend.source_company = source_company
+	city_trends.append(trend)
+	EconomyManager.post_message("news", "The city is craving %s!" % trend.display_name)
+	trends_changed.emit()
+
+
 func _tick_trends() -> void:
 	var changed: bool = false
 	for i: int in range(city_trends.size() - 1, -1, -1):
@@ -508,6 +527,14 @@ func _claim_is_true(campaign: MarketingCampaign) -> bool:
 			return _company_rank(campaign.company_id, _avg_staff_strength, false, opponent)
 		&"highest_quality":
 			return _company_rank(campaign.company_id, _avg_star_rating, false, opponent)
+		&"award_winner":
+			# True only for companies holding at least one trophy or medal —
+			# false award claims run the credibility/fine gauntlet.
+			var tree: SceneTree = Engine.get_main_loop() as SceneTree
+			var awards: Node = tree.root.get_node_or_null(^"AwardsManager") if tree != null else null
+			if awards == null:
+				return false
+			return int(awards.trophies_for(campaign.company_id)) > 0
 	return true
 
 

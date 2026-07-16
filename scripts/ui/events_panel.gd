@@ -5,6 +5,7 @@ extends PanelContainer
 
 const KIND_ICONS: Dictionary = {
 	"festival": &"megaphone", "rent": &"rent", "inspection": &"magnifier",
+	"competition": &"trophy",
 }
 
 var _rows: VBoxContainer

@@ -282,24 +282,28 @@ func _render_recipe_leaderboard() -> void:
 		_body.add_child(_simple_rank_row(i + 1, key.get_slice("@", 0).capitalize(), "%d sold" % int(agg[key]["units"]), -1.0))
 
 
+## Trophy count per company (awards + medals are public record), the latest
+## city winners, and the door into the Awards & Competitions screen.
 func _render_awards() -> void:
-	var panel: PanelContainer = PanelContainer.new()
-	panel.add_theme_stylebox_override("panel", BellaUi.sunk_box())
-	var vbox: VBoxContainer = VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 4)
-	panel.add_child(vbox)
-	var title: Label = Label.new()
-	title.text = "Awards & competitions"
-	title.add_theme_font_size_override("font_size", 15)
-	title.add_theme_color_override("font_color", INK)
-	vbox.add_child(title)
-	var body: Label = Label.new()
-	body.text = "City awards and recipe cups arrive with the Competitions update. Your company rankings above already feed the scenario score."
-	body.add_theme_font_size_override("font_size", 12)
-	body.add_theme_color_override("font_color", INK_MUTED)
-	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	vbox.add_child(body)
-	_body.add_child(panel)
+	_render_company_ranking(&"awards")
+	var open_btn: Button = Button.new()
+	open_btn.text = "Open Awards & Competitions"
+	TycoonTheme.apply_orange(open_btn)
+	open_btn.pressed.connect(func() -> void: request_screen.emit(&"awards"))
+	_body.add_child(open_btn)
+	var awards: Node = get_tree().root.get_node_or_null(^"AwardsManager")
+	if awards == null or (awards.award_results as Array).is_empty():
+		return
+	add_section("Recent Winners")
+	var results: Array = awards.award_results
+	var shown: int = 0
+	for i: int in range(results.size() - 1, -1, -1):
+		if shown >= 5:
+			break
+		shown += 1
+		var result: AwardResult = results[i]
+		_body.add_child(_simple_rank_row(shown,
+			"%s — %s" % [result.display_name, result.winner_name], result.period_label, -1.0))
 
 
 func _simple_rank_row(rank: int, name_text: String, value_text: String, rating: float) -> PanelContainer:

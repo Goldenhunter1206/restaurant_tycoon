@@ -6,7 +6,7 @@ Implement an optional underworld strategy layer inspired by Pizza Connection 2: 
 
 ## Product and scenario policy
 
-Crime is a scenario capability and can be disabled in free play. Campaigns introduce it only after the legal economy is established. Actions are stylized tycoon-game abstractions; avoid graphic presentation. Every hostile effect has advance information where plausible, a defense, a duration or repair path, evidence risk, and an economic opportunity cost.
+Crime is a scenario capability and can be disabled in free play. Campaigns introduce it only after the legal economy is established. Actions are stylized tycoon-game abstractions. Every hostile effect has advance information where plausible, a defense, a duration or repair path, evidence risk, and an economic opportunity cost.
 
 ## Data model
 
@@ -95,5 +95,5 @@ Add advanced crews, property attacks, kidnapping abstraction, demolition, strong
 - **Arbitrary-feeling losses:** warnings, bounded effects, incident explanations, insurance/recovery, and difficulty controls.
 - **Snowballing:** rising heat, expensive crews, retaliation risk, diminishing target impact, and government counterforce.
 - **Feature complexity:** ship nuisance and security before irreversible high-tier actions.
-- **Tone mismatch:** stylized presentation, optional mode, and no graphic detail.
+- **Tone mismatch:** stylized presentation, optional mode.
 

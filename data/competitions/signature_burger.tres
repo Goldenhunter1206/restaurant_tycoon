@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="CompetitionDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/competition_def.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"signature_burger"
+display_name = "Signature Burger Battle"
+brief = "The burger the youth will talk about — bacon required."
+icon = &"burger"
+product_type = &"burger"
+target_demographics = Array[StringName]([&"teens", &"students"])
+constraints = {
+"require_ingredient": "bacon"
+}
+entry_fee = 300.0
+reward_cash = 6000.0
+reward_reputation = 0.3
+reward_trend_days = 5
+judging = {
+"recipe": 0.6,
+"compliance": 0.25,
+"novelty": 0.15,
+"noise_range": 0.05
+}
+entry_window_days = 3
+judging_day_offset = 2
+cadence_days = 0

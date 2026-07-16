@@ -122,12 +122,20 @@ func _progress_for(goal_type: String) -> float:
 			return EconomyManager.reputation
 		"deliveries":
 			return float(DeliveryManager.total_delivered)
+		"stars":
+			var best: float = 0.0
+			for rest: RestaurantState in RestaurantManager.owned:
+				best = maxf(best, rest.star_rating)
+			return best
+		"awards":
+			var awards: Node = get_tree().root.get_node_or_null(^"AwardsManager")
+			return float(awards.trophies_for(CompanyManager.player.id)) if awards != null else 0.0
 	return 0.0
 
 
 func _fmt(value: float, goal: Dictionary) -> String:
 	if String(goal.get("type", "")) == "cash":
 		return "$%.0f" % value
-	if String(goal.get("type", "")) == "reputation":
+	if String(goal.get("type", "")) == "reputation" or String(goal.get("type", "")) == "stars":
 		return "%.1f" % value
 	return "%d" % int(value)

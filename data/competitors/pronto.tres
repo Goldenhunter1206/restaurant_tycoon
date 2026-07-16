@@ -19,3 +19,4 @@ procurement_style = 0.3
 safety_stock_bias = 0.9
 warehouse_appetite = 0.5
 reaction_delay_min = 180
+competition_appetite = 0.7

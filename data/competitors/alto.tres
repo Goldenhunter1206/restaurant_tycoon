@@ -23,3 +23,4 @@ warehouse_appetite = 0.6
 forecast_accuracy = 0.8
 reaction_delay_min = 300
 planning_noise = 0.15
+competition_appetite = 0.5

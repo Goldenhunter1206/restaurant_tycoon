@@ -15,3 +15,4 @@ target_demographics = Array[StringName]([&"families"])
 forecast_accuracy = 0.55
 reaction_delay_min = 480
 planning_noise = 0.3
+competition_appetite = 0.45
